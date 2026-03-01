@@ -5,6 +5,8 @@ import { Map } from './components/Map';
 import { Upload, FileJson, Loader2, BrainCircuit, Play, Sparkles, Send } from 'lucide-react';
 import { Node, Edge } from '@xyflow/react';
 import { EXAMPLE_MAP } from './exampleData';
+import { MobileMapView } from './components/MobileMapView';
+import { useMediaQuery } from './hooks/useMediaQuery';
 
 function convertTreeToGraph(tree: any): { nodes: Node[], edges: Edge[] } {
   const nodes: Node[] = [];
@@ -45,6 +47,7 @@ function convertTreeToGraph(tree: any): { nodes: Node[], edges: Edge[] } {
 }
 
 export default function App() {
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -172,14 +175,21 @@ export default function App() {
   };
 
   if (mapData || savedNodes) {
+    const nodesToRender = savedNodes || mapData?.nodes || [];
+    const edgesToRender = savedEdges || mapData?.edges || [];
+
     return (
       <div className="w-screen h-screen relative">
-        <Map 
-          data={mapData} 
-          initialNodes={savedNodes || undefined}
-          initialEdges={savedEdges || undefined}
-          onSave={handleSaveMap} 
-        />
+        {isMobile ? (
+          <MobileMapView nodes={nodesToRender} edges={edgesToRender} />
+        ) : (
+          <Map 
+            data={mapData} 
+            initialNodes={savedNodes || undefined}
+            initialEdges={savedEdges || undefined}
+            onSave={handleSaveMap} 
+          />
+        )}
         <button 
           onClick={() => {
             setMapData(null);
