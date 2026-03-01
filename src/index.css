@@ -1,9 +1,59 @@
 @import "tailwindcss";
 
+@property --theme-accent {
+    syntax: '<color>';
+    initial-value: #06b6d4;
+    inherits: true;
+}
+
+@property --theme-glow {
+    syntax: '<color>';
+    initial-value: rgba(6, 182, 212, 0.3);
+    inherits: true;
+}
+
+@theme {
+    --animate-theme-shift: theme-shift 10s ease-in-out infinite;
+
+    @keyframes theme-shift {
+
+        0%,
+        100% {
+            --theme-accent: #06b6d4;
+            --theme-glow: rgba(6, 182, 212, 0.3);
+        }
+
+        50% {
+            --theme-accent: #f97316;
+            --theme-glow: rgba(249, 115, 22, 0.3);
+        }
+    }
+}
+
 .react-flow__node {
-  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
 }
 
 .react-flow__edge-path {
-  transition: d 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
+    transition: d 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+.animate-theme-shift {
+    animation: var(--animate-theme-shift);
+}
+
+.theme-accent-bg {
+    background-color: var(--theme-accent);
+}
+
+.theme-accent-text {
+    color: var(--theme-accent);
+}
+
+.theme-accent-border {
+    border-color: var(--theme-accent);
+}
+
+.theme-accent-glow {
+    box-shadow: 0 0 30px var(--theme-glow);
 }

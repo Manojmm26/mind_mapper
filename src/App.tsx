@@ -196,120 +196,122 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 font-sans">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-100 p-8 space-y-6">
-        <div className="text-center space-y-2">
-          <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <BrainCircuit size={32} />
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 font-sans relative overflow-hidden animate-theme-shift">
+      {/* Subtle Grid Background for Light Theme */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_70%,transparent_100%)] opacity-20" />
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-cyan-200/40 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[50%] bg-orange-200/40 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="relative z-10 max-w-lg w-full bg-white/70 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white p-8 sm:p-10 space-y-8">
+        
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <div className="relative w-24 h-24 mx-auto mb-6">
+            <div className="absolute inset-0 theme-accent-bg rounded-full blur-2xl opacity-20 animate-pulse" />
+            <div className="relative w-full h-full theme-accent-bg theme-accent-glow rounded-3xl flex items-center justify-center shadow-md transform transition-all hover:scale-105 duration-500 border border-white/20 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent" />
+              <BrainCircuit size={48} className="text-white relative z-10" />
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">AI Mind Mapper</h1>
-          <p className="text-sm text-slate-500">
-            Enter a topic, upload a document, or load a saved map to generate an interactive knowledge graph.
+          <h1 className="text-4xl font-black tracking-tight text-slate-900 mb-2">
+            AI Mind <span className="theme-accent-text transition-colors duration-1000">Mapper</span>
+          </h1>
+          <p className="text-sm text-slate-600 max-w-xs mx-auto leading-relaxed">
+            Generate high-fidelity mind maps from your ideas and documents in seconds.
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm border border-red-100">
+          <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm border border-red-100 backdrop-blur-md">
             {error}
           </div>
         )}
 
         {/* Topic Input Section */}
-        <form onSubmit={handleTopicSubmit} className="space-y-3">
-          <div className="relative">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-400">
-              <Sparkles size={18} />
+        <form onSubmit={handleTopicSubmit} className="space-y-4 relative z-20">
+          <div className="relative group">
+            <div className="absolute -inset-0.5 theme-accent-bg rounded-2xl blur opacity-10 group-hover:opacity-20 transition-all duration-1000" />
+            <div className="relative flex items-center bg-white rounded-2xl overflow-hidden border border-slate-200 focus-within:theme-accent-border transition-all duration-1000 shadow-sm">
+              <div className="pl-5 pr-3 text-cyan-600">
+                <Sparkles size={20} className={isLoading ? "animate-pulse" : ""} />
+              </div>
+              <input
+                type="text"
+                value={topicInput}
+                onChange={(e) => setTopicInput(e.target.value)}
+                placeholder="Visualize any concept..."
+                disabled={isLoading}
+                className="w-full py-5 text-sm font-medium text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none disabled:opacity-50"
+              />
+              <button
+                type="submit"
+                disabled={isLoading || !topicInput.trim()}
+                className="mr-3 p-3 theme-accent-bg text-white rounded-xl hover:opacity-90 disabled:opacity-30 transition-all shadow-md"
+              >
+                {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+              </button>
             </div>
-            <input
-              type="text"
-              value={topicInput}
-              onChange={(e) => setTopicInput(e.target.value)}
-              placeholder="e.g. Machine Learning, React Hooks, Kubernetes..."
-              disabled={isLoading}
-              className="w-full pl-10 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            />
-            <button
-              type="submit"
-              disabled={isLoading || !topicInput.trim()}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            >
-              <Send size={16} />
-            </button>
           </div>
           {isLoading && loadingMessage && (
-            <div className="flex items-center gap-2 text-sm text-indigo-600 justify-center">
-              <Loader2 className="animate-spin" size={16} />
+            <div className="flex items-center gap-2 text-sm theme-accent-text justify-center animate-pulse font-semibold">
               <span>{loadingMessage}</span>
             </div>
           )}
         </form>
 
-        <div className="space-y-4">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-slate-400">Or upload</span>
-            </div>
+        <div className="space-y-6">
+          <div className="relative flex items-center">
+            <div className="flex-grow border-t border-slate-200"></div>
+            <span className="flex-shrink-0 mx-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Or Process Data</span>
+            <div className="flex-grow border-t border-slate-200"></div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isLoading}
-              className="flex flex-col items-center justify-center gap-1.5 px-3 py-3 bg-white text-slate-600 border border-slate-200 rounded-xl text-sm font-medium hover:bg-slate-50 hover:border-indigo-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group flex flex-col items-center justify-center gap-3 px-4 py-6 bg-slate-50 text-slate-700 border border-slate-200 rounded-2xl text-sm font-semibold hover:bg-white hover:border-cyan-500/30 hover:text-cyan-600 transition-all disabled:opacity-50 shadow-sm hover:shadow-md"
             >
-              <Upload size={20} className="text-slate-400" />
-              <span>Document</span>
-              <span className="text-xs text-slate-400 font-normal">PDF, TXT, MD</span>
+              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center group-hover:bg-cyan-50 transition-colors border border-slate-100 shadow-sm">
+                <Upload size={22} className="text-slate-400 group-hover:text-cyan-600" />
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <span>Document</span>
+                <span className="text-[9px] text-slate-500 uppercase tracking-tighter">PDF, TXT, MD</span>
+              </div>
             </button>
             <button
               onClick={() => jsonInputRef.current?.click()}
               disabled={isLoading}
-              className="flex flex-col items-center justify-center gap-1.5 px-3 py-3 bg-white text-slate-600 border border-slate-200 rounded-xl text-sm font-medium hover:bg-slate-50 hover:border-indigo-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group flex flex-col items-center justify-center gap-3 px-4 py-6 bg-slate-50 text-slate-700 border border-slate-200 rounded-2xl text-sm font-semibold hover:bg-white hover:border-orange-500/30 hover:text-orange-600 transition-all disabled:opacity-50 shadow-sm hover:shadow-md"
             >
-              <FileJson size={20} className="text-slate-400" />
-              <span>Saved Map</span>
-              <span className="text-xs text-slate-400 font-normal">JSON</span>
+              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center group-hover:bg-orange-50 transition-colors border border-slate-100 shadow-sm">
+                <FileJson size={22} className="text-slate-400 group-hover:text-orange-600" />
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <span>Saved Map</span>
+                <span className="text-[9px] text-slate-500 uppercase tracking-tighter">JSON</span>
+              </div>
             </button>
           </div>
 
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileUpload}
-            accept=".pdf,.txt,.md"
-            className="hidden"
-          />
-          <input
-            type="file"
-            ref={jsonInputRef}
-            onChange={handleJsonUpload}
-            accept=".json"
-            className="hidden"
-          />
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-slate-400">Example</span>
-            </div>
-          </div>
+          <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".pdf,.txt,.md" className="hidden" />
+          <input type="file" ref={jsonInputRef} onChange={handleJsonUpload} accept=".json" className="hidden" />
 
           <button
             onClick={handleLoadExample}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-xl font-medium hover:bg-indigo-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed group text-sm"
+            className="w-full relative group p-[2px] rounded-2xl bg-slate-200/50 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-orange-400 transition-all duration-500"
           >
-            <Play size={18} className="text-indigo-500 group-hover:scale-110 transition-transform" />
-            Visualize: {EXAMPLE_MAP.name}
+            <div className="flex items-center justify-center gap-3 w-full py-4 bg-white rounded-[14px] group-hover:bg-white transition-colors">
+              <Play size={16} className="text-cyan-600 group-hover:scale-125 transition-transform" />
+              <span className="text-sm font-bold text-slate-700">Example: <span className="text-orange-600 font-extrabold">{EXAMPLE_MAP.name}</span></span>
+            </div>
           </button>
         </div>
       </div>
     </div>
+
   );
 }
 
