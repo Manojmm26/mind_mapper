@@ -188,40 +188,83 @@ const getVisibleNodes = (nodes: Node[], edges: Edge[]) => {
 
 const updateLayout = (currentNodes: Node[], currentEdges: Edge[]) => {
   const childrenCount: Record<string, number> = {};
+  const parentMap: Record<string, string> = {};
+  
   currentEdges.forEach(e => {
     childrenCount[e.source] = (childrenCount[e.source] || 0) + 1;
+    if (!parentMap[e.target]) {
+      parentMap[e.target] = e.source;
+    }
   });
 
   const visibleNodeIds = getVisibleNodes(currentNodes, currentEdges);
 
-  const nextNodes = currentNodes.map(n => ({
-    ...n,
-    hidden: !visibleNodeIds.has(n.id),
-    data: {
-      ...n.data,
-      hasChildren: (childrenCount[n.id] || 0) > 0
-    }
-  }));
+  const visibleNodes = currentNodes.filter(n => visibleNodeIds.has(n.id));
+  const visibleEdges = currentEdges.filter(e => 
+    visibleNodeIds.has(e.source) && 
+    visibleNodeIds.has(e.target) && 
+    !currentNodes.find(n => n.id === e.source)?.data?.isCollapsed
+  );
 
-  const nextEdges = currentEdges.map(e => ({
-    ...e,
-    hidden: !visibleNodeIds.has(e.source) || !visibleNodeIds.has(e.target) || !!currentNodes.find(n => n.id === e.source)?.data?.isCollapsed
-  }));
+  const { nodes: layoutedVisibleNodes } = getLayoutedElements(visibleNodes, visibleEdges, 'LR');
 
-  const visibleNodes = nextNodes.filter(n => !n.hidden);
-  const visibleEdges = nextEdges.filter(e => !e.hidden);
+  const layoutPositions: Record<string, {x: number, y: number}> = {};
+  const targetPositions: Record<string, any> = {};
+  const sourcePositions: Record<string, any> = {};
 
-  const { nodes: layoutedVisibleNodes } = getLayoutedElements(visibleNodes, visibleEdges);
-
-  const finalNodes = nextNodes.map(n => {
-    const layoutedNode = layoutedVisibleNodes.find(ln => ln.id === n.id);
-    if (layoutedNode) {
-      return { ...n, position: layoutedNode.position, targetPosition: layoutedNode.targetPosition, sourcePosition: layoutedNode.sourcePosition };
-    }
-    return n;
+  layoutedVisibleNodes.forEach(n => {
+    layoutPositions[n.id] = n.position;
+    if (n.targetPosition) targetPositions[n.id] = n.targetPosition;
+    if (n.sourcePosition) sourcePositions[n.id] = n.sourcePosition;
   });
 
-  return { nodes: finalNodes, edges: nextEdges };
+  const finalNodes = currentNodes.map(n => {
+    const isVisible = visibleNodeIds.has(n.id);
+    let targetPos = n.position;
+    
+    if (isVisible) {
+      targetPos = layoutPositions[n.id] || n.position;
+    } else {
+      let ancestor = parentMap[n.id];
+      while (ancestor && !visibleNodeIds.has(ancestor)) {
+        ancestor = parentMap[ancestor];
+      }
+      if (ancestor && layoutPositions[ancestor]) {
+        targetPos = layoutPositions[ancestor];
+      }
+    }
+
+    return {
+      ...n,
+      hidden: false, // Never hide nodes so they can animate
+      position: targetPos,
+      targetPosition: targetPositions[n.id] || n.targetPosition,
+      sourcePosition: sourcePositions[n.id] || n.sourcePosition,
+      style: {
+        ...n.style,
+        opacity: isVisible ? 1 : 0,
+        pointerEvents: isVisible ? 'all' : 'none',
+      },
+      data: {
+        ...n.data,
+        hasChildren: (childrenCount[n.id] || 0) > 0
+      }
+    };
+  });
+
+  const finalEdges = currentEdges.map(e => {
+    const isVisible = visibleNodeIds.has(e.source) && visibleNodeIds.has(e.target) && !currentNodes.find(n => n.id === e.source)?.data?.isCollapsed;
+    return {
+      ...e,
+      hidden: false, // Never hide edges so they can animate
+      style: {
+        ...e.style,
+        opacity: isVisible ? 1 : 0,
+      }
+    };
+  });
+
+  return { nodes: finalNodes, edges: finalEdges };
 };
 
 export function Map({ data, onSave, initialNodes, initialEdges }: MapProps) {

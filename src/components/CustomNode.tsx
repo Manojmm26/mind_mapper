@@ -92,13 +92,13 @@ export const CustomNode = memo(({ id, data, isConnectable }: NodeProps) => {
 
   return (
     <div className={cn(
-      "w-[250px] min-h-[100px] rounded-xl shadow-sm border",
+      "w-[280px] min-h-[100px] rounded-xl shadow-sm border",
       theme.bg, theme.border,
       "flex flex-col overflow-visible transition-all hover:shadow-md relative"
     )}>
       <Handle
         type="target"
-        position={Position.Top}
+        position={Position.Left}
         isConnectable={isConnectable}
         className={cn("w-3 h-3", theme.handle)}
       />
@@ -126,7 +126,7 @@ export const CustomNode = memo(({ id, data, isConnectable }: NodeProps) => {
             onToggle?.(id);
           }}
           className={cn(
-            "absolute -bottom-3 left-1/2 -translate-x-1/2 border rounded-full p-1 shadow-sm z-10 cursor-pointer transition-colors",
+            "absolute -right-3 top-1/2 -translate-y-1/2 border rounded-full p-1 shadow-sm z-10 cursor-pointer transition-colors",
             theme.bg, theme.border, theme.text,
             "hover:brightness-95"
           )}
@@ -137,7 +137,7 @@ export const CustomNode = memo(({ id, data, isConnectable }: NodeProps) => {
 
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={Position.Right}
         isConnectable={isConnectable}
         className={cn("w-3 h-3", theme.handle)}
       />
