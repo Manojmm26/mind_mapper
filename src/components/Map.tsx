@@ -114,6 +114,55 @@ const assignThemes = (nodes: Node[], edges: Edge[]) => {
   }));
 };
 
+const applyDefaultCollapse = (nodes: Node[], edges: Edge[]) => {
+  const inDegree: Record<string, number> = {};
+  const childrenMap: Record<string, string[]> = {};
+  
+  nodes.forEach(n => {
+    inDegree[n.id] = 0;
+    childrenMap[n.id] = [];
+  });
+  
+  edges.forEach(e => {
+    if (inDegree[e.target] !== undefined) {
+      inDegree[e.target]++;
+    }
+    if (childrenMap[e.source]) {
+      childrenMap[e.source].push(e.target);
+    }
+  });
+
+  const roots = nodes.filter(n => inDegree[n.id] === 0);
+  const depths: Record<string, number> = {};
+
+  const traverse = (nodeId: string, depth: number) => {
+    if (depths[nodeId] !== undefined) return;
+    depths[nodeId] = depth;
+    (childrenMap[nodeId] || []).forEach(childId => {
+      traverse(childId, depth + 1);
+    });
+  };
+
+  roots.forEach(root => traverse(root.id, 0));
+
+  return nodes.map(n => {
+    const depth = depths[n.id] || 0;
+    const hasChildren = childrenMap[n.id].length > 0;
+    
+    const isCollapsed = n.data.isCollapsed !== undefined 
+      ? n.data.isCollapsed 
+      : (depth >= 1 && hasChildren);
+
+    return {
+      ...n,
+      data: {
+        ...n.data,
+        isCollapsed
+      }
+    };
+  });
+};
+
 const getVisibleNodes = (nodes: Node[], edges: Edge[]) => {
   const visible = new Set<string>();
   const roots = nodes.filter(n => !edges.some(e => e.target === n.id)).map(n => n.id);
@@ -185,7 +234,7 @@ export function Map({ data, onSave, initialNodes, initialEdges }: MapProps) {
         id: node.id,
         type: 'custom',
         position: { x: 0, y: 0 },
-        data: { label: node.label, description: node.description, isCollapsed: false },
+        data: { label: node.label, description: node.description },
       }));
 
       const rawEdges: Edge[] = data.edges.map((edge) => ({
@@ -197,7 +246,8 @@ export function Map({ data, onSave, initialNodes, initialEdges }: MapProps) {
         animated: true,
       }));
 
-      const themedNodes = assignThemes(rawNodes, rawEdges);
+      const nodesWithCollapse = applyDefaultCollapse(rawNodes, rawEdges);
+      const themedNodes = assignThemes(nodesWithCollapse, rawEdges);
       const themedEdges = rawEdges.map(edge => {
         const targetNode = themedNodes.find(n => n.id === edge.target);
         const themeFamily = (targetNode?.data?.themeFamily as string) || 'slate';
@@ -213,7 +263,8 @@ export function Map({ data, onSave, initialNodes, initialEdges }: MapProps) {
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
     } else if (initialNodes && initialEdges) {
-      const themedNodes = assignThemes(initialNodes, initialEdges);
+      const nodesWithCollapse = applyDefaultCollapse(initialNodes, initialEdges);
+      const themedNodes = assignThemes(nodesWithCollapse, initialEdges);
       const themedEdges = initialEdges.map(edge => {
         const targetNode = themedNodes.find(n => n.id === edge.target);
         const themeFamily = (targetNode?.data?.themeFamily as string) || 'slate';

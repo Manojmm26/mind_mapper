@@ -5,6 +5,44 @@ import { Map } from './components/Map';
 import { Upload, FileJson, Loader2, BrainCircuit } from 'lucide-react';
 import { Node, Edge } from '@xyflow/react';
 
+function convertTreeToGraph(tree: any): { nodes: Node[], edges: Edge[] } {
+  const nodes: Node[] = [];
+  const edges: Edge[] = [];
+  let idCounter = 0;
+
+  function traverse(node: any, parentId: string | null) {
+    const currentId = `node_${idCounter++}`;
+    nodes.push({
+      id: currentId,
+      type: 'custom',
+      position: { x: 0, y: 0 },
+      data: {
+        label: node.name || node.label || 'Untitled',
+        description: node.description || '',
+      }
+    });
+
+    if (parentId) {
+      edges.push({
+        id: `${parentId}-${currentId}`,
+        source: parentId,
+        target: currentId,
+        type: 'smoothstep',
+        animated: true,
+      });
+    }
+
+    if (node.children && Array.isArray(node.children)) {
+      node.children.forEach((child: any) => {
+        traverse(child, currentId);
+      });
+    }
+  }
+
+  traverse(tree, null);
+  return { nodes, edges };
+}
+
 export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +65,29 @@ export default function App() {
 
     try {
       const text = await extractTextFromFile(file);
+      
+      // Quick check: if the user uploaded a JSON file disguised as a TXT, 
+      // try to parse it directly instead of sending it to the LLM to avoid losing details.
+      try {
+        const json = JSON.parse(text);
+        if (json.nodes && json.edges) {
+          setSavedNodes(json.nodes);
+          setSavedEdges(json.edges);
+          setMapData({ nodes: [], edges: [] });
+          setIsLoading(false);
+          return;
+        } else if (json.name || json.children) {
+          const { nodes, edges } = convertTreeToGraph(json);
+          setSavedNodes(nodes);
+          setSavedEdges(edges);
+          setMapData({ nodes: [], edges: [] });
+          setIsLoading(false);
+          return;
+        }
+      } catch (e) {
+        // Not a JSON file, proceed to LLM
+      }
+
       const data = await generateMindMap(text);
       setMapData(data);
     } catch (err: any) {
@@ -48,8 +109,13 @@ export default function App() {
           setSavedNodes(json.nodes);
           setSavedEdges(json.edges);
           setMapData({ nodes: [], edges: [] }); // Trigger map render
+        } else if (json.name || json.children) {
+          const { nodes, edges } = convertTreeToGraph(json);
+          setSavedNodes(nodes);
+          setSavedEdges(edges);
+          setMapData({ nodes: [], edges: [] }); // Trigger map render
         } else {
-          setError("Invalid JSON format. Expected nodes and edges.");
+          setError("Invalid JSON format. Expected nodes/edges or a hierarchical tree.");
         }
       } catch (err) {
         setError("Failed to parse JSON file.");
