@@ -210,7 +210,7 @@ ${text.substring(0, 50000)}
 export async function generateMindMapFromTopic(topic: string): Promise<MindMapData> {
   const ai = getAI();
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-3-flash-preview",
     contents: `You are an expert educator and knowledge architect. A user wants to learn about: "${topic}"
 
 Your task is to create a comprehensive, well-organized mind map that serves as a learning roadmap.
