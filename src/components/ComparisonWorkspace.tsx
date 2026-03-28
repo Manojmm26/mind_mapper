@@ -51,8 +51,8 @@ function ComparisonPanel({ data }: { data: ComparisonWorkspaceData }) {
               Key criteria
             </div>
             <div className="grid gap-3">
-              {data.criteria.map((criterion) => (
-                <div key={`${criterion.label}-${criterion.value}`} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              {data.criteria.map((criterion, index) => (
+                <div key={`${index}-${criterion.label}`} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                   <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{criterion.label}</p>
                   <p className="mt-1 text-sm leading-6 text-slate-700">{criterion.value}</p>
                 </div>
@@ -100,7 +100,7 @@ function ComparisonPanel({ data }: { data: ComparisonWorkspaceData }) {
                       <p className="mt-1 text-sm leading-6 text-emerald-900">{item.bestFor}</p>
                     </div>
                     <div className="rounded-2xl bg-rose-50 p-3">
-                      <p className="text-[11px] font-black uppercase tracking-[0.16em] text-rose-700">Watchouts</p>
+                      <p className="text-[11px] font-black uppercase tracking-[0.16em] text-rose-700">Watch-outs</p>
                       <p className="mt-1 text-sm leading-6 text-rose-900">{item.considerations}</p>
                     </div>
                   </div>
