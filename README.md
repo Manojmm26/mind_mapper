@@ -12,6 +12,7 @@
 
 - **🚀 AI-Powered Extraction**: leverages Gemini 3.5 Flash to analyze PDF, TXT, or Markdown files and generate comprehensive mind maps.
 - **🎨 Interactive Visualization**: Built with `@xyflow/react` (React Flow), providing a smooth, draggable, and zoomable interface.
+- **⚖️ Comparison Workspace**: Compare products, tools, or topics with matched options, evaluation criteria, and a linked decision map.
 - **📁 Multi-Format Support**:
   - **Documents**: Upload PDF, TXT, or Markdown files for analysis.
   - **Saved Maps**: Load previously exported JSON mind maps.
@@ -71,16 +72,20 @@
 ## 📖 Usage Guide
 
 1. **Analyze a Document**:
-   - Click "Upload Document (PDF/TXT)".
-   - Select a file from your device.
-   - Wait for the AI to process and generate the map.
-2. **Interact with the Map**:
-   - **Drag**: click and drag nodes to reorganize them.
-   - **Zoom**: Use your mouse wheel or gestures to zoom in/out.
-   - **Explore Details**: Nodes contain titles and AI-generated descriptions.
-3. **Save/Load**:
-   - Click the "Save" icon on the map to download a JSON version.
-   - Use "Load Saved Map (JSON)" on the home screen to restore a previous session.
+    - Click "Upload Document (PDF/TXT)".
+    - Select a file from your device.
+    - Wait for the AI to process and generate the map.
+2. **Compare Options**:
+    - Switch from **Learn** to **Compare**.
+    - Enter a product, tool, or topic query such as a graphics card, framework, or service.
+    - Review the generated comparison workspace with recommended options, criteria, action links, and the supporting mind map.
+3. **Interact with the Map**:
+    - **Drag**: click and drag nodes to reorganize them.
+    - **Zoom**: Use your mouse wheel or gestures to zoom in/out.
+    - **Explore Details**: Nodes contain titles and AI-generated descriptions.
+4. **Save/Load**:
+    - Click the "Save" icon on the map to download a JSON version.
+    - Use "Load Saved Map (JSON)" on the home screen to restore a previous session.
 
 ---
 
