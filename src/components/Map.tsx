@@ -349,7 +349,7 @@ export function Map({ data, onSave, initialNodes, initialEdges }: MapProps) {
 
   return (
     <MapContext.Provider value={{ onToggle: handleToggle }}>
-      <div style={{ width: '100vw', height: '100vh' }}>
+      <div className="h-full w-full">
         <ReactFlow
           nodes={nodes}
           edges={edges}

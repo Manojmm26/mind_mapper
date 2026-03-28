@@ -1,12 +1,19 @@
 import React, { useState, useRef } from 'react';
 import { extractTextFromFile } from './services/pdfService';
-import { generateMindMap, generateMindMapFromTopic, MindMapData } from './services/llmService';
+import {
+  ComparisonWorkspaceData,
+  generateComparisonWorkspaceFromTopic,
+  generateMindMap,
+  generateMindMapFromTopic,
+  MindMapData
+} from './services/llmService';
 import { Map } from './components/Map';
-import { Upload, FileJson, Loader2, BrainCircuit, Play, Sparkles, Send } from 'lucide-react';
+import { Upload, FileJson, Loader2, BrainCircuit, Play, Sparkles, Send, Scale, GraduationCap } from 'lucide-react';
 import { Node, Edge } from '@xyflow/react';
 import { EXAMPLE_MAP } from './exampleData';
 import { MobileMapView } from './components/MobileMapView';
 import { useMediaQuery } from './hooks/useMediaQuery';
+import { ComparisonWorkspace } from './components/ComparisonWorkspace';
 
 function convertTreeToGraph(tree: any): { nodes: Node[], edges: Edge[] } {
   const nodes: Node[] = [];
@@ -48,10 +55,12 @@ function convertTreeToGraph(tree: any): { nodes: Node[], edges: Edge[] } {
 
 export default function App() {
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const [workflowMode, setWorkflowMode] = useState<'learn' | 'compare'>('learn');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [mapData, setMapData] = useState<MindMapData | null>(null);
+  const [comparisonData, setComparisonData] = useState<ComparisonWorkspaceData | null>(null);
   const [savedNodes, setSavedNodes] = useState<Node[] | null>(null);
   const [savedEdges, setSavedEdges] = useState<Edge[] | null>(null);
   const [topicInput, setTopicInput] = useState('');
@@ -67,6 +76,7 @@ export default function App() {
     setLoadingMessage('Analyzing document...');
     setError(null);
     setMapData(null);
+    setComparisonData(null);
     setSavedNodes(null);
     setSavedEdges(null);
 
@@ -115,14 +125,22 @@ export default function App() {
     setLoadingMessage(`Researching "${topic}"...`);
     setError(null);
     setMapData(null);
+    setComparisonData(null);
     setSavedNodes(null);
     setSavedEdges(null);
 
     try {
-      const data = await generateMindMapFromTopic(topic);
-      setMapData(data);
+      if (workflowMode === 'compare') {
+        setLoadingMessage(`Comparing options for "${topic}"...`);
+        const data = await generateComparisonWorkspaceFromTopic(topic);
+        setComparisonData(data);
+        setMapData(data.map);
+      } else {
+        const data = await generateMindMapFromTopic(topic);
+        setMapData(data);
+      }
     } catch (err: any) {
-      setError(err.message || "An error occurred while generating the mind map.");
+      setError(err.message || `An error occurred while generating the ${workflowMode === 'compare' ? 'comparison workspace' : 'mind map'}.`);
     } finally {
       setIsLoading(false);
       setLoadingMessage('');
@@ -140,11 +158,13 @@ export default function App() {
         if (json.nodes && json.edges) {
           setSavedNodes(json.nodes);
           setSavedEdges(json.edges);
+          setComparisonData(null);
           setMapData({ nodes: [], edges: [] }); // Trigger map render
         } else if (json.name || json.children) {
           const { nodes, edges } = convertTreeToGraph(json);
           setSavedNodes(nodes);
           setSavedEdges(edges);
+          setComparisonData(null);
           setMapData({ nodes: [], edges: [] }); // Trigger map render
         } else {
           setError("Invalid JSON format. Expected nodes/edges or a hierarchical tree.");
@@ -171,6 +191,7 @@ export default function App() {
   const handleLoadExample = () => {
     setSavedNodes((EXAMPLE_MAP.data as any).nodes);
     setSavedEdges((EXAMPLE_MAP.data as any).edges);
+    setComparisonData(null);
     setMapData({ nodes: [], edges: [] }); 
   };
 
@@ -180,7 +201,9 @@ export default function App() {
 
     return (
       <div className="w-screen h-screen relative">
-        {isMobile ? (
+        {comparisonData ? (
+          <ComparisonWorkspace data={comparisonData} isMobile={isMobile} onSave={handleSaveMap} />
+        ) : isMobile ? (
           <MobileMapView nodes={nodesToRender} edges={edgesToRender} />
         ) : (
           <Map 
@@ -193,6 +216,7 @@ export default function App() {
         <button 
           onClick={() => {
             setMapData(null);
+            setComparisonData(null);
             setSavedNodes(null);
             setSavedEdges(null);
             setTopicInput('');
@@ -227,7 +251,9 @@ export default function App() {
             AI Mind <span className="theme-accent-text transition-colors duration-1000">Mapper</span>
           </h1>
           <p className="text-sm text-slate-600 max-w-xs mx-auto leading-relaxed">
-            Generate high-fidelity mind maps from your ideas and documents in seconds.
+            {workflowMode === 'compare'
+              ? 'Compare options with a decision-focused workspace and a linked mind map.'
+              : 'Generate high-fidelity mind maps from your ideas and documents in seconds.'}
           </p>
         </div>
 
@@ -236,6 +262,35 @@ export default function App() {
             {error}
           </div>
         )}
+
+        <div className="grid grid-cols-2 gap-3 rounded-2xl bg-slate-100 p-1">
+          <button
+            type="button"
+            onClick={() => setWorkflowMode('learn')}
+            disabled={isLoading}
+            className={`flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+              workflowMode === 'learn'
+                ? 'bg-white text-slate-900 shadow-sm'
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            <GraduationCap size={16} />
+            Learn
+          </button>
+          <button
+            type="button"
+            onClick={() => setWorkflowMode('compare')}
+            disabled={isLoading}
+            className={`flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+              workflowMode === 'compare'
+                ? 'bg-white text-slate-900 shadow-sm'
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            <Scale size={16} />
+            Compare
+          </button>
+        </div>
 
         {/* Topic Input Section */}
         <form onSubmit={handleTopicSubmit} className="space-y-4 relative z-20">
@@ -249,7 +304,7 @@ export default function App() {
                 type="text"
                 value={topicInput}
                 onChange={(e) => setTopicInput(e.target.value)}
-                placeholder="Visualize any concept..."
+                placeholder={workflowMode === 'compare' ? 'Compare any product, tool, or topic...' : 'Visualize any concept...'}
                 disabled={isLoading}
                 className="w-full py-5 text-sm font-medium text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none disabled:opacity-50"
               />
@@ -267,6 +322,11 @@ export default function App() {
               <span>{loadingMessage}</span>
             </div>
           )}
+          <p className="text-center text-xs leading-5 text-slate-500">
+            {workflowMode === 'compare'
+              ? 'Comparison mode builds matched options, key decision criteria, and action links alongside the map.'
+              : 'Learning mode builds a structured knowledge map for the topic you enter.'}
+          </p>
         </form>
 
         <div className="space-y-6">
@@ -324,4 +384,3 @@ export default function App() {
 
   );
 }
-

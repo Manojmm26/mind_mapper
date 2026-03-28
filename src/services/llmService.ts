@@ -31,6 +31,31 @@ export interface MindMapData {
   edges: EdgeData[];
 }
 
+export interface ComparisonFacet {
+  label: string;
+  value: string;
+}
+
+export interface ComparisonItem {
+  id: string;
+  name: string;
+  summary: string;
+  bestFor: string;
+  considerations: string;
+  priceBand: string;
+  searchQuery: string;
+  attributes: ComparisonFacet[];
+}
+
+export interface ComparisonWorkspaceData {
+  overview: string;
+  recommendedApproach: string;
+  criteria: ComparisonFacet[];
+  items: ComparisonItem[];
+  nextSteps: string[];
+  map: MindMapData;
+}
+
 const mindMapSchema = {
   type: Type.OBJECT,
   properties: {
@@ -64,10 +89,76 @@ const mindMapSchema = {
   required: ["nodes", "edges"]
 };
 
-function parseResponse(response: any): MindMapData {
+const comparisonWorkspaceSchema = {
+  type: Type.OBJECT,
+  properties: {
+    overview: {
+      type: Type.STRING,
+      description: "A short overview of the comparison landscape for the user's query."
+    },
+    recommendedApproach: {
+      type: Type.STRING,
+      description: "Guidance on how the user should evaluate the available options."
+    },
+    criteria: {
+      type: Type.ARRAY,
+      description: "The key decision criteria the user should compare.",
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          label: { type: Type.STRING },
+          value: { type: Type.STRING }
+        },
+        required: ["label", "value"]
+      }
+    },
+    items: {
+      type: Type.ARRAY,
+      description: "The recommended options that best match the user's query.",
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          id: { type: Type.STRING },
+          name: { type: Type.STRING },
+          summary: { type: Type.STRING },
+          bestFor: { type: Type.STRING },
+          considerations: { type: Type.STRING },
+          priceBand: { type: Type.STRING },
+          searchQuery: {
+            type: Type.STRING,
+            description: "A concise search query that can be used to buy or research the item."
+          },
+          attributes: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                label: { type: Type.STRING },
+                value: { type: Type.STRING }
+              },
+              required: ["label", "value"]
+            }
+          }
+        },
+        required: ["id", "name", "summary", "bestFor", "considerations", "priceBand", "searchQuery", "attributes"]
+      }
+    },
+    nextSteps: {
+      type: Type.ARRAY,
+      description: "Concrete next steps the user can take after reviewing the comparison.",
+      items: {
+        type: Type.STRING
+      }
+    },
+    map: mindMapSchema
+  },
+  required: ["overview", "recommendedApproach", "criteria", "items", "nextSteps", "map"]
+};
+
+function parseResponse<T>(response: any): T {
   const jsonStr = response.text?.trim() || "{}";
   try {
-    return JSON.parse(jsonStr) as MindMapData;
+    return JSON.parse(jsonStr) as T;
   } catch (e) {
     console.error("Failed to parse JSON response:", jsonStr);
     throw new Error("Invalid response format from LLM.");
@@ -109,7 +200,7 @@ ${text.substring(0, 50000)}
     }
   });
 
-  return parseResponse(response);
+  return parseResponse<MindMapData>(response);
 }
 
 /**
@@ -150,5 +241,37 @@ Rules:
     }
   });
 
-  return parseResponse(response);
+  return parseResponse<MindMapData>(response);
+}
+
+export async function generateComparisonWorkspaceFromTopic(topic: string): Promise<ComparisonWorkspaceData> {
+  const ai = getAI();
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: `You are a product and research comparison assistant. A user wants to compare options for: "${topic}".
+
+Create a comparison workspace that can be shown inside a decision-support app.
+
+Your output must include:
+1. A practical comparison summary.
+2. The main criteria the user should evaluate.
+3. 4-8 recommended options that plausibly match the query.
+4. A decision-oriented mind map that explains how to choose.
+
+Rules:
+- The response must work for products, tools, services, or general topics.
+- Prefer concrete options when the query implies a set of choices.
+- If exact live pricing is uncertain, use a broad price band such as "Budget", "Mid-range", "Premium", or "Varies".
+- Every option must explain who it is best for and what tradeoffs to watch.
+- searchQuery should be a short query suitable for researching or buying that option. Do not invent direct URLs.
+- The mind map must remain a proper tree with one root and connected child nodes.
+- In the map, include criteria, tradeoffs, and recommended options so the user can explore the decision visually.
+- Keep labels concise and descriptions useful.`,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: comparisonWorkspaceSchema,
+    }
+  });
+
+  return parseResponse<ComparisonWorkspaceData>(response);
 }
