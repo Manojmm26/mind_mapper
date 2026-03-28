@@ -1,8 +1,9 @@
-import { ExternalLink, Lightbulb, Scale, Search, ShoppingBag } from 'lucide-react';
+import { ExternalLink, Lightbulb, Scale, Search, ShoppingBag, BrainCircuit, ChevronUp, ChevronDown, Download } from 'lucide-react';
 import { Edge, Node } from '@xyflow/react';
 import { ComparisonWorkspaceData } from '../services/llmService';
 import { Map } from './Map';
 import { MobileMapView } from './MobileMapView';
+import { useState } from 'react';
 
 interface ComparisonWorkspaceProps {
   data: ComparisonWorkspaceData;
@@ -29,9 +30,9 @@ function getComparisonLinks(itemName: string, searchQuery: string) {
 
 function ComparisonPanel({ data }: { data: ComparisonWorkspaceData }) {
   return (
-    <aside className="h-full overflow-y-auto border-b border-slate-200 bg-white/85 backdrop-blur-xl lg:border-b-0 lg:border-r">
-      <div className="space-y-6 p-5 pt-20 lg:p-6 lg:pt-24">
-        <section className="space-y-3">
+    <aside className="h-full overflow-y-auto border-b border-slate-200 bg-white lg:bg-white/85 lg:backdrop-blur-xl lg:border-b-0 lg:border-r">
+      <div className="space-y-6 p-6 pt-10 lg:p-6 lg:pt-24">
+        <section className="space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full bg-cyan-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-cyan-700">
             <Scale size={12} />
             Comparison Workspace
@@ -149,28 +150,87 @@ function ComparisonPanel({ data }: { data: ComparisonWorkspaceData }) {
 }
 
 export function ComparisonWorkspace({ data, isMobile, onSave }: ComparisonWorkspaceProps) {
+  const [isOutlineOpen, setIsOutlineOpen] = useState(false);
+
   return (
     <div className="h-full w-full bg-slate-50">
       <div className="grid h-full lg:grid-cols-[430px_minmax(0,1fr)]">
         <ComparisonPanel data={data} />
-        <div className="min-h-[50vh] lg:min-h-0">
+        <div className="relative min-h-[50vh] lg:min-h-0">
           {isMobile ? (
-            <div className="h-full overflow-y-auto">
-              <div className="h-[55vh] min-h-[420px] border-t border-slate-200 bg-white lg:border-t-0">
-                <MobileMapView
-                  nodes={data.map.nodes.map((node) => ({
-                    id: node.id,
-                    type: 'custom',
-                    position: { x: 0, y: 0 },
-                    data: { label: node.label, description: node.description },
-                  }))}
-                  edges={data.map.edges.map((edge) => ({
-                    id: `${edge.source}-${edge.target}`,
-                    source: edge.source,
-                    target: edge.target,
-                    label: edge.label,
-                  }))}
-                />
+            <div className="h-full">
+              <div className="h-[70vh] min-h-[500px] border-t border-slate-200 bg-white lg:border-t-0">
+                <div className="h-full overflow-y-auto">
+                  <div className="p-6 pb-32">
+                    <h3 className="mb-4 text-lg font-bold text-slate-900">Workspace Map</h3>
+                    <p className="mb-6 text-sm text-slate-500">Visualization of your research and comparison path.</p>
+                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 min-h-[300px] flex items-center justify-center italic text-slate-400">
+                      Interactive map is optimized for larger screens. Use the outline below for a structured view.
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sticky/Collapsible Outline Trigger */}
+                <div className={`fixed bottom-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out ${isOutlineOpen ? 'h-[80vh]' : 'h-16'}`}>
+                  <div className="h-full rounded-t-[32px] border-t border-slate-200 bg-white shadow-[0_-8px_30px_rgb(0,0,0,0.08)] flex flex-col">
+                    <button 
+                      onClick={() => setIsOutlineOpen(!isOutlineOpen)}
+                      className="flex w-full items-center justify-between px-6 py-4"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-cyan-100 text-cyan-700">
+                          <BrainCircuit size={18} />
+                        </div>
+                        <span className="font-bold text-slate-900 text-sm">Mind Map Outline</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSave(
+                              data.map.nodes.map((node) => ({
+                                id: node.id,
+                                type: 'custom',
+                                position: { x: 0, y: 0 },
+                                data: { label: node.label, description: node.description },
+                              })),
+                              data.map.edges.map((edge) => ({
+                                id: `${edge.source}-${edge.target}`,
+                                source: edge.source,
+                                target: edge.target,
+                                label: edge.label,
+                              }))
+                            );
+                          }}
+                          className="flex h-8 items-center gap-1.5 rounded-lg bg-slate-900 px-3 text-[11px] font-bold text-white transition-transform active:scale-95"
+                        >
+                          <Download size={14} />
+                          SAVE
+                        </button>
+                        <div className="text-slate-400">
+                          {isOutlineOpen ? <ChevronDown size={20} /> : <ChevronUp size={20} />}
+                        </div>
+                      </div>
+                    </button>
+                    
+                    <div className="flex-1 overflow-hidden">
+                      <MobileMapView
+                        nodes={data.map.nodes.map((node) => ({
+                          id: node.id,
+                          type: 'custom',
+                          position: { x: 0, y: 0 },
+                          data: { label: node.label, description: node.description },
+                        }))}
+                        edges={data.map.edges.map((edge) => ({
+                          id: `${edge.source}-${edge.target}`,
+                          source: edge.source,
+                          target: edge.target,
+                          label: edge.label,
+                        }))}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           ) : (

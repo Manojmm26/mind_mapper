@@ -110,13 +110,8 @@ export function MobileMapView({ nodes, edges }: MobileMapViewProps) {
   }, [nodes, edges]);
 
   return (
-    <div className="w-full h-full overflow-y-auto bg-slate-50 p-4 pt-20 pb-10">
+    <div className="w-full h-full overflow-y-auto bg-slate-50 p-4 pt-4 pb-20">
       <div className="max-w-md mx-auto space-y-4">
-        <div className="flex items-center space-x-2 px-2 pb-2">
-          <Sparkles className="w-5 h-5 text-cyan-500" />
-          <h2 className="text-lg font-bold text-slate-800">Mind Map Outline</h2>
-        </div>
-        
         {tree.length === 0 ? (
           <div className="p-6 text-center text-slate-500 bg-white rounded-2xl border border-slate-100 border-dashed">
             No items to display.

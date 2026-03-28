@@ -88,6 +88,14 @@ export default function App() {
       try {
         const json = JSON.parse(text);
         if (json.nodes && json.edges) {
+          if (json.comparisonData) {
+            setComparisonData({
+              ...json.comparisonData,
+              map: { nodes: [], edges: [] } // Just placeholder
+            });
+          } else {
+            setComparisonData(null);
+          }
           setSavedNodes(json.nodes);
           setSavedEdges(json.edges);
           setMapData({ nodes: [], edges: [] });
@@ -156,9 +164,16 @@ export default function App() {
       try {
         const json = JSON.parse(event.target?.result as string);
         if (json.nodes && json.edges) {
+          if (json.comparisonData) {
+            setComparisonData({
+              ...json.comparisonData,
+              map: { nodes: [], edges: [] } // Just placeholder
+            });
+          } else {
+            setComparisonData(null);
+          }
           setSavedNodes(json.nodes);
           setSavedEdges(json.edges);
-          setComparisonData(null);
           setMapData({ nodes: [], edges: [] }); // Trigger map render
         } else if (json.name || json.children) {
           const { nodes, edges } = convertTreeToGraph(json);
@@ -177,10 +192,19 @@ export default function App() {
   };
 
   const handleSaveMap = (nodes: Node[], edges: Edge[]) => {
-    const dataStr = JSON.stringify({ nodes, edges }, null, 2);
+    // If we're in comparison mode, we include the comparison workspace metadata
+    const exportData: any = { nodes, edges };
+    
+    if (comparisonData) {
+      // Exclude the map property from comparisonData as we're saving nodes/edges separately
+      const { map, ...rest } = comparisonData;
+      exportData.comparisonData = rest;
+    }
+
+    const dataStr = JSON.stringify(exportData, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
     
-    const exportFileDefaultName = 'mindmap.json';
+    const exportFileDefaultName = comparisonData ? 'comparison-workspace.json' : 'mindmap.json';
     
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
@@ -200,7 +224,7 @@ export default function App() {
     const edgesToRender = savedEdges || mapData?.edges || [];
 
     return (
-      <div className="w-screen h-screen relative">
+      <div className="w-screen h-screen relative pt-14 md:pt-0">
         {comparisonData ? (
           <ComparisonWorkspace data={comparisonData} isMobile={isMobile} onSave={handleSaveMap} />
         ) : isMobile ? (
@@ -213,6 +237,16 @@ export default function App() {
             onSave={handleSaveMap} 
           />
         )}
+
+        {!comparisonData && isMobile && (
+          <button
+            onClick={() => handleSaveMap(nodesToRender, edgesToRender)}
+            className="absolute top-4 right-4 z-20 px-4 py-2 bg-indigo-600 text-white rounded-md shadow-sm border border-indigo-500 hover:bg-indigo-700 text-sm font-medium transition-colors"
+          >
+            Save Map
+          </button>
+        )}
+
         <button 
           onClick={() => {
             setMapData(null);

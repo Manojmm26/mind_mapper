@@ -29,6 +29,7 @@ export interface EdgeData {
 export interface MindMapData {
   nodes: NodeData[];
   edges: EdgeData[];
+  comparisonData?: Omit<ComparisonWorkspaceData, 'map'>;
 }
 
 export interface ComparisonFacet {
