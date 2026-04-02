@@ -18,6 +18,7 @@ import { CustomNode } from './CustomNode';
 import { getLayoutedElements } from '../services/layoutService';
 import { MindMapData } from '../services/llmService';
 import { MapContext } from './MapContext';
+import { createFlowEdge, createFlowNode } from '../utils/mapData';
 
 const nodeTypes = {
   custom: CustomNode,
@@ -28,6 +29,8 @@ interface MapProps {
   onSave: (nodes: Node[], edges: Edge[]) => void;
   initialNodes?: Node[];
   initialEdges?: Edge[];
+  selectedNodeId?: string | null;
+  onSelectNode?: (nodeId: string) => void;
 }
 
 const THEMES = ['blue', 'green', 'amber', 'purple', 'teal', 'pink', 'orange', 'red'];
@@ -42,6 +45,110 @@ const themeColors: Record<string, string[]> = {
   blue: ['#60a5fa', '#3b82f6', '#2563eb', '#1d4ed8', '#1e40af'],
   purple: ['#c084fc', '#a855f7', '#9333ea', '#7e22ce', '#6b21a8'],
   pink: ['#f472b6', '#ec4899', '#db2777', '#be185d', '#9d174d'],
+};
+
+const getDepthMap = (nodes: Node[], edges: Edge[]) => {
+  const inDegree: Record<string, number> = {};
+  const childrenMap: Record<string, string[]> = {};
+  const depths: Record<string, number> = {};
+
+  nodes.forEach((node) => {
+    inDegree[node.id] = 0;
+    childrenMap[node.id] = [];
+  });
+
+  edges.forEach((edge) => {
+    if (inDegree[edge.target] !== undefined) {
+      inDegree[edge.target] += 1;
+    }
+    if (childrenMap[edge.source]) {
+      childrenMap[edge.source].push(edge.target);
+    }
+  });
+
+  const roots = nodes.filter((node) => inDegree[node.id] === 0);
+
+  const visit = (nodeId: string, depth: number) => {
+    if (depths[nodeId] !== undefined) {
+      return;
+    }
+
+    depths[nodeId] = depth;
+    (childrenMap[nodeId] || []).forEach((childId) => visit(childId, depth + 1));
+  };
+
+  roots.forEach((root) => visit(root.id, 0));
+
+  return { depths, childrenMap };
+};
+
+const applyEdgeThemes = (currentEdges: Edge[], themedNodes: Node[]) => {
+  return currentEdges.map((edge) => {
+    const targetNode = themedNodes.find((node) => node.id === edge.target);
+    const themeFamily = (targetNode?.data?.themeFamily as string) || 'slate';
+    const themeLevel = Math.min(Math.max((targetNode?.data?.themeLevel as number) || 0, 0), 4);
+    const familyColors = themeColors[themeFamily] || themeColors.slate;
+    return {
+      ...edge,
+      style: { ...edge.style, stroke: familyColors[themeLevel], strokeWidth: 2 },
+    };
+  });
+};
+
+const prepareGraph = (rawNodes: Node[], rawEdges: Edge[]) => {
+  const nodesWithCollapse = applyDefaultCollapse(rawNodes, rawEdges);
+  const themedNodes = assignThemes(nodesWithCollapse, rawEdges);
+  const themedEdges = applyEdgeThemes(rawEdges, themedNodes);
+  return updateLayout(themedNodes, themedEdges);
+};
+
+const revealSelectedPath = (currentNodes: Node[], currentEdges: Edge[], selectedNodeId?: string | null) => {
+  const selectedSet = new Set(selectedNodeId ? [selectedNodeId] : []);
+  const parentMap: Record<string, string | undefined> = {};
+
+  currentEdges.forEach((edge) => {
+    parentMap[edge.target] = edge.source;
+  });
+
+  let currentId = selectedNodeId || undefined;
+  while (currentId && parentMap[currentId]) {
+    currentId = parentMap[currentId];
+    if (currentId) {
+      selectedSet.add(currentId);
+    }
+  }
+
+  return currentNodes.map((node) => ({
+    ...node,
+    selected: node.id === selectedNodeId,
+    data: {
+      ...node.data,
+      isCollapsed: selectedSet.has(node.id) ? false : node.data.isCollapsed,
+    },
+  }));
+};
+
+const collapseToOverview = (currentNodes: Node[], currentEdges: Edge[]) => {
+  const { depths, childrenMap } = getDepthMap(currentNodes, currentEdges);
+
+  return currentNodes.map((node) => ({
+    ...node,
+    selected: false,
+    data: {
+      ...node.data,
+      isCollapsed: (childrenMap[node.id] || []).length > 0 && (depths[node.id] || 0) >= 1,
+    },
+  }));
+};
+
+const expandAllNodes = (currentNodes: Node[]) => {
+  return currentNodes.map((node) => ({
+    ...node,
+    data: {
+      ...node.data,
+      isCollapsed: false,
+    },
+  }));
 };
 
 const assignThemes = (nodes: Node[], edges: Edge[]) => {
@@ -267,63 +374,40 @@ const updateLayout = (currentNodes: Node[], currentEdges: Edge[]) => {
   return { nodes: finalNodes, edges: finalEdges };
 };
 
-export function Map({ data, onSave, initialNodes, initialEdges }: MapProps) {
+export function Map({ data, onSave, initialNodes, initialEdges, selectedNodeId, onSelectNode }: MapProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   useEffect(() => {
     if (data && !initialNodes && !initialEdges) {
-      const rawNodes: Node[] = data.nodes.map((node) => ({
-        id: node.id,
-        type: 'custom',
-        position: { x: 0, y: 0 },
-        data: { label: node.label, description: node.description },
-      }));
-
-      const rawEdges: Edge[] = data.edges.map((edge) => ({
-        id: `${edge.source}-${edge.target}`,
-        source: edge.source,
-        target: edge.target,
-        label: edge.label,
-        type: 'smoothstep',
-        animated: true,
-      }));
-
-      const nodesWithCollapse = applyDefaultCollapse(rawNodes, rawEdges);
-      const themedNodes = assignThemes(nodesWithCollapse, rawEdges);
-      const themedEdges = rawEdges.map(edge => {
-        const targetNode = themedNodes.find(n => n.id === edge.target);
-        const themeFamily = (targetNode?.data?.themeFamily as string) || 'slate';
-        const themeLevel = Math.min(Math.max((targetNode?.data?.themeLevel as number) || 0, 0), 4);
-        const familyColors = themeColors[themeFamily] || themeColors.slate;
-        return {
-          ...edge,
-          style: { stroke: familyColors[themeLevel], strokeWidth: 2 },
-        };
-      });
-
-      const { nodes: layoutedNodes, edges: layoutedEdges } = updateLayout(themedNodes, themedEdges);
+      const rawNodes: Node[] = data.nodes.map((node) => createFlowNode(node));
+      const rawEdges: Edge[] = data.edges.map((edge) => createFlowEdge(edge));
+      const preparedNodes = selectedNodeId
+        ? revealSelectedPath(rawNodes, rawEdges, selectedNodeId)
+        : rawNodes;
+      const { nodes: layoutedNodes, edges: layoutedEdges } = prepareGraph(preparedNodes, rawEdges);
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
     } else if (initialNodes && initialEdges) {
-      const nodesWithCollapse = applyDefaultCollapse(initialNodes, initialEdges);
-      const themedNodes = assignThemes(nodesWithCollapse, initialEdges);
-      const themedEdges = initialEdges.map(edge => {
-        const targetNode = themedNodes.find(n => n.id === edge.target);
-        const themeFamily = (targetNode?.data?.themeFamily as string) || 'slate';
-        const themeLevel = Math.min(Math.max((targetNode?.data?.themeLevel as number) || 0, 0), 4);
-        const familyColors = themeColors[themeFamily] || themeColors.slate;
-        return {
-          ...edge,
-          style: { stroke: familyColors[themeLevel], strokeWidth: 2 },
-        };
-      });
-
-      const { nodes: layoutedNodes, edges: layoutedEdges } = updateLayout(themedNodes, themedEdges);
+      const preparedNodes = selectedNodeId
+        ? revealSelectedPath(initialNodes, initialEdges, selectedNodeId)
+        : initialNodes;
+      const { nodes: layoutedNodes, edges: layoutedEdges } = prepareGraph(preparedNodes, initialEdges);
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
     }
-  }, [data, initialNodes, initialEdges, setNodes, setEdges]);
+  }, [data, initialNodes, initialEdges, selectedNodeId, setNodes, setEdges]);
+
+  useEffect(() => {
+    if (!nodes.length) {
+      return;
+    }
+
+    const nextNodes = revealSelectedPath(nodes, edges, selectedNodeId);
+    const { nodes: layoutedNodes, edges: layoutedEdges } = updateLayout(nextNodes, edges);
+    setNodes(layoutedNodes);
+    setEdges(layoutedEdges);
+  }, [selectedNodeId]);
 
   const onConnect = useCallback(
     (params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -343,6 +427,20 @@ export function Map({ data, onSave, initialNodes, initialEdges }: MapProps) {
     setEdges(layoutedEdges);
   }, [nodes, edges, setNodes, setEdges]);
 
+  const handleExpandAll = useCallback(() => {
+    const nextNodes = expandAllNodes(nodes);
+    const { nodes: layoutedNodes, edges: layoutedEdges } = updateLayout(nextNodes, edges);
+    setNodes(layoutedNodes);
+    setEdges(layoutedEdges);
+  }, [nodes, edges, setNodes, setEdges]);
+
+  const handleCollapseAll = useCallback(() => {
+    const nextNodes = collapseToOverview(nodes, edges);
+    const { nodes: layoutedNodes, edges: layoutedEdges } = updateLayout(nextNodes, edges);
+    setNodes(layoutedNodes);
+    setEdges(layoutedEdges);
+  }, [nodes, edges, setNodes, setEdges]);
+
   const handleSave = () => {
     onSave(nodes, edges);
   };
@@ -356,19 +454,39 @@ export function Map({ data, onSave, initialNodes, initialEdges }: MapProps) {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          onNodeClick={(_, node) => onSelectNode?.(node.id)}
           nodeTypes={nodeTypes}
           fitView
-          className="bg-slate-50"
+          className="workspace-map-canvas"
         >
-          <Controls />
-          <MiniMap zoomable pannable nodeClassName={(node) => 'bg-indigo-500 rounded-sm'} />
-          <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
-          <Panel position="top-right" className="bg-white p-2 rounded-lg shadow-sm border border-slate-200">
+          <Controls className="workspace-map-controls" />
+          <MiniMap
+            zoomable
+            pannable
+            className="!rounded-2xl !border !border-slate-200 !bg-white/90 !shadow-lg"
+            nodeColor={(node) => String(node.style?.borderColor || '#94a3b8')}
+          />
+          <Background variant={BackgroundVariant.Dots} gap={18} size={1.4} color="#cbd5e1" />
+          <Panel position="top-left" className="flex items-center gap-2 rounded-2xl border border-white/70 bg-white/85 p-2 shadow-lg backdrop-blur-xl">
+            <button
+              onClick={handleExpandAll}
+              className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100"
+            >
+              Expand all
+            </button>
+            <button
+              onClick={handleCollapseAll}
+              className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100"
+            >
+              Collapse layers
+            </button>
+          </Panel>
+          <Panel position="top-right" className="rounded-2xl border border-white/70 bg-white/85 p-2 shadow-lg backdrop-blur-xl">
             <button
               onClick={handleSave}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors"
+              className="rounded-xl bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
             >
-              Save Map
+              Save map
             </button>
           </Panel>
         </ReactFlow>

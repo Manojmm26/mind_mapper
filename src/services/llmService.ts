@@ -5,7 +5,8 @@ let aiInstance: GoogleGenAI | null = null;
 function getAI() {
   if (aiInstance) return aiInstance;
 
-  const apiKey = (process.env as any).GEMINI_API_KEY;
+  const viteEnv = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
+  const apiKey = viteEnv?.VITE_GEMINI_API_KEY || (process.env as any).GEMINI_API_KEY;
   if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
     throw new Error("Gemini API Key is not set. Please add your key to the .env file.");
   }
@@ -18,6 +19,12 @@ export interface NodeData {
   id: string;
   label: string;
   description?: string;
+  type?: 'topic' | 'concept' | 'example' | 'question' | 'action' | 'decision' | 'source';
+  tags?: string[];
+  importance?: 'high' | 'medium' | 'low';
+  confidence?: 'high' | 'medium' | 'low';
+  sourceHint?: string;
+  nextStep?: string;
 }
 
 export interface EdgeData {
@@ -68,7 +75,32 @@ const mindMapSchema = {
         properties: {
           id: { type: Type.STRING, description: "A unique identifier (e.g., 'node_0', 'node_1')." },
           label: { type: Type.STRING, description: "A short, concise title for this concept (max 6 words)." },
-          description: { type: Type.STRING, description: "A clear 1-2 sentence explanation of this concept. Be specific and informative, not generic." }
+          description: { type: Type.STRING, description: "A clear 1-2 sentence explanation of this concept. Be specific and informative, not generic." },
+          type: {
+            type: Type.STRING,
+            description: "Optional semantic role for the node. Use one of: topic, concept, example, question, action, decision, source."
+          },
+          tags: {
+            type: Type.ARRAY,
+            description: "Optional short tags that help filter or cluster this node.",
+            items: { type: Type.STRING }
+          },
+          importance: {
+            type: Type.STRING,
+            description: "Optional priority marker: high, medium, or low."
+          },
+          confidence: {
+            type: Type.STRING,
+            description: "Optional confidence marker: high, medium, or low."
+          },
+          sourceHint: {
+            type: Type.STRING,
+            description: "Optional note describing where this idea comes from, such as the source section, evidence, or basis."
+          },
+          nextStep: {
+            type: Type.STRING,
+            description: "Optional next action or follow-up someone should take after reading this node."
+          }
         },
         required: ["id", "label", "description"]
       }
@@ -188,6 +220,7 @@ Rules:
 - Every non-root node must be connected to exactly one parent via an edge.
 - Aim for 20-60 nodes depending on document complexity.
 - Labels should be concise (max 6 words). Descriptions should be informative (1-2 sentences).
+- Add metadata when it helps: node type, 1-3 tags, importance, confidence, sourceHint, and nextStep.
 - Do NOT create disconnected nodes. Every node must be reachable from the root.
 - Prefer depth over breadth — 3-4 levels of hierarchy is better than 15 flat siblings.
 
@@ -233,6 +266,7 @@ Rules:
 - Every non-root node connects to exactly one parent.
 - Target 30-70 nodes for a rich, useful map.
 - Labels: concise (max 6 words). Descriptions: specific and educational (1-2 sentences that actually teach something).
+- Add metadata when relevant: node type, 1-3 tags, importance, confidence, sourceHint, and nextStep.
 - Do NOT create disconnected nodes.
 - Do NOT be superficial — go deep enough that each leaf node contains actionable or specific knowledge.
 - Organize logically: foundational concepts first, advanced topics later in the hierarchy.`,
@@ -267,6 +301,7 @@ Rules:
 - searchQuery should be a short query suitable for researching or buying that option. Do not invent direct URLs.
 - The mind map must remain a proper tree with one root and connected child nodes.
 - In the map, include criteria, tradeoffs, and recommended options so the user can explore the decision visually.
+- For map nodes, add metadata when useful: node type, tags, importance, confidence, sourceHint, and nextStep.
 - Keep labels concise and descriptions useful.`,
     config: {
       responseMimeType: "application/json",

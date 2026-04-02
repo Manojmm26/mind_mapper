@@ -1,7 +1,7 @@
 import { Handle, Position, NodeProps } from '@xyflow/react';
 import { memo, useContext } from 'react';
 import { cn } from '../utils/cn';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, CircleArrowOutUpRight } from 'lucide-react';
 import { MapContext } from './MapContext';
 
 interface Theme {
@@ -78,11 +78,14 @@ const themes: Record<string, Theme[]> = {
   ],
 };
 
-export const CustomNode = memo(({ id, data, isConnectable }: NodeProps) => {
+export const CustomNode = memo(({ id, data, isConnectable, selected }: NodeProps) => {
   const { onToggle } = useContext(MapContext);
 
   const hasChildren = !!data.hasChildren;
   const isCollapsed = !!data.isCollapsed;
+  const tags = Array.isArray(data.tags) ? (data.tags as string[]) : [];
+  const typeLabel = data.type as string | undefined;
+  const importanceLabel = data.importance as string | undefined;
   
   const themeFamily = (data.themeFamily as string) || 'slate';
   const themeLevel = Math.min(Math.max((data.themeLevel as number) || 0, 0), 4);
@@ -92,9 +95,10 @@ export const CustomNode = memo(({ id, data, isConnectable }: NodeProps) => {
 
   return (
     <div className={cn(
-      "w-[280px] min-h-[100px] rounded-xl shadow-sm border",
+      "w-[300px] min-h-[120px] rounded-[22px] border shadow-sm",
       theme.bg, theme.border,
-      "flex flex-col overflow-visible transition-all hover:shadow-md relative"
+      "relative flex flex-col overflow-visible transition-all hover:-translate-y-0.5 hover:shadow-xl",
+      selected && 'ring-2 ring-cyan-300 ring-offset-4 ring-offset-slate-50 shadow-[0_20px_50px_rgba(14,165,233,0.18)]'
     )}>
       <Handle
         type="target"
@@ -103,19 +107,52 @@ export const CustomNode = memo(({ id, data, isConnectable }: NodeProps) => {
         className={cn("w-3 h-3", theme.handle)}
       />
       
-      <div className={cn("border-b px-4 py-2 rounded-t-xl", theme.header, theme.border)}>
-        <h3 className={cn("font-semibold text-sm truncate", theme.text)} title={data.label as string}>
-          {data.label as string}
-        </h3>
+      <div className={cn('border-b px-4 py-3 rounded-t-[22px]', theme.header, theme.border)}>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className={cn('truncate text-sm font-bold', theme.text)} title={data.label as string}>
+              {data.label as string}
+            </h3>
+            {(typeLabel || importanceLabel) && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {typeLabel && (
+                  <span className="rounded-full bg-white/75 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 shadow-sm">
+                    {typeLabel}
+                  </span>
+                )}
+                {importanceLabel && (
+                  <span className="rounded-full bg-white/75 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 shadow-sm">
+                    {importanceLabel}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+          {data.nextStep && (
+            <div className="rounded-full bg-white/75 p-1 text-slate-500 shadow-sm">
+              <CircleArrowOutUpRight size={12} />
+            </div>
+          )}
+        </div>
       </div>
       
-      <div className="p-4 flex-1 flex flex-col justify-center">
+      <div className="flex flex-1 flex-col gap-3 p-4">
         {data.description ? (
-          <p className="text-xs text-slate-600 leading-relaxed line-clamp-4" title={data.description as string}>
+          <p className="text-xs leading-relaxed text-slate-600 line-clamp-4" title={data.description as string}>
             {data.description as string}
           </p>
         ) : (
           <p className="text-xs text-slate-400 italic">No description provided.</p>
+        )}
+
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {tags.slice(0, 3).map((tag) => (
+              <span key={tag} className="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold text-slate-500">
+                {tag}
+              </span>
+            ))}
+          </div>
         )}
       </div>
 
@@ -126,9 +163,9 @@ export const CustomNode = memo(({ id, data, isConnectable }: NodeProps) => {
             onToggle?.(id);
           }}
           className={cn(
-            "absolute -right-3 top-1/2 -translate-y-1/2 border rounded-full p-1 shadow-sm z-10 cursor-pointer transition-colors",
+            'absolute -right-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer rounded-full border p-1.5 shadow-md transition-colors',
             theme.bg, theme.border, theme.text,
-            "hover:brightness-95"
+            'hover:brightness-95'
           )}
         >
           {isCollapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}

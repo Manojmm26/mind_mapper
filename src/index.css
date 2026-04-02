@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+:root {
+    --font-body: "IBM Plex Sans", sans-serif;
+    --font-display: "Space Grotesk", "IBM Plex Sans", sans-serif;
+}
+
 @property --theme-accent {
     syntax: '<color>';
     initial-value: #06b6d4;
@@ -36,6 +41,128 @@
 
 .react-flow__edge-path {
     transition: d 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+body {
+    background: linear-gradient(180deg, #eef4ff 0%, #f8fafc 48%, #fffdf9 100%);
+    color: #0f172a;
+    font-family: var(--font-body);
+}
+
+#root {
+    min-height: 100vh;
+}
+
+.workspace-surface {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.82) 100%);
+    backdrop-filter: blur(26px);
+}
+
+.font-display {
+    font-family: var(--font-display);
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.animate-spin-slow {
+    animation: spin 8s linear infinite;
+}
+
+.pretext-canvas-shell {
+    background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(249, 115, 22, 0.12), transparent 18%),
+        linear-gradient(180deg, rgba(248, 250, 252, 0.98) 0%, rgba(241, 245, 249, 0.92) 100%);
+}
+
+.pretext-canvas-stage {
+    touch-action: none;
+    cursor: grab;
+}
+
+.pretext-canvas-stage:active {
+    cursor: grabbing;
+}
+
+.pretext-atlas-shell {
+    background:
+        radial-gradient(circle at top left, rgba(34, 211, 238, 0.14), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(251, 146, 60, 0.14), transparent 20%),
+        linear-gradient(180deg, rgba(6, 16, 29, 0.98) 0%, rgba(13, 27, 47, 0.98) 48%, rgba(17, 37, 61, 0.98) 100%);
+}
+
+.pretext-atlas-stage {
+    touch-action: none;
+}
+
+.pretext-atlas-stage:focus-visible {
+    box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.65), 0 28px 80px rgba(8, 145, 178, 0.22);
+}
+
+.workspace-map-canvas {
+    background:
+        radial-gradient(circle at top left, rgba(125, 211, 252, 0.12), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(253, 186, 116, 0.12), transparent 18%),
+        linear-gradient(180deg, rgba(248, 250, 252, 0.98) 0%, rgba(241, 245, 249, 0.92) 100%);
+}
+
+.workspace-map-controls {
+    border-radius: 18px !important;
+    overflow: hidden;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12) !important;
+}
+
+.workspace-map-controls button {
+    border: none !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    color: #0f172a !important;
+}
+
+.workspace-map-controls button:hover {
+    background: rgba(241, 245, 249, 0.98) !important;
+}
+
+@keyframes signal-deck-hero-enter {
+    0% {
+        opacity: 0;
+        transform: translateY(26px) scale(0.985);
+        filter: saturate(0.9);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: saturate(1);
+    }
+}
+
+@keyframes signal-deck-card-enter {
+    0% {
+        opacity: 0;
+        transform: translateY(calc(var(--signal-deck-rest-y, 0px) + 34px)) scale(0.965) rotate(var(--signal-deck-entry-rot, -1.2deg));
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(var(--signal-deck-rest-y, 0px)) scale(1) rotate(var(--signal-deck-rest-rot, 0deg));
+    }
+}
+
+[data-motion="hero"] {
+    animation: signal-deck-hero-enter 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.signal-deck-card-enter {
+    animation: signal-deck-card-enter 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--signal-deck-delay, 0ms);
+    transform: translateY(var(--signal-deck-rest-y, 0px)) rotate(var(--signal-deck-rest-rot, 0deg));
 }
 
 .animate-theme-shift {
