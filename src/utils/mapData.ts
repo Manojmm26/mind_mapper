@@ -1,15 +1,15 @@
-import { Edge, Node } from '@xyflow/react';
-import { EdgeData, MindMapData, NodeData } from '../services/llmService';
+import { Edge, Node } from "@xyflow/react";
+import { EdgeData, MindMapData, NodeData } from "../services/llmService";
 
 export function createFlowNode(node: NodeData): Node {
   return {
     id: node.id,
-    type: 'custom',
+    type: "custom",
     position: { x: 0, y: 0 },
     data: {
       ...node,
       label: node.label,
-      description: node.description || '',
+      description: node.description || "",
     },
   };
 }
@@ -20,19 +20,25 @@ export function createFlowEdge(edge: EdgeData): Edge {
     source: edge.source,
     target: edge.target,
     label: edge.label,
-    type: 'smoothstep',
+    type: "smoothstep",
     animated: true,
   };
 }
 
-export function toFlowGraph(data: MindMapData): { nodes: Node[]; edges: Edge[] } {
+export function toFlowGraph(data: MindMapData): {
+  nodes: Node[];
+  edges: Edge[];
+} {
   return {
     nodes: data.nodes.map(createFlowNode),
     edges: data.edges.map(createFlowEdge),
   };
 }
 
-export function convertTreeToGraph(tree: any): { nodes: Node[]; edges: Edge[] } {
+export function convertTreeToGraph(tree: any): {
+  nodes: Node[];
+  edges: Edge[];
+} {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
   let idCounter = 0;
@@ -41,12 +47,12 @@ export function convertTreeToGraph(tree: any): { nodes: Node[]; edges: Edge[] } 
     const currentId = `node_${idCounter++}`;
     nodes.push({
       id: currentId,
-      type: 'custom',
+      type: "custom",
       position: { x: 0, y: 0 },
       data: {
         id: currentId,
-        label: node.name || node.label || 'Untitled',
-        description: node.description || '',
+        label: node.name || node.label || "Untitled",
+        description: node.description || "",
         type: node.type,
         tags: node.tags,
         importance: node.importance,
@@ -61,7 +67,7 @@ export function convertTreeToGraph(tree: any): { nodes: Node[]; edges: Edge[] } 
         id: `${parentId}-${currentId}`,
         source: parentId,
         target: currentId,
-        type: 'smoothstep',
+        type: "smoothstep",
         animated: true,
       });
     }

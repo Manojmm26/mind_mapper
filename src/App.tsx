@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Edge, Node } from '@xyflow/react';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Edge, Node } from "@xyflow/react";
 import {
   ArrowLeft,
   BrainCircuit,
@@ -14,67 +14,71 @@ import {
   Send,
   Sparkles,
   Upload,
-} from 'lucide-react';
-import { ComparisonWorkspace } from './components/ComparisonWorkspace';
-import { Map } from './components/Map';
-import { MobileMapView } from './components/MobileMapView';
-import { PretextShowcase } from './components/PretextShowcase';
-import { WorkspaceInspector } from './components/WorkspaceInspector';
-import { WorkspaceSidebar, WorkspaceView } from './components/WorkspaceSidebar';
-import { EXAMPLE_MAP } from './exampleData';
-import { useElementFullscreen } from './hooks/useElementFullscreen';
-import { useMediaQuery } from './hooks/useMediaQuery';
+} from "lucide-react";
+import { ComparisonWorkspace } from "./components/ComparisonWorkspace";
+import { Map } from "./components/Map";
+import { MobileMapView } from "./components/MobileMapView";
+import { PretextShowcase } from "./components/PretextShowcase";
+import { WorkspaceInspector } from "./components/WorkspaceInspector";
+import { WorkspaceSidebar, WorkspaceView } from "./components/WorkspaceSidebar";
+import { EXAMPLE_MAP } from "./exampleData";
+import { useElementFullscreen } from "./hooks/useElementFullscreen";
+import { useMediaQuery } from "./hooks/useMediaQuery";
 import {
   ComparisonWorkspaceData,
   generateComparisonWorkspaceFromTopic,
   generateMindMap,
   generateMindMapFromTopic,
   MindMapData,
-} from './services/llmService';
-import { extractTextFromFile } from './services/pdfService';
-import { convertTreeToGraph, findRootNode, toFlowGraph } from './utils/mapData';
+} from "./services/llmService";
+import { extractTextFromFile } from "./services/pdfService";
+import { convertTreeToGraph, findRootNode, toFlowGraph } from "./utils/mapData";
 
-type AppExperience = 'classic' | 'pretext';
+type AppExperience = "classic" | "pretext";
 
 function getInitialExperience(): AppExperience {
-  if (typeof window === 'undefined') {
-    return 'classic';
+  if (typeof window === "undefined") {
+    return "classic";
   }
 
   const params = new URLSearchParams(window.location.search);
-  return params.get('experience') === 'pretext' ? 'pretext' : 'classic';
+  return params.get("experience") === "pretext" ? "pretext" : "classic";
 }
 
 function syncExperienceInUrl(experience: AppExperience) {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return;
   }
 
   const url = new URL(window.location.href);
-  if (experience === 'pretext') {
-    url.searchParams.set('experience', 'pretext');
+  if (experience === "pretext") {
+    url.searchParams.set("experience", "pretext");
   } else {
-    url.searchParams.delete('experience');
+    url.searchParams.delete("experience");
   }
 
-  window.history.replaceState(null, '', url);
+  window.history.replaceState(null, "", url);
 }
 
 export default function App() {
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const outlineFullscreen = useElementFullscreen<HTMLDivElement>();
-  const [experience, setExperience] = useState<AppExperience>(getInitialExperience);
-  const [workflowMode, setWorkflowMode] = useState<'learn' | 'compare'>('learn');
-  const [activeView, setActiveView] = useState<WorkspaceView>('map');
+  const [experience, setExperience] =
+    useState<AppExperience>(getInitialExperience);
+  const [workflowMode, setWorkflowMode] = useState<"learn" | "compare">(
+    "learn",
+  );
+  const [activeView, setActiveView] = useState<WorkspaceView>("map");
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState('');
+  const [loadingMessage, setLoadingMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [mapData, setMapData] = useState<MindMapData | null>(null);
-  const [comparisonData, setComparisonData] = useState<ComparisonWorkspaceData | null>(null);
+  const [comparisonData, setComparisonData] =
+    useState<ComparisonWorkspaceData | null>(null);
   const [savedNodes, setSavedNodes] = useState<Node[] | null>(null);
   const [savedEdges, setSavedEdges] = useState<Edge[] | null>(null);
-  const [topicInput, setTopicInput] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [topicInput, setTopicInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -94,7 +98,7 @@ export default function App() {
 
   const workspaceRoot = useMemo(
     () => findRootNode(workspaceGraph.nodes, workspaceGraph.edges),
-    [workspaceGraph.edges, workspaceGraph.nodes]
+    [workspaceGraph.edges, workspaceGraph.nodes],
   );
 
   useEffect(() => {
@@ -107,16 +111,16 @@ export default function App() {
     setSavedNodes(null);
     setSavedEdges(null);
     setSelectedNodeId(null);
-    setSearchQuery('');
-    setTopicInput('');
-    setActiveView('map');
+    setSearchQuery("");
+    setTopicInput("");
+    setActiveView("map");
     setError(null);
   };
 
   const handleSelectNode = (nodeId: string | null) => {
     setSelectedNodeId(nodeId);
-    if (activeView === 'compare') {
-      setActiveView(isMobile ? 'outline' : 'map');
+    if (activeView === "compare") {
+      setActiveView(isMobile ? "outline" : "map");
     }
   };
 
@@ -126,15 +130,17 @@ export default function App() {
       return;
     }
 
-    const selectionStillExists = selectedNodeId && workspaceGraph.nodes.some((node) => node.id === selectedNodeId);
+    const selectionStillExists =
+      selectedNodeId &&
+      workspaceGraph.nodes.some((node) => node.id === selectedNodeId);
     if (!selectionStillExists) {
       setSelectedNodeId(workspaceRoot?.id || workspaceGraph.nodes[0].id);
     }
   }, [selectedNodeId, workspaceGraph.nodes, workspaceRoot]);
 
   useEffect(() => {
-    if (activeView === 'compare' && !comparisonData) {
-      setActiveView('map');
+    if (activeView === "compare" && !comparisonData) {
+      setActiveView("map");
     }
   }, [activeView, comparisonData]);
 
@@ -145,7 +151,7 @@ export default function App() {
     }
 
     setIsLoading(true);
-    setLoadingMessage('Analyzing document...');
+    setLoadingMessage("Analyzing document...");
     setError(null);
     resetWorkspaceState();
 
@@ -160,12 +166,12 @@ export default function App() {
               ...json.comparisonData,
               map: { nodes: [], edges: [] },
             });
-            setWorkflowMode('compare');
-            setActiveView('compare');
+            setWorkflowMode("compare");
+            setActiveView("compare");
           } else {
             setComparisonData(null);
-            setWorkflowMode('learn');
-            setActiveView('map');
+            setWorkflowMode("learn");
+            setActiveView("map");
           }
           setSavedNodes(json.nodes);
           setSavedEdges(json.edges);
@@ -178,25 +184,25 @@ export default function App() {
           setSavedNodes(nodes);
           setSavedEdges(edges);
           setMapData({ nodes: [], edges: [] });
-          setWorkflowMode('learn');
-          setActiveView('map');
+          setWorkflowMode("learn");
+          setActiveView("map");
           return;
         }
       } catch {
         // Fall through to LLM processing.
       }
 
-      setLoadingMessage('AI is building your mind map...');
+      setLoadingMessage("AI is building your mind map...");
       const data = await generateMindMap(text);
       setMapData(data);
-      setWorkflowMode('learn');
-      setActiveView('map');
+      setWorkflowMode("learn");
+      setActiveView("map");
     } catch (err: any) {
-      setError(err.message || 'An error occurred while processing the file.');
+      setError(err.message || "An error occurred while processing the file.");
     } finally {
       setIsLoading(false);
-      setLoadingMessage('');
-      e.target.value = '';
+      setLoadingMessage("");
+      e.target.value = "";
     }
   };
 
@@ -211,29 +217,32 @@ export default function App() {
     setLoadingMessage(`Researching "${topic}"...`);
     setError(null);
     setSelectedNodeId(null);
-    setSearchQuery('');
+    setSearchQuery("");
     setMapData(null);
     setComparisonData(null);
     setSavedNodes(null);
     setSavedEdges(null);
 
     try {
-      if (workflowMode === 'compare') {
+      if (workflowMode === "compare") {
         setLoadingMessage(`Comparing options for "${topic}"...`);
         const data = await generateComparisonWorkspaceFromTopic(topic);
         setComparisonData(data);
         setMapData(data.map);
-        setActiveView('compare');
+        setActiveView("compare");
       } else {
         const data = await generateMindMapFromTopic(topic);
         setMapData(data);
-        setActiveView('map');
+        setActiveView("map");
       }
     } catch (err: any) {
-      setError(err.message || `An error occurred while generating the ${workflowMode === 'compare' ? 'comparison workspace' : 'mind map'}.`);
+      setError(
+        err.message ||
+          `An error occurred while generating the ${workflowMode === "compare" ? "comparison workspace" : "mind map"}.`,
+      );
     } finally {
       setIsLoading(false);
-      setLoadingMessage('');
+      setLoadingMessage("");
     }
   };
 
@@ -249,7 +258,7 @@ export default function App() {
         const json = JSON.parse(event.target?.result as string);
         setError(null);
         setSelectedNodeId(null);
-        setSearchQuery('');
+        setSearchQuery("");
 
         if (json.nodes && json.edges) {
           if (json.comparisonData) {
@@ -257,12 +266,12 @@ export default function App() {
               ...json.comparisonData,
               map: { nodes: [], edges: [] },
             });
-            setWorkflowMode('compare');
-            setActiveView('compare');
+            setWorkflowMode("compare");
+            setActiveView("compare");
           } else {
             setComparisonData(null);
-            setWorkflowMode('learn');
-            setActiveView('map');
+            setWorkflowMode("learn");
+            setActiveView("map");
           }
 
           setSavedNodes(json.nodes);
@@ -273,19 +282,21 @@ export default function App() {
           setSavedNodes(nodes);
           setSavedEdges(edges);
           setComparisonData(null);
-          setWorkflowMode('learn');
-          setActiveView('map');
+          setWorkflowMode("learn");
+          setActiveView("map");
           setMapData({ nodes: [], edges: [] });
         } else {
-          setError('Invalid JSON format. Expected nodes/edges or a hierarchical tree.');
+          setError(
+            "Invalid JSON format. Expected nodes/edges or a hierarchical tree.",
+          );
         }
       } catch {
-        setError('Failed to parse JSON file.');
+        setError("Failed to parse JSON file.");
       }
     };
 
     reader.readAsText(file);
-    e.target.value = '';
+    e.target.value = "";
   };
 
   const handleSaveMap = (nodes: Node[], edges: Edge[]) => {
@@ -298,10 +309,12 @@ export default function App() {
 
     const dataStr = JSON.stringify(exportData, null, 2);
     const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
-    const exportFileDefaultName = comparisonData ? 'comparison-workspace.json' : 'mindmap.json';
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
+    const exportFileDefaultName = comparisonData
+      ? "comparison-workspace.json"
+      : "mindmap.json";
+    const linkElement = document.createElement("a");
+    linkElement.setAttribute("href", dataUri);
+    linkElement.setAttribute("download", exportFileDefaultName);
     linkElement.click();
   };
 
@@ -310,25 +323,25 @@ export default function App() {
     setSavedNodes(exampleGraph.nodes);
     setSavedEdges(exampleGraph.edges);
     setComparisonData(null);
-    setWorkflowMode('learn');
+    setWorkflowMode("learn");
     setMapData({ nodes: [], edges: [] });
-    setActiveView('map');
+    setActiveView("map");
     setError(null);
-    setSearchQuery('');
+    setSearchQuery("");
     setSelectedNodeId(null);
   };
 
   const renderWorkspaceContent = () => {
-    if (activeView === 'compare' && comparisonData) {
+    if (activeView === "compare" && comparisonData) {
       return <ComparisonWorkspace data={comparisonData} />;
     }
 
-    if (activeView === 'outline') {
+    if (activeView === "outline") {
       return (
         <div
           ref={outlineFullscreen.elementRef}
           className={`workspace-surface relative h-full overflow-hidden border border-white/60 p-4 shadow-[0_20px_70px_rgba(15,23,42,0.08)] md:p-5 ${
-            outlineFullscreen.isFullscreen ? 'rounded-none' : 'rounded-[32px]'
+            outlineFullscreen.isFullscreen ? "rounded-none" : "rounded-[32px]"
           }`}
         >
           {outlineFullscreen.isSupported && (
@@ -337,14 +350,23 @@ export default function App() {
               onClick={() => outlineFullscreen.toggleFullscreen()}
               className="absolute right-4 top-4 z-20 inline-flex items-center gap-2 rounded-2xl border border-white/60 bg-white/88 px-3 py-2 text-xs font-semibold text-slate-700 shadow-lg backdrop-blur-xl transition-colors hover:bg-white"
             >
-              {outlineFullscreen.isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-              {outlineFullscreen.isFullscreen ? 'Exit full screen' : 'Full screen'}
+              {outlineFullscreen.isFullscreen ? (
+                <Minimize2 size={14} />
+              ) : (
+                <Maximize2 size={14} />
+              )}
+              {outlineFullscreen.isFullscreen
+                ? "Exit full screen"
+                : "Full screen"}
             </button>
           )}
           <div className="mb-4 rounded-[24px] border border-slate-200 bg-white/80 p-4">
-            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">Structured outline</p>
+            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
+              Structured outline
+            </p>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              Browse the map as an expandable tree when you want faster scanning than the canvas.
+              Browse the map as an expandable tree when you want faster scanning
+              than the canvas.
             </p>
           </div>
           <MobileMapView
@@ -361,9 +383,12 @@ export default function App() {
       return (
         <div className="workspace-surface h-full overflow-hidden rounded-[32px] border border-white/60 p-4 shadow-[0_20px_70px_rgba(15,23,42,0.08)] md:p-5">
           <div className="mb-4 rounded-[24px] bg-[linear-gradient(135deg,rgba(10,132,255,0.1),rgba(255,159,10,0.12))] p-4">
-            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Mobile workspace</p>
+            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
+              Mobile workspace
+            </p>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              Mobile stays outline-first for speed and legibility. Use the sidebar tabs to switch between map context and the decision board.
+              Mobile stays outline-first for speed and legibility. Use the
+              sidebar tabs to switch between map context and the decision board.
             </p>
           </div>
           <MobileMapView
@@ -390,8 +415,8 @@ export default function App() {
     );
   };
 
-  if (experience === 'pretext') {
-    return <PretextShowcase onExit={() => setExperience('classic')} />;
+  if (experience === "pretext") {
+    return <PretextShowcase onExit={() => setExperience("classic")} />;
   }
 
   if (workspaceGraph.nodes.length > 0) {
@@ -410,17 +435,28 @@ export default function App() {
                 </button>
                 <div>
                   <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
-                    {workflowMode === 'compare' ? <Scale size={12} /> : <GraduationCap size={12} />}
-                    {workflowMode === 'compare' ? 'Decision workspace' : 'Learning workspace'}
+                    {workflowMode === "compare" ? (
+                      <Scale size={12} />
+                    ) : (
+                      <GraduationCap size={12} />
+                    )}
+                    {workflowMode === "compare"
+                      ? "Decision workspace"
+                      : "Learning workspace"}
                   </div>
                   <h1 className="mt-3 text-2xl font-black tracking-tight text-slate-950 md:text-3xl">
-                    {String(workspaceRoot?.data?.label || (workflowMode === 'compare' ? 'Comparison workspace' : 'Mind map'))}
+                    {String(
+                      workspaceRoot?.data?.label ||
+                        (workflowMode === "compare"
+                          ? "Comparison workspace"
+                          : "Mind map"),
+                    )}
                   </h1>
                   <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                     {comparisonData?.overview ||
                       String(
                         workspaceRoot?.data?.description ||
-                          'Explore the map, inspect deeper branches, and move between canvas, outline, and decision layers.'
+                          "Explore the map, inspect deeper branches, and move between canvas, outline, and decision layers.",
                       )}
                   </p>
                 </div>
@@ -429,7 +465,7 @@ export default function App() {
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => setExperience('pretext')}
+                  onClick={() => setExperience("pretext")}
                   className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
                 >
                   <Sparkles size={16} />
@@ -437,18 +473,22 @@ export default function App() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveView('map')}
+                  onClick={() => setActiveView("map")}
                   className={`rounded-2xl px-4 py-2.5 text-sm font-semibold transition-colors ${
-                    activeView === 'map' ? 'bg-slate-950 text-white' : 'bg-white text-slate-700 hover:bg-slate-50'
+                    activeView === "map"
+                      ? "bg-slate-950 text-white"
+                      : "bg-white text-slate-700 hover:bg-slate-50"
                   }`}
                 >
                   Map
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveView('outline')}
+                  onClick={() => setActiveView("outline")}
                   className={`rounded-2xl px-4 py-2.5 text-sm font-semibold transition-colors ${
-                    activeView === 'outline' ? 'bg-slate-950 text-white' : 'bg-white text-slate-700 hover:bg-slate-50'
+                    activeView === "outline"
+                      ? "bg-slate-950 text-white"
+                      : "bg-white text-slate-700 hover:bg-slate-50"
                   }`}
                 >
                   Outline
@@ -456,9 +496,11 @@ export default function App() {
                 {comparisonData && (
                   <button
                     type="button"
-                    onClick={() => setActiveView('compare')}
+                    onClick={() => setActiveView("compare")}
                     className={`rounded-2xl px-4 py-2.5 text-sm font-semibold transition-colors ${
-                      activeView === 'compare' ? 'bg-slate-950 text-white' : 'bg-white text-slate-700 hover:bg-slate-50'
+                      activeView === "compare"
+                        ? "bg-slate-950 text-white"
+                        : "bg-white text-slate-700 hover:bg-slate-50"
                     }`}
                   >
                     Compare
@@ -466,7 +508,9 @@ export default function App() {
                 )}
                 <button
                   type="button"
-                  onClick={() => handleSaveMap(workspaceGraph.nodes, workspaceGraph.edges)}
+                  onClick={() =>
+                    handleSaveMap(workspaceGraph.nodes, workspaceGraph.edges)
+                  }
                   className="inline-flex items-center gap-2 rounded-2xl bg-cyan-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-cyan-700"
                 >
                   <Download size={16} />
@@ -493,7 +537,9 @@ export default function App() {
               />
             </div>
 
-            <div className="min-h-[560px] xl:h-[calc(100vh-190px)]">{renderWorkspaceContent()}</div>
+            <div className="min-h-[560px] xl:h-[calc(100vh-190px)]">
+              {renderWorkspaceContent()}
+            </div>
 
             <div className="xl:h-[calc(100vh-190px)]">
               <WorkspaceInspector
@@ -527,27 +573,35 @@ export default function App() {
               </div>
             </div>
             <h1 className="text-4xl font-black tracking-tight text-slate-950">
-              AI Mind <span className="theme-accent-text transition-colors duration-1000">Mapper</span>
+              AI Mind{" "}
+              <span className="theme-accent-text transition-colors duration-1000">
+                Mapper
+              </span>
             </h1>
             <p className="mx-auto max-w-sm text-sm leading-6 text-slate-600">
-              {workflowMode === 'compare'
-                ? 'Build a decision board, linked map, and action path in one workspace.'
-                : 'Generate a layered mind map with outline, inspection, and map views from one prompt or source.'}
+              {workflowMode === "compare"
+                ? "Build a decision board, linked map, and action path in one workspace."
+                : "Generate a layered mind map with outline, inspection, and map views from one prompt or source."}
             </p>
           </div>
 
           <div className="rounded-[28px] border border-slate-200/80 bg-[linear-gradient(135deg,rgba(14,165,233,0.08),rgba(251,146,60,0.08))] p-5 shadow-sm">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-cyan-700">New portfolio demo</p>
-                <h2 className="font-display mt-2 text-2xl font-bold tracking-tight text-slate-950">Pretext Mind Map Builder</h2>
+                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-cyan-700">
+                  New portfolio demo
+                </p>
+                <h2 className="font-display mt-2 text-2xl font-bold tracking-tight text-slate-950">
+                  Pretext Mind Map Builder
+                </h2>
                 <p className="mt-2 max-w-md text-sm leading-6 text-slate-600">
-                  A canvas-first showcase with DOM-free text layout, variable-size node cards, and AI-generated maps.
+                  A canvas-first showcase with DOM-free text layout,
+                  variable-size node cards, and AI-generated maps.
                 </p>
               </div>
               <button
                 type="button"
-                onClick={() => setExperience('pretext')}
+                onClick={() => setExperience("pretext")}
                 className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
               >
                 <Sparkles size={16} />
@@ -565,10 +619,12 @@ export default function App() {
           <div className="grid grid-cols-2 gap-3 rounded-2xl bg-slate-100 p-1">
             <button
               type="button"
-              onClick={() => setWorkflowMode('learn')}
+              onClick={() => setWorkflowMode("learn")}
               disabled={isLoading}
               className={`flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
-                workflowMode === 'learn' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                workflowMode === "learn"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
               }`}
             >
               <GraduationCap size={16} />
@@ -576,10 +632,12 @@ export default function App() {
             </button>
             <button
               type="button"
-              onClick={() => setWorkflowMode('compare')}
+              onClick={() => setWorkflowMode("compare")}
               disabled={isLoading}
               className={`flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
-                workflowMode === 'compare' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                workflowMode === "compare"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
               }`}
             >
               <Scale size={16} />
@@ -592,13 +650,20 @@ export default function App() {
               <div className="theme-accent-bg absolute -inset-0.5 rounded-2xl blur opacity-10 transition-all duration-1000 group-hover:opacity-20" />
               <div className="relative flex items-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm focus-within:theme-accent-border transition-all duration-1000">
                 <div className="pl-5 pr-3 text-cyan-600">
-                  <Sparkles size={20} className={isLoading ? 'animate-pulse' : ''} />
+                  <Sparkles
+                    size={20}
+                    className={isLoading ? "animate-pulse" : ""}
+                  />
                 </div>
                 <input
                   type="text"
                   value={topicInput}
                   onChange={(event) => setTopicInput(event.target.value)}
-                  placeholder={workflowMode === 'compare' ? 'Compare any product, tool, or topic...' : 'Visualize any concept...'}
+                  placeholder={
+                    workflowMode === "compare"
+                      ? "Compare any product, tool, or topic..."
+                      : "Visualize any concept..."
+                  }
                   disabled={isLoading}
                   className="w-full bg-transparent py-5 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none disabled:opacity-50"
                 />
@@ -607,7 +672,11 @@ export default function App() {
                   disabled={isLoading || !topicInput.trim()}
                   className="theme-accent-bg mr-3 rounded-xl p-3 text-white shadow-md transition-all hover:opacity-90 disabled:opacity-30"
                 >
-                  {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                  {isLoading ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <Send size={18} />
+                  )}
                 </button>
               </div>
             </div>
@@ -619,16 +688,18 @@ export default function App() {
             )}
 
             <p className="text-center text-xs leading-5 text-slate-500">
-              {workflowMode === 'compare'
-                ? 'Comparison mode builds a decision board, matched options, next steps, and a linked knowledge map.'
-                : 'Learning mode builds a layered workspace with map, outline, and node inspection.'}
+              {workflowMode === "compare"
+                ? "Comparison mode builds a decision board, matched options, next steps, and a linked knowledge map."
+                : "Learning mode builds a layered workspace with map, outline, and node inspection."}
             </p>
           </form>
 
           <div className="space-y-6">
             <div className="relative flex items-center">
               <div className="flex-grow border-t border-slate-200" />
-              <span className="mx-4 flex-shrink-0 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Or Process Data</span>
+              <span className="mx-4 flex-shrink-0 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                Or Process Data
+              </span>
               <div className="flex-grow border-t border-slate-200" />
             </div>
 
@@ -639,11 +710,16 @@ export default function App() {
                 className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-6 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:border-cyan-500/30 hover:bg-white hover:text-cyan-600 hover:shadow-md disabled:opacity-50"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 bg-white shadow-sm transition-colors group-hover:bg-cyan-50">
-                  <Upload size={22} className="text-slate-400 group-hover:text-cyan-600" />
+                  <Upload
+                    size={22}
+                    className="text-slate-400 group-hover:text-cyan-600"
+                  />
                 </div>
                 <div className="flex flex-col items-center text-center">
                   <span>Document</span>
-                  <span className="text-[9px] uppercase tracking-tighter text-slate-500">PDF, TXT, MD</span>
+                  <span className="text-[9px] uppercase tracking-tighter text-slate-500">
+                    PDF, TXT, MD
+                  </span>
                 </div>
               </button>
 
@@ -653,17 +729,34 @@ export default function App() {
                 className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-6 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:border-orange-500/30 hover:bg-white hover:text-orange-600 hover:shadow-md disabled:opacity-50"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 bg-white shadow-sm transition-colors group-hover:bg-orange-50">
-                  <FileJson size={22} className="text-slate-400 group-hover:text-orange-600" />
+                  <FileJson
+                    size={22}
+                    className="text-slate-400 group-hover:text-orange-600"
+                  />
                 </div>
                 <div className="flex flex-col items-center text-center">
                   <span>Saved Map</span>
-                  <span className="text-[9px] uppercase tracking-tighter text-slate-500">JSON</span>
+                  <span className="text-[9px] uppercase tracking-tighter text-slate-500">
+                    JSON
+                  </span>
                 </div>
               </button>
             </div>
 
-            <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".pdf,.txt,.md" className="hidden" />
-            <input type="file" ref={jsonInputRef} onChange={handleJsonUpload} accept=".json" className="hidden" />
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              accept=".pdf,.txt,.md"
+              className="hidden"
+            />
+            <input
+              type="file"
+              ref={jsonInputRef}
+              onChange={handleJsonUpload}
+              accept=".json"
+              className="hidden"
+            />
 
             <button
               onClick={handleLoadExample}
@@ -671,9 +764,15 @@ export default function App() {
               className="group relative w-full rounded-2xl bg-slate-200/50 p-[2px] transition-all duration-500 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-orange-400"
             >
               <div className="flex w-full items-center justify-center gap-3 rounded-[14px] bg-white py-4 transition-colors group-hover:bg-white">
-                <Play size={16} className="text-cyan-600 transition-transform group-hover:scale-125" />
+                <Play
+                  size={16}
+                  className="text-cyan-600 transition-transform group-hover:scale-125"
+                />
                 <span className="text-sm font-bold text-slate-700">
-                  Example: <span className="font-extrabold text-orange-600">{EXAMPLE_MAP.name}</span>
+                  Example:{" "}
+                  <span className="font-extrabold text-orange-600">
+                    {EXAMPLE_MAP.name}
+                  </span>
                 </span>
               </div>
             </button>
