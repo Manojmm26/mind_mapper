@@ -31,6 +31,7 @@ import {
   generateMindMapFromTopic,
   MindMapData,
 } from "./services/llmService";
+import { normalizeComparisonData } from "./utils/comparisonHelpers";
 import { extractTextFromFile } from "./services/pdfService";
 import { convertTreeToGraph, findRootNode, toFlowGraph } from "./utils/mapData";
 
@@ -162,9 +163,10 @@ export default function App() {
         const json = JSON.parse(text);
         if (json.nodes && json.edges) {
           if (json.comparisonData) {
+            const normalized = normalizeComparisonData(json.comparisonData);
             setComparisonData({
-              ...json.comparisonData,
-              map: { nodes: [], edges: [] },
+              ...normalized,
+              map: normalized.map ?? { nodes: [], edges: [] },
             });
             setWorkflowMode("compare");
             setActiveView("compare");
@@ -226,9 +228,10 @@ export default function App() {
     try {
       if (workflowMode === "compare") {
         setLoadingMessage(`Comparing options for "${topic}"...`);
-        const data = await generateComparisonWorkspaceFromTopic(topic);
+        const raw = await generateComparisonWorkspaceFromTopic(topic);
+        const data = normalizeComparisonData(raw);
         setComparisonData(data);
-        setMapData(data.map);
+        setMapData(data.map ?? { nodes: [], edges: [] });
         setActiveView("compare");
       } else {
         const data = await generateMindMapFromTopic(topic);
@@ -262,9 +265,10 @@ export default function App() {
 
         if (json.nodes && json.edges) {
           if (json.comparisonData) {
+            const normalized = normalizeComparisonData(json.comparisonData);
             setComparisonData({
-              ...json.comparisonData,
-              map: { nodes: [], edges: [] },
+              ...normalized,
+              map: normalized.map ?? { nodes: [], edges: [] },
             });
             setWorkflowMode("compare");
             setActiveView("compare");
