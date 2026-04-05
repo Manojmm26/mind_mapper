@@ -1,4 +1,37 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
+import { WikiContext } from "./wikiPromptEnhancer";
+import {
+  mindMapSchemaGenAI,
+  comparisonWorkspaceSchemaGenAI,
+  validateMindMap,
+  validateComparisonWorkspace,
+  normalizeComparisonData,
+  type NodeData,
+  type EdgeData,
+  type MindMapData,
+  type ComparisonCriterion,
+  type CriterionScore,
+  type ComparisonAction,
+  type ComparisonOption,
+  type ComparisonDomain,
+  type ComparisonWorkspaceData,
+  type ComparisonWorkspaceDataRaw,
+} from "./llmSchemas";
+
+// Re-export types and helpers so existing imports from other modules continue to work
+export type {
+  NodeData,
+  EdgeData,
+  MindMapData,
+  ComparisonCriterion,
+  CriterionScore,
+  ComparisonAction,
+  ComparisonOption,
+  ComparisonDomain,
+  ComparisonWorkspaceData,
+  ComparisonWorkspaceDataRaw,
+};
+export { normalizeComparisonData };
 
 let aiInstance: GoogleGenAI | null = null;
 
@@ -20,369 +53,116 @@ function getAI() {
   return aiInstance;
 }
 
-export interface NodeData {
-  id: string;
-  label: string;
-  description?: string;
-  type?:
-    | "topic"
-    | "concept"
-    | "example"
-    | "question"
-    | "action"
-    | "decision"
-    | "source";
-  tags?: string[];
-  importance?: "high" | "medium" | "low";
-  confidence?: "high" | "medium" | "low";
-  sourceHint?: string;
-  nextStep?: string;
-}
-
-export interface EdgeData {
-  source: string;
-  target: string;
-  label?: string;
-}
-
-export interface MindMapData {
-  nodes: NodeData[];
-  edges: EdgeData[];
-  comparisonData?: Omit<ComparisonWorkspaceData, "map">;
-}
-
-export interface ComparisonCriterion {
-  id: string;
-  label: string;
-  description?: string;
-  weight?: number; // 1-10 importance
-  type: "numeric" | "categorical" | "boolean" | "text";
-  unit?: string;
-}
-
-export interface CriterionScore {
-  value: string | number | boolean;
-  displayValue: string;
-  rating?: 1 | 2 | 3 | 4 | 5;
-  note?: string;
-}
-
-export interface ComparisonAction {
-  label: string;
-  href: string;
-  variant?: "primary" | "secondary" | "ghost";
-}
-
-export interface ComparisonOption {
-  id: string;
-  name: string;
-  summary: string;
-  scores: Record<string, CriterionScore>; // keyed by criterion ID
-  tags?: string[];
-  metadata?: Record<string, string>;
-  actions?: ComparisonAction[];
-}
-
-export type ComparisonDomain =
-  | "products"
-  | "tools"
-  | "services"
-  | "approaches"
-  | "strategies"
-  | "concepts";
-
-export interface ComparisonWorkspaceData {
-  topic: string;
-  domainType: ComparisonDomain;
-  overview: string;
-  recommendedApproach: string;
-  criteria: ComparisonCriterion[];
-  options: ComparisonOption[];
-  nextSteps: string[];
-  map?: MindMapData;
-}
-
-const mindMapSchema = {
-  type: Type.OBJECT,
-  properties: {
-    nodes: {
-      type: Type.ARRAY,
-      description: "All nodes in the mind map, from root to leaves.",
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          id: {
-            type: Type.STRING,
-            description: "A unique identifier (e.g., 'node_0', 'node_1').",
-          },
-          label: {
-            type: Type.STRING,
-            description:
-              "A short, concise title for this concept (max 6 words).",
-          },
-          description: {
-            type: Type.STRING,
-            description:
-              "A clear 1-2 sentence explanation of this concept. Be specific and informative, not generic.",
-          },
-          type: {
-            type: Type.STRING,
-            description:
-              "Optional semantic role for the node. Use one of: topic, concept, example, question, action, decision, source.",
-          },
-          tags: {
-            type: Type.ARRAY,
-            description:
-              "Optional short tags that help filter or cluster this node.",
-            items: { type: Type.STRING },
-          },
-          importance: {
-            type: Type.STRING,
-            description: "Optional priority marker: high, medium, or low.",
-          },
-          confidence: {
-            type: Type.STRING,
-            description: "Optional confidence marker: high, medium, or low.",
-          },
-          sourceHint: {
-            type: Type.STRING,
-            description:
-              "Optional note describing where this idea comes from, such as the source section, evidence, or basis.",
-          },
-          nextStep: {
-            type: Type.STRING,
-            description:
-              "Optional next action or follow-up someone should take after reading this node.",
-          },
-        },
-        required: ["id", "label", "description"],
-      },
-    },
-    edges: {
-      type: Type.ARRAY,
-      description:
-        "Directed edges representing parent-child or relational links between nodes.",
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          source: {
-            type: Type.STRING,
-            description: "The ID of the parent/source node.",
-          },
-          target: {
-            type: Type.STRING,
-            description: "The ID of the child/target node.",
-          },
-          label: {
-            type: Type.STRING,
-            description:
-              "A brief label describing the relationship (e.g., 'includes', 'requires', 'leads to').",
-          },
-        },
-        required: ["source", "target"],
-      },
-    },
-  },
-  required: ["nodes", "edges"],
-};
-
-const comparisonWorkspaceSchema = {
-  type: Type.OBJECT,
-  properties: {
-    topic: {
-      type: Type.STRING,
-      description: "The original topic or query being compared.",
-    },
-    domainType: {
-      type: Type.STRING,
-      description: "The domain category of this comparison.",
-      enum: [
-        "products",
-        "tools",
-        "services",
-        "approaches",
-        "strategies",
-        "concepts",
-      ],
-    },
-    overview: {
-      type: Type.STRING,
-      description:
-        "A short overview of the comparison landscape for the user's query.",
-    },
-    recommendedApproach: {
-      type: Type.STRING,
-      description:
-        "Guidance on how the user should evaluate the available options.",
-    },
-    criteria: {
-      type: Type.ARRAY,
-      description: "The key decision criteria the user should compare.",
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          id: { type: Type.STRING },
-          label: { type: Type.STRING },
-          description: { type: Type.STRING },
-          weight: { type: Type.INTEGER },
-          type: {
-            type: Type.STRING,
-            enum: ["numeric", "categorical", "boolean", "text"],
-          },
-          unit: { type: Type.STRING },
-        },
-        required: ["id", "label", "type"],
-      },
-    },
-    options: {
-      type: Type.ARRAY,
-      description: "The recommended options that best match the user's query.",
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          id: { type: Type.STRING },
-          name: { type: Type.STRING },
-          summary: { type: Type.STRING },
-          scores: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                criterionId: { type: Type.STRING },
-                value: { type: Type.STRING },
-                displayValue: { type: Type.STRING },
-                rating: { type: Type.INTEGER },
-                note: { type: Type.STRING },
-              },
-              required: ["criterionId", "displayValue"],
-            },
-          },
-          tags: {
-            type: Type.ARRAY,
-            items: { type: Type.STRING },
-          },
-          metadata: {
-            type: Type.OBJECT,
-            description:
-              "Domain-specific metadata fields. Use keys like: bestFor, considerations, priceBand (for products); idealUseCase, limitations (for tools); bestFit, tradeoffs (for services); whenToUse, tradeoffs (for approaches); bestScenario, risks (for strategies); keyTakeaway, limitations (for concepts).",
-            additionalProperties: { type: Type.STRING },
-          },
-          actions: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                label: { type: Type.STRING },
-                href: { type: Type.STRING },
-                variant: {
-                  type: Type.STRING,
-                  enum: ["primary", "secondary", "ghost"],
-                },
-              },
-              required: ["label", "href"],
-            },
-          },
-        },
-        required: ["id", "name", "summary", "scores"],
-      },
-    },
-    nextSteps: {
-      type: Type.ARRAY,
-      description:
-        "Concrete next steps the user can take after reviewing the comparison.",
-      items: {
-        type: Type.STRING,
-      },
-    },
-    map: mindMapSchema,
-  },
-  required: [
-    "topic",
-    "domainType",
-    "overview",
-    "recommendedApproach",
-    "criteria",
-    "options",
-    "nextSteps",
-  ],
-};
-
-function parseResponse<T>(response: any): T {
+function parseAndValidate<T>(
+  response: any,
+  validator: (data: unknown) => T,
+): T {
   const jsonStr = response.text?.trim() || "{}";
+  let parsed: unknown;
   try {
-    return JSON.parse(jsonStr) as T;
+    parsed = JSON.parse(jsonStr);
   } catch (e) {
     console.error("Failed to parse JSON response:", jsonStr);
-    throw new Error("Invalid response format from LLM.");
+    throw new Error("Invalid JSON response format from LLM.");
   }
+
+  return validator(parsed);
 }
 
-/**
- * Generates a mind map from a document's text content.
- * Uses a prompt optimized for extracting and organizing existing information.
- */
-export async function generateMindMap(text: string): Promise<MindMapData> {
-  const ai = getAI();
-  const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: `You are analyzing the following document to create a comprehensive, hierarchical mind map.
+// ---------------------------------------------------------------------------
+// Wiki Pattern Instructions (shared across all prompts)
+// ---------------------------------------------------------------------------
 
-Your task:
-1. Identify the single central theme or title of the document — this becomes the ROOT node.
-2. Extract the major topics/sections as LEVEL 1 children of the root.
+const WIKI_INSTRUCTIONS = `
+--- WIKI INTEGRATION RULES ---
+You are building upon an existing knowledge base. Follow these rules:
+1. CROSS-REFERENCE: When a node relates to an existing page, add a [[wikilink]] in its description or sourceHint (e.g., "See also [[Transformer Architecture]]").
+2. CONTRADICTION FLAGGING: If new information contradicts an existing page, note it in sourceHint: "Note: This contrasts with [[Page Title]] which states..."
+3. TERMINOLOGY CONSISTENCY: Use the same terms and tags as the existing wiki. Do not invent synonyms for concepts that already have established names.
+4. EXPAND, DON'T DUPLICATE: If a concept is already well-covered in an existing page, link to it and explain the new perspective rather than recreating the same content.
+5. COMPOUNDING KNOWLEDGE: Each new map should make the overall knowledge base richer — add depth, nuance, or connections that weren't there before.
+--- END WIKI RULES ---
+`;
+
+// ---------------------------------------------------------------------------
+// Mind Map from Document
+// ---------------------------------------------------------------------------
+
+export async function generateMindMap(
+  text: string,
+  wikiContext?: WikiContext,
+): Promise<MindMapData> {
+  const ai = getAI();
+  const basePrompt = `You are an expert knowledge architect analyzing a document to build a comprehensive, hierarchical mind map.
+
+## Your Task
+1. Identify the single central theme or thesis — this becomes the ROOT node.
+2. Extract major topics/sections as LEVEL 1 children of the root.
 3. For each major topic, extract sub-topics as LEVEL 2 children.
 4. Continue decomposing into LEVEL 3 and LEVEL 4 where the document provides enough detail.
-5. Every node MUST have a meaningful, specific description — not generic filler.
+5. Every node MUST have a meaningful, specific description — never use generic filler.
 
-Rules:
-- Build a proper TREE structure: one root, with branches going deeper into detail.
-- Every non-root node must be connected to exactly one parent via an edge.
+## Structural Rules
+- Build a proper TREE: one root, with branches going deeper into detail.
+- Every non-root node must connect to exactly one parent via an edge.
 - Aim for 20-60 nodes depending on document complexity.
-- Labels should be concise (max 6 words). Descriptions should be informative (1-2 sentences).
+- Labels: concise (max 6 words). Descriptions: specific and informative (1-2 sentences).
 - Add metadata when it helps: node type, 1-3 tags, importance, confidence, sourceHint, and nextStep.
 - Do NOT create disconnected nodes. Every node must be reachable from the root.
 - Prefer depth over breadth — 3-4 levels of hierarchy is better than 15 flat siblings.
 
+## Output Format
+- Return structured JSON matching the MindMapData schema.
+- Include metadata on nodes: type, tags, importance, confidence, sourceHint.
+- Keep labels concise (max 6 words), descriptions specific and educational (1-2 sentences).
+
 Document content:
 """
 ${text.substring(0, 50000)}
-"""`,
+"""`;
+
+  const prompt = wikiContext?.contextString
+    ? `${basePrompt}${wikiContext.contextString}${WIKI_INSTRUCTIONS}`
+    : basePrompt;
+
+  const response = await ai.models.generateContent({
+    model: "gemini-3-flash-preview",
+    contents: prompt,
     config: {
       responseMimeType: "application/json",
-      responseSchema: mindMapSchema,
+      responseSchema: mindMapSchemaGenAI,
     },
   });
 
-  return parseResponse<MindMapData>(response);
+  return parseAndValidate(response, validateMindMap);
 }
 
-/**
- * Generates a mind map from a topic/subject query.
- * Uses a prompt that first reasons about the topic, then builds a structured knowledge map.
- */
+// ---------------------------------------------------------------------------
+// Mind Map from Topic (Learning Roadmap)
+// ---------------------------------------------------------------------------
+
 export async function generateMindMapFromTopic(
   topic: string,
+  wikiContext?: WikiContext,
 ): Promise<MindMapData> {
   const ai = getAI();
-  const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: `You are an expert educator and knowledge architect. A user wants to learn about: "${topic}"
+  const basePrompt = `You are an expert educator and knowledge architect. A user wants to learn about: "${topic}"
 
 Your task is to create a comprehensive, well-organized mind map that serves as a learning roadmap.
 
-Step 1 — Think deeply about the topic:
+## Step 1 — Think Deeply About the Topic
 - What are the foundational concepts someone must understand first?
 - What are the major pillars/categories within this topic?
 - What are the practical applications, tools, or techniques?
 - What are common misconceptions or advanced nuances?
 
-Step 2 — Build the mind map:
+## Step 2 — Build the Mind Map
 - The ROOT node should be the topic title with a description summarizing what this map covers.
 - LEVEL 1: Major categories or pillars (aim for 4-8 branches).
 - LEVEL 2: Key concepts within each category (2-5 per branch).
 - LEVEL 3+: Specific details, examples, techniques, or sub-concepts.
 
-Rules:
+## Structural Rules
 - Build a proper TREE: one root, branching into increasing specificity.
 - Every non-root node connects to exactly one parent.
 - Target 30-70 nodes for a rich, useful map.
@@ -390,27 +170,38 @@ Rules:
 - Add metadata when relevant: node type, 1-3 tags, importance, confidence, sourceHint, and nextStep.
 - Do NOT create disconnected nodes.
 - Do NOT be superficial — go deep enough that each leaf node contains actionable or specific knowledge.
-- Organize logically: foundational concepts first, advanced topics later in the hierarchy.`,
+- Organize logically: foundational concepts first, advanced topics later in the hierarchy.`;
+
+  const prompt = wikiContext?.contextString
+    ? `${basePrompt}${wikiContext.contextString}${WIKI_INSTRUCTIONS}`
+    : basePrompt;
+
+  const response = await ai.models.generateContent({
+    model: "gemini-3-flash-preview",
+    contents: prompt,
     config: {
       responseMimeType: "application/json",
-      responseSchema: mindMapSchema,
+      responseSchema: mindMapSchemaGenAI,
     },
   });
 
-  return parseResponse<MindMapData>(response);
+  return parseAndValidate(response, validateMindMap);
 }
+
+// ---------------------------------------------------------------------------
+// Comparison Workspace
+// ---------------------------------------------------------------------------
 
 export async function generateComparisonWorkspaceFromTopic(
   topic: string,
+  wikiContext?: WikiContext,
 ): Promise<ComparisonWorkspaceData> {
   const ai = getAI();
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: `You are an expert comparison and decision-support assistant. A user wants to compare options for: "${topic}".
+  const basePrompt = `You are an expert comparison and decision-support assistant. A user wants to compare options for: "${topic}".
 
 Create a comprehensive, domain-agnostic comparison workspace that can be shown inside a decision-support app. This could apply to products, tools, services, approaches, strategies, or concepts.
 
-Your output must include:
+## Your Output Must Include
 1. A domainType field: classify this comparison as one of "products", "tools", "services", "approaches", "strategies", or "concepts".
 2. A clear overview of the comparison landscape.
 3. 4-8 key decision criteria appropriate to the domain (e.g., cost, learning curve, scalability, features, community support).
@@ -420,7 +211,7 @@ Your output must include:
 7. Concrete next steps for the user.
 8. (Optional) A decision-oriented mind map that explains how to choose.
 
-Rules:
+## Domain-Specific Rules
 - First determine the domain type, then adapt criteria, scoring, and actions accordingly.
 - For "products": include pricing, features, ecosystem. Actions: "Compare Pricing", "Read Reviews", "Try Demo".
 - For "tools": include learning curve, integrations, community. Actions: "Read Docs", "Start Trial", "View GitHub".
@@ -431,12 +222,20 @@ Rules:
 - Scores should be realistic and comparative. Use the "scores" array to map each option to the criteria by ID.
 - Actions should be practical and domain-appropriate. Do not default to shopping links unless domainType is "products".
 - If a mind map is included, it must remain a proper tree with one root and connected child nodes.
-- Keep labels concise and descriptions useful.`,
+- Keep labels concise and descriptions useful.`;
+
+  const prompt = wikiContext?.contextString
+    ? `${basePrompt}${wikiContext.contextString}${WIKI_INSTRUCTIONS}`
+    : basePrompt;
+
+  const response = await ai.models.generateContent({
+    model: "gemini-3-flash-preview",
+    contents: prompt,
     config: {
       responseMimeType: "application/json",
-      responseSchema: comparisonWorkspaceSchema,
+      responseSchema: comparisonWorkspaceSchemaGenAI,
     },
   });
 
-  return parseResponse<ComparisonWorkspaceData>(response);
+  return parseAndValidate(response, validateComparisonWorkspace);
 }

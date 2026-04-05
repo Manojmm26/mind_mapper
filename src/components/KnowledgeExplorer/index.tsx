@@ -42,10 +42,45 @@ import {
 import { useKnowledgeExplorer } from "./useKnowledgeExplorer";
 import { drawNodeCard, drawEdge } from "./renderers";
 import { hexToRgba } from "./utils";
-import { COLORS, VIEWPORT, LERP_FACTORS, PARALLAX_SMOOTHING, ANIMATION_DURATION } from "./constants";
+import {
+  COLORS,
+  VIEWPORT,
+  LERP_FACTORS,
+  PARALLAX_SMOOTHING,
+  ANIMATION_DURATION,
+} from "./constants";
 import { Easing } from "../../services/cameraService";
+import { TopBar } from "./ui/TopBar";
+import { CanvasArea } from "./ui/CanvasArea";
+import {
+  SearchPanel,
+  AddChildPanel,
+  CollectedPanel,
+  ComparePanel,
+  StatsPanel,
+  DetailPanel,
+} from "./ui/Panels";
+import {
+  OnboardingOverlay,
+  StoryModeControls,
+  EdgeCreationHint,
+  MiniMap,
+  HelpModal,
+  DeleteConfirmation,
+  PresentationModeOverlay,
+  ModeIndicator,
+  TopicSuggestions,
+  GenerationLoadingOverlay,
+  ErrorToast,
+} from "./ui/Overlays";
 
-export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; onExit?: () => void }) {
+export function KnowledgeExplorer({
+  initialData,
+  onExit,
+}: {
+  initialData?: any;
+  onExit?: () => void;
+}) {
   const {
     // State
     size,
@@ -259,7 +294,8 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
         (a, b) => (roleOrder[a.role] ?? 0) - (roleOrder[b.role] ?? 0),
       );
 
-      const lerpFactor = mode === "tunnel" ? LERP_FACTORS.tunnel : LERP_FACTORS.default;
+      const lerpFactor =
+        mode === "tunnel" ? LERP_FACTORS.tunnel : LERP_FACTORS.default;
 
       for (const sn of sortedNodes) {
         const existing = nodeAnimState.current.get(sn.id);
@@ -301,8 +337,10 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
 
         if (mode === "tunnel") {
           const px = targetParallaxRef.current;
-          parallaxRef.current.x += (px.x - parallaxRef.current.x) * PARALLAX_SMOOTHING;
-          parallaxRef.current.y += (px.y - parallaxRef.current.y) * PARALLAX_SMOOTHING;
+          parallaxRef.current.x +=
+            (px.x - parallaxRef.current.x) * PARALLAX_SMOOTHING;
+          parallaxRef.current.y +=
+            (px.y - parallaxRef.current.y) * PARALLAX_SMOOTHING;
         }
 
         if (mode === "tunnel" && sn.role !== "focus") {
@@ -330,8 +368,10 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
         }
 
         // Performance culling
-        const nodeScreenX = (x + sn.node.width / 2) * viewport.scale + viewport.x;
-        const nodeScreenY = (y + sn.node.height / 2) * viewport.scale + viewport.y;
+        const nodeScreenX =
+          (x + sn.node.width / 2) * viewport.scale + viewport.x;
+        const nodeScreenY =
+          (y + sn.node.height / 2) * viewport.scale + viewport.y;
         const margin = VIEWPORT.viewportMargin;
         if (
           nodeScreenX < -margin ||
@@ -402,7 +442,9 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
           )}
           <div className="flex items-center gap-2">
             <Sparkles size={18} className="text-cyan-400" />
-            <span className="text-sm font-semibold tracking-wide">Knowledge Explorer</span>
+            <span className="text-sm font-semibold tracking-wide">
+              Knowledge Explorer
+            </span>
           </div>
         </div>
 
@@ -411,7 +453,9 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
           <button
             onClick={() => setMode("atlas")}
             className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-              mode === "atlas" ? "bg-cyan-500/20 text-cyan-300" : "text-slate-400 hover:text-white"
+              mode === "atlas"
+                ? "bg-cyan-500/20 text-cyan-300"
+                : "text-slate-400 hover:text-white"
             }`}
           >
             <Target size={14} className="mr-1 inline" />
@@ -420,7 +464,9 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
           <button
             onClick={() => setMode("tunnel")}
             className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-              mode === "tunnel" ? "bg-cyan-500/20 text-cyan-300" : "text-slate-400 hover:text-white"
+              mode === "tunnel"
+                ? "bg-cyan-500/20 text-cyan-300"
+                : "text-slate-400 hover:text-white"
             }`}
           >
             <Eye size={14} className="mr-1 inline" />
@@ -429,7 +475,9 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
           <button
             onClick={() => setMode("overview")}
             className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-              mode === "overview" ? "bg-cyan-500/20 text-cyan-300" : "text-slate-400 hover:text-white"
+              mode === "overview"
+                ? "bg-cyan-500/20 text-cyan-300"
+                : "text-slate-400 hover:text-white"
             }`}
           >
             <Layers size={14} className="mr-1 inline" />
@@ -488,7 +536,11 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
               disabled={isGenerating || !topicInput.trim()}
               className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-1 text-cyan-400 transition-colors hover:bg-white/10 disabled:opacity-40"
             >
-              {isGenerating ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+              {isGenerating ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Sparkles size={16} />
+              )}
             </button>
           </div>
 
@@ -724,7 +776,11 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="rounded-xl p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
           >
-            {sidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
+            {sidebarOpen ? (
+              <PanelLeftClose size={18} />
+            ) : (
+              <PanelLeftOpen size={18} />
+            )}
           </button>
         </div>
       </div>
@@ -746,7 +802,10 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
           {!fontsReady && (
             <div className="absolute inset-0 flex items-center justify-center bg-slate-950">
               <div className="text-center">
-                <Loader2 size={32} className="mx-auto animate-spin text-cyan-400" />
+                <Loader2
+                  size={32}
+                  className="mx-auto animate-spin text-cyan-400"
+                />
                 <p className="mt-4 text-sm font-medium text-slate-400">
                   Preparing typography engine...
                 </p>
@@ -781,7 +840,11 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                         ? "bg-cyan-500/20 text-cyan-300"
                         : "text-slate-400 hover:bg-white/10 hover:text-white"
                     }`}
-                    title={collectedIds.has(focusNode.id) ? "Unsave node" : "Save node"}
+                    title={
+                      collectedIds.has(focusNode.id)
+                        ? "Unsave node"
+                        : "Save node"
+                    }
                   >
                     <Save size={14} />
                   </button>
@@ -833,7 +896,8 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                     className="pointer-events-auto flex items-center gap-1 rounded-md bg-cyan-500/10 px-2 py-1 text-cyan-400 transition-colors hover:bg-cyan-500/20"
                   >
                     <ArrowRight size={10} />
-                    {childNodes.length} branch{childNodes.length > 1 ? "es" : ""}
+                    {childNodes.length} branch
+                    {childNodes.length > 1 ? "es" : ""}
                   </button>
                 )}
                 {collectedIds.size > 0 && (
@@ -861,10 +925,15 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
             <button
               onClick={() => {
                 if (cameraRef.current) {
-                  cameraRef.current.zoomBy(0.8, size.width / 2, size.height / 2, {
-                    duration: ANIMATION_DURATION.fast,
-                    easing: Easing.easeOutExpo,
-                  });
+                  cameraRef.current.zoomBy(
+                    0.8,
+                    size.width / 2,
+                    size.height / 2,
+                    {
+                      duration: ANIMATION_DURATION.fast,
+                      easing: Easing.easeOutExpo,
+                    },
+                  );
                 }
               }}
               className="rounded-xl p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
@@ -875,10 +944,15 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
             <button
               onClick={() => {
                 if (cameraRef.current) {
-                  cameraRef.current.zoomBy(1.25, size.width / 2, size.height / 2, {
-                    duration: ANIMATION_DURATION.fast,
-                    easing: Easing.easeOutExpo,
-                  });
+                  cameraRef.current.zoomBy(
+                    1.25,
+                    size.width / 2,
+                    size.height / 2,
+                    {
+                      duration: ANIMATION_DURATION.fast,
+                      easing: Easing.easeOutExpo,
+                    },
+                  );
                 }
               }}
               className="rounded-xl p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
@@ -897,12 +971,22 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                       maxX: Math.max(acc.maxX, n.x + n.width),
                       maxY: Math.max(acc.maxY, n.y + n.height),
                     }),
-                    { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
+                    {
+                      minX: Infinity,
+                      minY: Infinity,
+                      maxX: -Infinity,
+                      maxY: -Infinity,
+                    },
                   );
-                  cameraRef.current.fitToBounds(bounds, size.width, size.height, {
-                    duration: ANIMATION_DURATION.normal,
-                    easing: Easing.easeInOutCubic,
-                  });
+                  cameraRef.current.fitToBounds(
+                    bounds,
+                    size.width,
+                    size.height,
+                    {
+                      duration: ANIMATION_DURATION.normal,
+                      easing: Easing.easeInOutCubic,
+                    },
+                  );
                 }
               }}
               className="rounded-xl p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
@@ -946,7 +1030,9 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
           {showCollected && collectedIds.size > 0 && (
             <div className="pointer-events-auto absolute bottom-16 right-4 w-80 max-h-[50vh] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 shadow-2xl backdrop-blur-xl">
               <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-                <h3 className="text-sm font-semibold text-white">Collected Nodes</h3>
+                <h3 className="text-sm font-semibold text-white">
+                  Collected Nodes
+                </h3>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handleExportCollectedSummary}
@@ -1097,7 +1183,9 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
               </div>
               <div className="space-y-3">
                 <div>
-                  <label className="mb-1 block text-xs text-slate-500">Label</label>
+                  <label className="mb-1 block text-xs text-slate-500">
+                    Label
+                  </label>
                   <input
                     type="text"
                     value={newChildLabel}
@@ -1109,7 +1197,9 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs text-slate-500">Description (optional)</label>
+                  <label className="mb-1 block text-xs text-slate-500">
+                    Description (optional)
+                  </label>
                   <textarea
                     value={newChildDescription}
                     onChange={(e) => setNewChildDescription(e.target.value)}
@@ -1146,7 +1236,9 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
           {compareMode && (
             <div className="pointer-events-auto absolute top-16 left-1/2 -translate-x-1/2 w-full max-w-md rounded-2xl border border-indigo-500/20 bg-slate-900/95 shadow-2xl backdrop-blur-xl p-4">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-white">Compare Nodes</h3>
+                <h3 className="text-sm font-semibold text-white">
+                  Compare Nodes
+                </h3>
                 <button
                   onClick={() => {
                     resetCompare();
@@ -1158,20 +1250,31 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                 </button>
               </div>
               {!compareFirst ? (
-                <p className="text-xs text-slate-400">Click the first node to compare.</p>
+                <p className="text-xs text-slate-400">
+                  Click the first node to compare.
+                </p>
               ) : !compareSecond ? (
                 <div>
                   <p className="text-xs text-slate-400 mb-2">
-                    First: <span className="text-indigo-300 font-medium">{nodeMap.get(compareFirst)?.data.label}</span>
+                    First:{" "}
+                    <span className="text-indigo-300 font-medium">
+                      {nodeMap.get(compareFirst)?.data.label}
+                    </span>
                   </p>
-                  <p className="text-xs text-slate-500">Now click the second node.</p>
+                  <p className="text-xs text-slate-500">
+                    Now click the second node.
+                  </p>
                 </div>
               ) : (
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs font-medium text-indigo-300">{nodeMap.get(compareFirst)?.data.label}</span>
+                    <span className="text-xs font-medium text-indigo-300">
+                      {nodeMap.get(compareFirst)?.data.label}
+                    </span>
                     <span className="text-slate-500">→</span>
-                    <span className="text-xs font-medium text-indigo-300">{nodeMap.get(compareSecond)?.data.label}</span>
+                    <span className="text-xs font-medium text-indigo-300">
+                      {nodeMap.get(compareSecond)?.data.label}
+                    </span>
                   </div>
                   {comparePath.length > 0 ? (
                     <div>
@@ -1183,7 +1286,11 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                           const node = nodeMap.get(id);
                           return (
                             <React.Fragment key={id}>
-                              {i > 0 && <span className="text-slate-600 text-[10px]">›</span>}
+                              {i > 0 && (
+                                <span className="text-slate-600 text-[10px]">
+                                  ›
+                                </span>
+                              )}
                               <button
                                 onClick={() => handleSelectNode(id)}
                                 className="rounded-md bg-white/5 px-2 py-1 text-[10px] text-slate-300 hover:bg-white/10"
@@ -1196,7 +1303,9 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                       </div>
                     </div>
                   ) : (
-                    <p className="text-xs text-slate-500">No path found between these nodes.</p>
+                    <p className="text-xs text-slate-500">
+                      No path found between these nodes.
+                    </p>
                   )}
                   <button
                     onClick={resetCompare}
@@ -1213,7 +1322,9 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
           {statsPanelOpen && (
             <div className="pointer-events-auto absolute top-16 left-1/2 -translate-x-1/2 w-full max-w-2xl rounded-2xl border border-white/10 bg-slate-900/95 shadow-2xl backdrop-blur-xl overflow-hidden">
               <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
-                <h3 className="text-sm font-semibold text-white">Map Analytics</h3>
+                <h3 className="text-sm font-semibold text-white">
+                  Map Analytics
+                </h3>
                 <button
                   onClick={() => setStatsPanelOpen(false)}
                   className="text-slate-400 hover:text-white"
@@ -1224,41 +1335,75 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
               <div className="p-5">
                 <div className="grid grid-cols-4 gap-3 mb-5">
                   <div className="rounded-xl bg-white/5 p-3 text-center">
-                    <p className="text-2xl font-bold text-white">{nodes.length}</p>
-                    <p className="text-[10px] uppercase tracking-wider text-slate-500 mt-1">Total Nodes</p>
+                    <p className="text-2xl font-bold text-white">
+                      {nodes.length}
+                    </p>
+                    <p className="text-[10px] uppercase tracking-wider text-slate-500 mt-1">
+                      Total Nodes
+                    </p>
                   </div>
                   <div className="rounded-xl bg-white/5 p-3 text-center">
-                    <p className="text-2xl font-bold text-white">{edges.length}</p>
-                    <p className="text-[10px] uppercase tracking-wider text-slate-500 mt-1">Connections</p>
+                    <p className="text-2xl font-bold text-white">
+                      {edges.length}
+                    </p>
+                    <p className="text-[10px] uppercase tracking-wider text-slate-500 mt-1">
+                      Connections
+                    </p>
                   </div>
                   <div className="rounded-xl bg-white/5 p-3 text-center">
-                    <p className="text-2xl font-bold text-cyan-300">{collectedIds.size}</p>
-                    <p className="text-[10px] uppercase tracking-wider text-slate-500 mt-1">Collected</p>
+                    <p className="text-2xl font-bold text-cyan-300">
+                      {collectedIds.size}
+                    </p>
+                    <p className="text-[10px] uppercase tracking-wider text-slate-500 mt-1">
+                      Collected
+                    </p>
                   </div>
                   <div className="rounded-xl bg-white/5 p-3 text-center">
-                    <p className="text-2xl font-bold text-amber-300">{visitedIds.size}</p>
-                    <p className="text-[10px] uppercase tracking-wider text-slate-500 mt-1">Visited</p>
+                    <p className="text-2xl font-bold text-amber-300">
+                      {visitedIds.size}
+                    </p>
+                    <p className="text-[10px] uppercase tracking-wider text-slate-500 mt-1">
+                      Visited
+                    </p>
                   </div>
                 </div>
 
                 <div className="mb-5">
-                  <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">Depth Distribution</h4>
+                  <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                    Depth Distribution
+                  </h4>
                   <div className="flex items-end gap-1 h-16">
                     {(() => {
                       const depthCounts: Record<number, number> = {};
                       nodes.forEach((n) => {
                         depthCounts[n.depth] = (depthCounts[n.depth] || 0) + 1;
                       });
-                      const maxDepth = Math.max(0, ...Object.keys(depthCounts).map(Number));
-                      const maxCount = Math.max(1, ...Object.values(depthCounts));
+                      const maxDepth = Math.max(
+                        0,
+                        ...Object.keys(depthCounts).map(Number),
+                      );
+                      const maxCount = Math.max(
+                        1,
+                        ...Object.values(depthCounts),
+                      );
                       return Array.from({ length: maxDepth + 1 }, (_, i) => {
                         const count = depthCounts[i] || 0;
                         const height = (count / maxCount) * 100;
                         return (
-                          <div key={i} className="flex-1 flex flex-col items-center justify-end">
-                            <span className="text-[9px] text-slate-500 mb-1">{count}</span>
-                            <div className="w-full rounded-t bg-cyan-500/30 transition-all" style={{ height: `${Math.max(4, height)}%` }} />
-                            <span className="text-[9px] text-slate-600 mt-1">{i}</span>
+                          <div
+                            key={i}
+                            className="flex-1 flex flex-col items-center justify-end"
+                          >
+                            <span className="text-[9px] text-slate-500 mb-1">
+                              {count}
+                            </span>
+                            <div
+                              className="w-full rounded-t bg-cyan-500/30 transition-all"
+                              style={{ height: `${Math.max(4, height)}%` }}
+                            />
+                            <span className="text-[9px] text-slate-600 mt-1">
+                              {i}
+                            </span>
                           </div>
                         );
                       });
@@ -1267,7 +1412,9 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                 </div>
 
                 <div className="mb-5">
-                  <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">Node Types</h4>
+                  <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                    Node Types
+                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {(() => {
                       const typeCounts: Record<string, number> = {};
@@ -1288,7 +1435,10 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                       return Object.entries(typeCounts)
                         .sort((a, b) => b[1] - a[1])
                         .map(([type, count]) => (
-                          <span key={type} className={`rounded-full px-3 py-1 text-xs font-medium ${colors[type] || colors.unknown}`}>
+                          <span
+                            key={type}
+                            className={`rounded-full px-3 py-1 text-xs font-medium ${colors[type] || colors.unknown}`}
+                          >
                             {type}: {count}
                           </span>
                         ));
@@ -1297,25 +1447,45 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                 </div>
 
                 <div>
-                  <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">Exploration Progress</h4>
+                  <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                    Exploration Progress
+                  </h4>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-slate-400">Visited</span>
                       <span className="text-slate-300">
-                        {visitedIds.size} / {nodes.length} ({nodes.length > 0 ? Math.round((visitedIds.size / nodes.length) * 100) : 0}%)
+                        {visitedIds.size} / {nodes.length} (
+                        {nodes.length > 0
+                          ? Math.round((visitedIds.size / nodes.length) * 100)
+                          : 0}
+                        %)
                       </span>
                     </div>
                     <div className="h-2 rounded-full bg-white/5 overflow-hidden">
-                      <div className="h-full rounded-full bg-cyan-500/40 transition-all" style={{ width: `${nodes.length > 0 ? (visitedIds.size / nodes.length) * 100 : 0}%` }} />
+                      <div
+                        className="h-full rounded-full bg-cyan-500/40 transition-all"
+                        style={{
+                          width: `${nodes.length > 0 ? (visitedIds.size / nodes.length) * 100 : 0}%`,
+                        }}
+                      />
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-slate-400">Collected</span>
                       <span className="text-slate-300">
-                        {collectedIds.size} / {nodes.length} ({nodes.length > 0 ? Math.round((collectedIds.size / nodes.length) * 100) : 0}%)
+                        {collectedIds.size} / {nodes.length} (
+                        {nodes.length > 0
+                          ? Math.round((collectedIds.size / nodes.length) * 100)
+                          : 0}
+                        %)
                       </span>
                     </div>
                     <div className="h-2 rounded-full bg-white/5 overflow-hidden">
-                      <div className="h-full rounded-full bg-amber-500/40 transition-all" style={{ width: `${nodes.length > 0 ? (collectedIds.size / nodes.length) * 100 : 0}%` }} />
+                      <div
+                        className="h-full rounded-full bg-amber-500/40 transition-all"
+                        style={{
+                          width: `${nodes.length > 0 ? (collectedIds.size / nodes.length) * 100 : 0}%`,
+                        }}
+                      />
                     </div>
                   </div>
                 </div>
@@ -1327,17 +1497,26 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
           {detailPanelOpen && focusNode && (
             <div className="pointer-events-auto absolute top-0 right-0 z-30 w-96 h-full border-l border-white/10 bg-slate-900/95 shadow-2xl backdrop-blur-xl overflow-y-auto">
               <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/10 bg-slate-900/95 px-5 py-4 backdrop-blur-xl">
-                <h3 className="text-sm font-semibold text-white">Node Details</h3>
-                <button onClick={() => setDetailPanelOpen(false)} className="text-slate-400 hover:text-white">
+                <h3 className="text-sm font-semibold text-white">
+                  Node Details
+                </h3>
+                <button
+                  onClick={() => setDetailPanelOpen(false)}
+                  className="text-slate-400 hover:text-white"
+                >
                   <X size={18} />
                 </button>
               </div>
 
               <div className="p-5 space-y-5">
                 <div>
-                  <h2 className="text-lg font-bold text-white">{focusNode.data.label}</h2>
+                  <h2 className="text-lg font-bold text-white">
+                    {focusNode.data.label}
+                  </h2>
                   {focusNode.data.description && (
-                    <p className="mt-2 text-sm leading-relaxed text-slate-300">{focusNode.data.description}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-300">
+                      {focusNode.data.description}
+                    </p>
                   )}
                 </div>
 
@@ -1348,10 +1527,15 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                     </span>
                   )}
                   {focusNode.data.importance && (
-                    <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${
-                      focusNode.data.importance === "high" ? "bg-red-500/15 text-red-300" :
-                      focusNode.data.importance === "medium" ? "bg-amber-500/15 text-amber-300" : "bg-green-500/15 text-green-300"
-                    }`}>
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${
+                        focusNode.data.importance === "high"
+                          ? "bg-red-500/15 text-red-300"
+                          : focusNode.data.importance === "medium"
+                            ? "bg-amber-500/15 text-amber-300"
+                            : "bg-green-500/15 text-green-300"
+                      }`}
+                    >
                       {focusNode.data.importance}
                     </span>
                   )}
@@ -1367,10 +1551,15 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
 
                 {focusNode.data.tags && focusNode.data.tags.length > 0 && (
                   <div>
-                    <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">Tags</h4>
+                    <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                      Tags
+                    </h4>
                     <div className="flex flex-wrap gap-1.5">
                       {focusNode.data.tags.map((tag) => (
-                        <span key={tag} className="rounded-md bg-white/5 px-2 py-1 text-xs text-slate-300">
+                        <span
+                          key={tag}
+                          className="rounded-md bg-white/5 px-2 py-1 text-xs text-slate-300"
+                        >
                           {tag}
                         </span>
                       ))}
@@ -1380,21 +1569,31 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
 
                 {focusNode.data.nextStep && (
                   <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-3">
-                    <h4 className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-cyan-400">Next Step</h4>
-                    <p className="text-sm text-slate-300">{focusNode.data.nextStep}</p>
+                    <h4 className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-cyan-400">
+                      Next Step
+                    </h4>
+                    <p className="text-sm text-slate-300">
+                      {focusNode.data.nextStep}
+                    </p>
                   </div>
                 )}
 
                 {focusNode.data.sourceHint && (
                   <div className="rounded-xl border border-white/5 bg-white/5 p-3">
-                    <h4 className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">Source</h4>
-                    <p className="text-xs text-slate-400">{focusNode.data.sourceHint}</p>
+                    <h4 className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                      Source
+                    </h4>
+                    <p className="text-xs text-slate-400">
+                      {focusNode.data.sourceHint}
+                    </p>
                   </div>
                 )}
 
                 {parentNode && (
                   <div>
-                    <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">Parent</h4>
+                    <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                      Parent
+                    </h4>
                     <button
                       onClick={() => handleSelectNode(parentNode.id)}
                       className="w-full rounded-lg border border-white/5 bg-white/5 px-3 py-2 text-left text-sm text-slate-300 transition-colors hover:bg-white/10"
@@ -1406,7 +1605,9 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
 
                 {childNodes.length > 0 && (
                   <div>
-                    <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">Children ({childNodes.length})</h4>
+                    <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                      Children ({childNodes.length})
+                    </h4>
                     <div className="space-y-1">
                       {childNodes.map((child) => (
                         <button
@@ -1416,7 +1617,9 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                         >
                           <div className="font-medium">{child.data.label}</div>
                           {child.data.description && (
-                            <div className="mt-0.5 line-clamp-1 text-xs text-slate-500">{child.data.description}</div>
+                            <div className="mt-0.5 line-clamp-1 text-xs text-slate-500">
+                              {child.data.description}
+                            </div>
                           )}
                         </button>
                       ))}
@@ -1425,7 +1628,9 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                 )}
 
                 <div>
-                  <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">Quick Actions</h4>
+                  <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                    Quick Actions
+                  </h4>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => startEditing(focusNode.id)}
@@ -1435,7 +1640,14 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                       Edit
                     </button>
                     <button
-                      onClick={() => setExpandPrompt({ open: true, nodeId: focusNode.id, input: "", isGenerating: false })}
+                      onClick={() =>
+                        setExpandPrompt({
+                          open: true,
+                          nodeId: focusNode.id,
+                          input: "",
+                          isGenerating: false,
+                        })
+                      }
                       className="flex items-center gap-2 rounded-lg border border-white/5 bg-white/5 px-3 py-2 text-xs font-medium text-slate-300 transition-colors hover:bg-white/10"
                     >
                       <Sparkles size={12} />
@@ -1444,7 +1656,9 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                     <button
                       onClick={() => handleToggleCollect(focusNode.id)}
                       className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
-                        collectedIds.has(focusNode.id) ? "border-cyan-500/30 bg-cyan-500/10 text-cyan-300" : "border-white/5 bg-white/5 text-slate-300 hover:bg-white/10"
+                        collectedIds.has(focusNode.id)
+                          ? "border-cyan-500/30 bg-cyan-500/10 text-cyan-300"
+                          : "border-white/5 bg-white/5 text-slate-300 hover:bg-white/10"
                       }`}
                     >
                       <Save size={12} />
@@ -1481,15 +1695,22 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/20">
                       <Sparkles size={20} className="text-cyan-400" />
                     </div>
-                    <h2 className="text-xl font-bold text-white">Welcome to Knowledge Explorer</h2>
+                    <h2 className="text-xl font-bold text-white">
+                      Welcome to Knowledge Explorer
+                    </h2>
                   </div>
-                  <button onClick={dismissOnboarding} className="text-slate-400 hover:text-white">
+                  <button
+                    onClick={dismissOnboarding}
+                    className="text-slate-400 hover:text-white"
+                  >
                     <X size={20} />
                   </button>
                 </div>
 
                 <p className="text-sm text-slate-300 mb-6 leading-relaxed">
-                  Explore knowledge maps with an atlas-first approach. Click nodes to navigate, collect important ideas, and let AI expand any branch.
+                  Explore knowledge maps with an atlas-first approach. Click
+                  nodes to navigate, collect important ideas, and let AI expand
+                  any branch.
                 </p>
 
                 <div className="grid grid-cols-2 gap-3 mb-6">
@@ -1503,11 +1724,16 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                     { key: "X", label: "Focus mode (dim others)" },
                     { key: "S", label: "Map analytics" },
                   ].map((shortcut) => (
-                    <div key={shortcut.key} className="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
+                    <div
+                      key={shortcut.key}
+                      className="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2"
+                    >
                       <kbd className="shrink-0 rounded-md bg-white/10 px-1.5 py-0.5 text-[10px] font-mono text-cyan-300">
                         {shortcut.key}
                       </kbd>
-                      <span className="text-xs text-slate-400">{shortcut.label}</span>
+                      <span className="text-xs text-slate-400">
+                        {shortcut.label}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -1538,19 +1764,30 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
           {/* Story Mode Controls */}
           {storyMode && storyNodes.length > 0 && (
             <div className="pointer-events-auto absolute bottom-20 left-1/2 -translate-x-1/2 flex items-center gap-3 rounded-2xl border border-violet-500/20 bg-slate-900/95 px-5 py-3 shadow-2xl backdrop-blur-xl">
-              <button onClick={rewindStory} className="rounded-xl p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white">
+              <button
+                onClick={rewindStory}
+                className="rounded-xl p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+              >
                 <ChevronsLeft size={16} />
               </button>
               <div className="text-center min-w-[120px]">
-                <p className="text-[10px] uppercase tracking-wider text-violet-400">Story {storyIndex + 1} / {storyNodes.length}</p>
+                <p className="text-[10px] uppercase tracking-wider text-violet-400">
+                  Story {storyIndex + 1} / {storyNodes.length}
+                </p>
                 <p className="text-sm font-medium text-white truncate max-w-[200px]">
                   {nodeMap.get(storyNodes[storyIndex])?.data.label}
                 </p>
               </div>
-              <button onClick={advanceStory} className="rounded-xl p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white">
+              <button
+                onClick={advanceStory}
+                className="rounded-xl p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+              >
                 <ChevronsRight size={16} />
               </button>
-              <button onClick={() => setStoryMode(false)} className="ml-2 text-slate-500 hover:text-white">
+              <button
+                onClick={() => setStoryMode(false)}
+                className="ml-2 text-slate-500 hover:text-white"
+              >
                 <X size={14} />
               </button>
             </div>
@@ -1587,13 +1824,21 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                       maxX: Math.max(acc.maxX, n.x + n.width),
                       maxY: Math.max(acc.maxY, n.y + n.height),
                     }),
-                    { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
+                    {
+                      minX: Infinity,
+                      minY: Infinity,
+                      maxX: -Infinity,
+                      maxY: -Infinity,
+                    },
                   );
 
                   const padding = 8;
                   const bw = bounds.maxX - bounds.minX || 1;
                   const bh = bounds.maxY - bounds.minY || 1;
-                  const scale = Math.min((width - padding * 2) / bw, (height - padding * 2) / bh);
+                  const scale = Math.min(
+                    (width - padding * 2) / bw,
+                    (height - padding * 2) / bh,
+                  );
                   const ox = (width - bw * scale) / 2 - bounds.minX * scale;
                   const oy = (height - bh * scale) / 2 - bounds.minY * scale;
 
@@ -1607,16 +1852,30 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                     const t = nodes.find((n) => n.id === e.target);
                     if (!s || !t) return;
                     ctx.beginPath();
-                    ctx.moveTo((s.x + s.width / 2) * scale + ox, (s.y + s.height / 2) * scale + oy);
-                    ctx.lineTo((t.x + t.width / 2) * scale + ox, (t.y + t.height / 2) * scale + oy);
+                    ctx.moveTo(
+                      (s.x + s.width / 2) * scale + ox,
+                      (s.y + s.height / 2) * scale + oy,
+                    );
+                    ctx.lineTo(
+                      (t.x + t.width / 2) * scale + ox,
+                      (t.y + t.height / 2) * scale + oy,
+                    );
                     ctx.stroke();
                   });
 
                   nodes.forEach((n) => {
                     ctx.fillStyle =
-                      n.id === focusId ? "rgba(34, 211, 238, 0.8)" :
-                      collectedIds.has(n.id) ? "rgba(251, 191, 36, 0.6)" : "rgba(148, 163, 184, 0.4)";
-                    ctx.fillRect(n.x * scale + ox, n.y * scale + oy, Math.max(2, n.width * scale), Math.max(2, n.height * scale));
+                      n.id === focusId
+                        ? "rgba(34, 211, 238, 0.8)"
+                        : collectedIds.has(n.id)
+                          ? "rgba(251, 191, 36, 0.6)"
+                          : "rgba(148, 163, 184, 0.4)";
+                    ctx.fillRect(
+                      n.x * scale + ox,
+                      n.y * scale + oy,
+                      Math.max(2, n.width * scale),
+                      Math.max(2, n.height * scale),
+                    );
                   });
 
                   const vx = (-viewport.x / viewport.scale) * scale + ox;
@@ -1640,13 +1899,21 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                       maxX: Math.max(acc.maxX, n.x + n.width),
                       maxY: Math.max(acc.maxY, n.y + n.height),
                     }),
-                    { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
+                    {
+                      minX: Infinity,
+                      minY: Infinity,
+                      maxX: -Infinity,
+                      maxY: -Infinity,
+                    },
                   );
 
                   const padding = 8;
                   const bw = bounds.maxX - bounds.minX || 1;
                   const bh = bounds.maxY - bounds.minY || 1;
-                  const scale = Math.min((192 - padding * 2) / bw, (144 - padding * 2) / bh);
+                  const scale = Math.min(
+                    (192 - padding * 2) / bw,
+                    (144 - padding * 2) / bh,
+                  );
                   const ox = (192 - bw * scale) / 2 - bounds.minX * scale;
                   const oy = (144 - bh * scale) / 2 - bounds.minY * scale;
 
@@ -1654,17 +1921,28 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                   const worldY = (y - oy) / scale;
 
                   const hit = nodes.find(
-                    (n) => worldX >= n.x && worldX <= n.x + n.width && worldY >= n.y && worldY <= n.y + n.height,
+                    (n) =>
+                      worldX >= n.x &&
+                      worldX <= n.x + n.width &&
+                      worldY >= n.y &&
+                      worldY <= n.y + n.height,
                   );
 
                   if (hit) {
                     handleSelectNode(hit.id);
                   } else {
                     if (cameraRef.current) {
-                      cameraRef.current.focusOnPoint(worldX, worldY, size.width, size.height, viewport.scale, {
-                        duration: 400,
-                        easing: Easing.easeOutExpo,
-                      });
+                      cameraRef.current.focusOnPoint(
+                        worldX,
+                        worldY,
+                        size.width,
+                        size.height,
+                        viewport.scale,
+                        {
+                          duration: 400,
+                          easing: Easing.easeOutExpo,
+                        },
+                      );
                     }
                   }
                 }}
@@ -1677,8 +1955,13 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
             <div className="pointer-events-auto fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
               <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-white">Keyboard Shortcuts</h3>
-                  <button onClick={() => setHelpOpen(false)} className="text-slate-400 hover:text-white">
+                  <h3 className="text-sm font-semibold text-white">
+                    Keyboard Shortcuts
+                  </h3>
+                  <button
+                    onClick={() => setHelpOpen(false)}
+                    className="text-slate-400 hover:text-white"
+                  >
                     <X size={18} />
                   </button>
                 </div>
@@ -1712,7 +1995,11 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                   ))}
                 </div>
                 <div className="mt-4 pt-3 border-t border-white/10 text-center text-[10px] text-slate-500">
-                  Press <kbd className="rounded bg-white/10 px-1 py-0.5 font-mono text-slate-400">?</kbd> to toggle this help
+                  Press{" "}
+                  <kbd className="rounded bg-white/10 px-1 py-0.5 font-mono text-slate-400">
+                    ?
+                  </kbd>{" "}
+                  to toggle this help
                 </div>
               </div>
             </div>
@@ -1722,9 +2009,15 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
           {deleteConfirm && (
             <div className="pointer-events-auto fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
               <div className="w-full max-w-sm rounded-2xl border border-red-500/20 bg-slate-900 p-6 shadow-2xl">
-                <h3 className="text-sm font-semibold text-white mb-2">Delete Node</h3>
+                <h3 className="text-sm font-semibold text-white mb-2">
+                  Delete Node
+                </h3>
                 <p className="text-xs text-slate-400 mb-4">
-                  This will remove <span className="text-red-300 font-medium">{nodeMap.get(deleteConfirm)?.data.label}</span> and all its descendants. This action can be undone.
+                  This will remove{" "}
+                  <span className="text-red-300 font-medium">
+                    {nodeMap.get(deleteConfirm)?.data.label}
+                  </span>{" "}
+                  and all its descendants. This action can be undone.
                 </p>
                 <div className="flex justify-end gap-2">
                   <button
@@ -1752,14 +2045,21 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                   <Sparkles size={10} />
                   Presentation Mode
                 </div>
-                <h2 className="text-4xl font-bold text-white mb-4">{focusNode.data.label}</h2>
+                <h2 className="text-4xl font-bold text-white mb-4">
+                  {focusNode.data.label}
+                </h2>
                 {focusNode.data.description && (
-                  <p className="text-lg leading-relaxed text-slate-300 mb-8">{focusNode.data.description}</p>
+                  <p className="text-lg leading-relaxed text-slate-300 mb-8">
+                    {focusNode.data.description}
+                  </p>
                 )}
                 {focusNode.data.tags && focusNode.data.tags.length > 0 && (
                   <div className="flex flex-wrap justify-center gap-2 mb-8">
                     {focusNode.data.tags.map((tag) => (
-                      <span key={tag} className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-400">
+                      <span
+                        key={tag}
+                        className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-400"
+                      >
                         {tag}
                       </span>
                     ))}
@@ -1768,13 +2068,33 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                 {focusNode.data.nextStep && (
                   <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 mb-8">
                     <p className="text-xs text-slate-500 mb-1">Next Step</p>
-                    <p className="text-sm text-slate-300">{focusNode.data.nextStep}</p>
+                    <p className="text-sm text-slate-300">
+                      {focusNode.data.nextStep}
+                    </p>
                   </div>
                 )}
                 <div className="flex items-center justify-center gap-4 text-xs text-slate-500">
-                  <span>Press <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-slate-400">→</kbd> for next child</span>
-                  <span>Press <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-slate-400">←</kbd> for parent</span>
-                  <span>Press <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-slate-400">Esc</kbd> to exit</span>
+                  <span>
+                    Press{" "}
+                    <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-slate-400">
+                      →
+                    </kbd>{" "}
+                    for next child
+                  </span>
+                  <span>
+                    Press{" "}
+                    <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-slate-400">
+                      ←
+                    </kbd>{" "}
+                    for parent
+                  </span>
+                  <span>
+                    Press{" "}
+                    <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-slate-400">
+                      Esc
+                    </kbd>{" "}
+                    to exit
+                  </span>
                 </div>
               </div>
             </div>
@@ -1782,15 +2102,23 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
 
           {/* Mode indicator */}
           <div className="pointer-events-none absolute top-4 right-4 rounded-xl border border-white/10 bg-slate-900/80 px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500 backdrop-blur-xl">
-            {mode === "atlas" ? "Atlas Mode" : mode === "tunnel" ? "Tunnel Mode" : "Overview Mode"}
+            {mode === "atlas"
+              ? "Atlas Mode"
+              : mode === "tunnel"
+                ? "Tunnel Mode"
+                : "Overview Mode"}
           </div>
 
           {/* Topic Suggestions */}
           {!focusNode && !isGenerating && (
             <div className="pointer-events-auto absolute top-20 left-1/2 -translate-x-1/2 max-w-xl w-full px-4">
               <div className="rounded-2xl border border-white/10 bg-slate-900/90 p-5 shadow-2xl backdrop-blur-xl">
-                <h3 className="text-sm font-semibold text-white mb-3">Start exploring</h3>
-                <p className="text-xs text-slate-400 mb-4">Type any topic above, or try one of these suggestions:</p>
+                <h3 className="text-sm font-semibold text-white mb-3">
+                  Start exploring
+                </h3>
+                <p className="text-xs text-slate-400 mb-4">
+                  Type any topic above, or try one of these suggestions:
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {[
                     "Machine Learning",
@@ -1816,7 +2144,12 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                 </div>
                 <div className="mt-4 pt-4 border-t border-white/10">
                   <p className="text-[10px] text-slate-500">
-                    💡 Tip: Atlas (1) for focused exploration, Tunnel (2) for deep dives with parallax, Overview (3) for the full map. Press C to collect, N to add child, Delete to remove, P for presentation mode, / to search, D for details, S for stats, T for story mode, X for focus mode, B to compare, M for mini-map.
+                    💡 Tip: Atlas (1) for focused exploration, Tunnel (2) for
+                    deep dives with parallax, Overview (3) for the full map.
+                    Press C to collect, N to add child, Delete to remove, P for
+                    presentation mode, / to search, D for details, S for stats,
+                    T for story mode, X for focus mode, B to compare, M for
+                    mini-map.
                   </p>
                 </div>
               </div>
@@ -1831,9 +2164,12 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                   <div className="absolute inset-0 rounded-full border-2 border-cyan-500/20" />
                   <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-cyan-400 animate-spin" />
                 </div>
-                <p className="mt-4 text-sm font-medium text-slate-300">Generating knowledge map...</p>
+                <p className="mt-4 text-sm font-medium text-slate-300">
+                  Generating knowledge map...
+                </p>
                 <p className="mt-1 text-xs text-slate-500">
-                  AI is analyzing "{topicInput.slice(0, 40)}{topicInput.length > 40 ? "..." : ""}"
+                  AI is analyzing "{topicInput.slice(0, 40)}
+                  {topicInput.length > 40 ? "..." : ""}"
                 </p>
               </div>
             </div>
@@ -1843,7 +2179,10 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
           {error && (
             <div className="absolute top-4 left-1/2 -translate-x-1/2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm text-red-300 backdrop-blur-xl">
               {error}
-              <button onClick={() => setError(null)} className="ml-2 text-red-400 hover:text-red-300">
+              <button
+                onClick={() => setError(null)}
+                className="ml-2 text-red-400 hover:text-red-300"
+              >
                 <X size={14} />
               </button>
             </div>
@@ -1867,31 +2206,52 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                 {view === "edit" && focusNode?.isEditing ? (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Edit Node</h3>
-                      <button onClick={cancelEdit} className="text-slate-500 hover:text-white">
+                      <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                        Edit Node
+                      </h3>
+                      <button
+                        onClick={cancelEdit}
+                        className="text-slate-500 hover:text-white"
+                      >
                         <X size={14} />
                       </button>
                     </div>
                     <div>
-                      <label className="mb-1 block text-xs text-slate-500">Label</label>
+                      <label className="mb-1 block text-xs text-slate-500">
+                        Label
+                      </label>
                       <input
                         type="text"
                         value={focusNode.editLabel ?? focusNode.data.label}
                         onChange={(e) =>
                           setNodes((prev) =>
-                            prev.map((n) => (n.id === focusNode.id ? { ...n, editLabel: e.target.value } : n)),
+                            prev.map((n) =>
+                              n.id === focusNode.id
+                                ? { ...n, editLabel: e.target.value }
+                                : n,
+                            ),
                           )
                         }
                         className="w-full rounded-lg border border-white/10 bg-slate-800 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50"
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-xs text-slate-500">Description</label>
+                      <label className="mb-1 block text-xs text-slate-500">
+                        Description
+                      </label>
                       <textarea
-                        value={focusNode.editDescription ?? focusNode.data.description ?? ""}
+                        value={
+                          focusNode.editDescription ??
+                          focusNode.data.description ??
+                          ""
+                        }
                         onChange={(e) =>
                           setNodes((prev) =>
-                            prev.map((n) => (n.id === focusNode.id ? { ...n, editDescription: e.target.value } : n)),
+                            prev.map((n) =>
+                              n.id === focusNode.id
+                                ? { ...n, editDescription: e.target.value }
+                                : n,
+                            ),
                           )
                         }
                         rows={4}
@@ -1927,12 +2287,18 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                               key={child.id}
                               onClick={() => handleSelectNode(child.id)}
                               className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-                                child.id === focusId ? "bg-cyan-500/15 text-cyan-300" : "text-slate-300 hover:bg-white/5"
+                                child.id === focusId
+                                  ? "bg-cyan-500/15 text-cyan-300"
+                                  : "text-slate-300 hover:bg-white/5"
                               }`}
                             >
-                              <div className="font-medium">{child.data.label}</div>
+                              <div className="font-medium">
+                                {child.data.label}
+                              </div>
                               {child.data.description && (
-                                <div className="mt-0.5 line-clamp-2 text-xs text-slate-500">{child.data.description}</div>
+                                <div className="mt-0.5 line-clamp-2 text-xs text-slate-500">
+                                  {child.data.description}
+                                </div>
                               )}
                             </button>
                           ))}
@@ -1964,7 +2330,9 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                                 onClick={() => handleSelectNode(id)}
                                 className="group flex w-full items-start justify-between rounded-lg px-3 py-2 text-left text-sm text-slate-300 transition-colors hover:bg-white/5"
                               >
-                                <span className="font-medium">{node.data.label}</span>
+                                <span className="font-medium">
+                                  {node.data.label}
+                                </span>
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -1982,11 +2350,15 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                     )}
 
                     <div className="rounded-xl border border-white/5 bg-slate-800/40 p-3">
-                      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Shortcuts</h3>
+                      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Shortcuts
+                      </h3>
                       <div className="space-y-1 text-[11px] text-slate-400">
                         <div className="flex justify-between">
                           <span>Atlas / Tunnel / Overview</span>
-                          <span className="font-mono text-slate-500">1 / 2 / 3</span>
+                          <span className="font-mono text-slate-500">
+                            1 / 2 / 3
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span>Collect node</span>
@@ -1994,7 +2366,9 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                         </div>
                         <div className="flex justify-between">
                           <span>Navigate</span>
-                          <span className="font-mono text-slate-500">Arrow keys</span>
+                          <span className="font-mono text-slate-500">
+                            Arrow keys
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span>Edit node</span>
@@ -2023,32 +2397,44 @@ export function KnowledgeExplorer({ initialData, onExit }: { initialData?: any; 
                 Expand: {nodeMap.get(expandPrompt.nodeId ?? "")?.data.label}
               </h3>
               <button
-                onClick={() => setExpandPrompt((prev) => ({ ...prev, open: false }))}
+                onClick={() =>
+                  setExpandPrompt((prev) => ({ ...prev, open: false }))
+                }
                 className="text-slate-400 hover:text-white"
               >
                 <X size={18} />
               </button>
             </div>
             <p className="mb-3 text-xs text-slate-400">
-              Ask AI to expand this branch with more detail, examples, or sub-topics.
+              Ask AI to expand this branch with more detail, examples, or
+              sub-topics.
             </p>
             <textarea
               value={expandPrompt.input}
-              onChange={(e) => setExpandPrompt((prev) => ({ ...prev, input: e.target.value }))}
+              onChange={(e) =>
+                setExpandPrompt((prev) => ({ ...prev, input: e.target.value }))
+              }
               placeholder="e.g., Show me practical examples, Add implementation details, What are common pitfalls?"
               rows={3}
               className="w-full rounded-xl border border-white/10 bg-slate-800 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none focus:border-cyan-500/50"
             />
             <div className="mt-4 flex justify-end gap-2">
               <button
-                onClick={() => setExpandPrompt((prev) => ({ ...prev, open: false }))}
+                onClick={() =>
+                  setExpandPrompt((prev) => ({ ...prev, open: false }))
+                }
                 className="rounded-xl px-4 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-white/5"
               >
                 Cancel
               </button>
               <button
-                onClick={() => expandPrompt.nodeId && handleExpandNode(expandPrompt.nodeId, expandPrompt.input)}
-                disabled={expandPrompt.isGenerating || !expandPrompt.input.trim()}
+                onClick={() =>
+                  expandPrompt.nodeId &&
+                  handleExpandNode(expandPrompt.nodeId, expandPrompt.input)
+                }
+                disabled={
+                  expandPrompt.isGenerating || !expandPrompt.input.trim()
+                }
                 className="flex items-center gap-2 rounded-xl bg-cyan-500/20 px-4 py-2 text-sm font-medium text-cyan-300 transition-colors hover:bg-cyan-500/30 disabled:opacity-40"
               >
                 {expandPrompt.isGenerating ? (

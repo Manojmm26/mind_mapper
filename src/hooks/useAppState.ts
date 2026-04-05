@@ -1,0 +1,224 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Edge, Node } from "@xyflow/react";
+import { ComparisonWorkspaceData, MindMapData } from "../services/llmService";
+import { convertTreeToGraph, findRootNode, toFlowGraph } from "../utils/mapData";
+import { useMediaQuery } from "./useMediaQuery";
+import { useElementFullscreen } from "./useElementFullscreen";
+
+type AppExperience = "classic" | "pretext";
+export type { AppExperience };
+
+function getInitialExperience(): AppExperience {
+  if (typeof window === "undefined") {
+    return "classic";
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  return params.get("experience") === "pretext" ? "pretext" : "classic";
+}
+
+function syncExperienceInUrl(experience: AppExperience) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const url = new URL(window.location.href);
+  if (experience === "pretext") {
+    url.searchParams.set("experience", "pretext");
+  } else {
+    url.searchParams.delete("experience");
+  }
+
+  window.history.replaceState(null, "", url);
+}
+
+export interface AppState {
+  // Derived
+  isMobile: boolean;
+  outlineFullscreen: { ref: React.RefObject<HTMLDivElement | null>; toggle: () => void; isFullscreen: boolean };
+  workspaceGraph: { nodes: Node[]; edges: Edge[] };
+  workspaceRoot: Node | null;
+
+  // Experience
+  experience: AppExperience;
+  setExperience: React.Dispatch<React.SetStateAction<AppExperience>>;
+
+  // Workflow
+  workflowMode: "learn" | "compare";
+  setWorkflowMode: React.Dispatch<React.SetStateAction<"learn" | "compare">>;
+  activeView: "map" | "outline" | "compare";
+  setActiveView: React.Dispatch<React.SetStateAction<"map" | "outline" | "compare">>;
+
+  // Loading
+  isLoading: boolean;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  loadingMessage: string;
+  setLoadingMessage: React.Dispatch<React.SetStateAction<string>>;
+
+  // Errors
+  error: string;
+  setError: React.Dispatch<React.SetStateAction<string>>;
+
+  // Map data (AI-generated)
+  mapData: MindMapData | null;
+  setMapData: React.Dispatch<React.SetStateAction<MindMapData | null>>;
+
+  // Comparison data
+  comparisonData: ComparisonWorkspaceData | null;
+  setComparisonData: React.Dispatch<React.SetStateAction<ComparisonWorkspaceData | null>>;
+
+  // Saved/loaded map data
+  savedNodes: Node[] | null;
+  setSavedNodes: React.Dispatch<React.SetStateAction<Node[] | null>>;
+  savedEdges: Edge[] | null;
+  setSavedEdges: React.Dispatch<React.SetStateAction<Edge[] | null>>;
+
+  // Inputs
+  topicInput: string;
+  setTopicInput: React.Dispatch<React.SetStateAction<string>>;
+  searchQuery: string;
+  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+  selectedNodeId: string | null;
+  setSelectedNodeId: React.Dispatch<React.SetStateAction<string | null>>;
+
+  // Refs
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
+  jsonInputRef: React.RefObject<HTMLInputElement | null>;
+
+  // Wiki explorer modal
+  showWikiExplorer: boolean;
+  setShowWikiExplorer: React.Dispatch<React.SetStateAction<boolean>>;
+
+  // Actions
+  resetWorkspaceState: () => void;
+  handleSelectNode: (nodeId: string | null) => void;
+}
+
+export function useAppState(): AppState {
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const outlineFullscreen = useElementFullscreen<HTMLDivElement>();
+
+  const [experience, setExperience] = useState<AppExperience>(getInitialExperience);
+  const [workflowMode, setWorkflowMode] = useState<"learn" | "compare">("learn");
+  const [activeView, setActiveView] = useState<"map" | "outline" | "compare">("map");
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("");
+  const [error, setError] = useState("");
+  const [mapData, setMapData] = useState<MindMapData | null>(null);
+  const [comparisonData, setComparisonData] = useState<ComparisonWorkspaceData | null>(null);
+  const [savedNodes, setSavedNodes] = useState<Node[] | null>(null);
+  const [savedEdges, setSavedEdges] = useState<Edge[] | null>(null);
+  const [topicInput, setTopicInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [showWikiExplorer, setShowWikiExplorer] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const jsonInputRef = useRef<HTMLInputElement>(null);
+
+  // Computed: current workspace graph
+  const workspaceGraph = useMemo(() => {
+    if (savedNodes && savedEdges) {
+      return { nodes: savedNodes, edges: savedEdges };
+    }
+
+    if (mapData) {
+      return toFlowGraph(mapData);
+    }
+
+    return { nodes: [] as Node[], edges: [] as Edge[] };
+  }, [savedNodes, savedEdges, mapData]);
+
+  // Computed: root node of the current graph
+  const workspaceRoot = useMemo(
+    () => findRootNode(workspaceGraph.nodes, workspaceGraph.edges),
+    [workspaceGraph.edges, workspaceGraph.nodes],
+  );
+
+  // Sync experience in URL
+  useEffect(() => {
+    syncExperienceInUrl(experience);
+  }, [experience]);
+
+  // Reset all workspace-related state
+  const resetWorkspaceState = () => {
+    setMapData(null);
+    setComparisonData(null);
+    setSavedNodes(null);
+    setSavedEdges(null);
+    setSelectedNodeId(null);
+    setSearchQuery("");
+    setTopicInput("");
+    setActiveView("map");
+    setError("");
+  };
+
+  // Handle node selection
+  const handleSelectNode = (nodeId: string | null) => {
+    setSelectedNodeId(nodeId);
+    if (activeView === "compare") {
+      setActiveView(isMobile ? "outline" : "map");
+    }
+  };
+
+  // Clear selection if the graph changes and the selected node no longer exists
+  useEffect(() => {
+    if (!workspaceGraph.nodes.length) {
+      setSelectedNodeId(null);
+      return;
+    }
+
+    const selectionStillExists =
+      selectedNodeId &&
+      workspaceGraph.nodes.some((node) => node.id === selectedNodeId);
+    if (!selectionStillExists) {
+      setSelectedNodeId(workspaceRoot?.id || workspaceGraph.nodes[0].id);
+    }
+  }, [selectedNodeId, workspaceGraph.nodes, workspaceRoot]);
+
+  // Auto-switch away from compare view if comparison data is cleared
+  useEffect(() => {
+    if (activeView === "compare" && !comparisonData) {
+      setActiveView("map");
+    }
+  }, [activeView, comparisonData]);
+
+  return {
+    isMobile,
+    outlineFullscreen,
+    workspaceGraph,
+    workspaceRoot,
+    experience,
+    setExperience,
+    workflowMode,
+    setWorkflowMode,
+    activeView,
+    setActiveView,
+    isLoading,
+    setIsLoading,
+    loadingMessage,
+    setLoadingMessage,
+    error,
+    setError,
+    mapData,
+    setMapData,
+    comparisonData,
+    setComparisonData,
+    savedNodes,
+    setSavedNodes,
+    savedEdges,
+    setSavedEdges,
+    topicInput,
+    setTopicInput,
+    searchQuery,
+    setSearchQuery,
+    selectedNodeId,
+    setSelectedNodeId,
+    fileInputRef,
+    jsonInputRef,
+    showWikiExplorer,
+    setShowWikiExplorer,
+    resetWorkspaceState,
+    handleSelectNode,
+  };
+}

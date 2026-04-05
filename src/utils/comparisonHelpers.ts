@@ -1,14 +1,15 @@
 import {
-  ComparisonCriterion,
-  ComparisonOption,
   ComparisonWorkspaceData,
-  CriterionScore,
+  ComparisonWorkspaceDataRaw,
+  normalizeComparisonData,
 } from "../services/llmService";
 
+// Re-export the normalization helper so existing imports continue to work
+export { normalizeComparisonData };
+
 /**
- * The LLM returns scores as an array of { criterionId, ... } objects
- * because Gemini's schema doesn't support Record<string, X>.
- * This helper converts that array into a Record keyed by criterionId.
+ * @deprecated Use normalizeComparisonData from llmSchemas instead.
+ * Kept for backward compatibility with any code that still calls this directly.
  */
 export function scoresArrayToRecord(
   scoresArray: {
@@ -18,33 +19,19 @@ export function scoresArrayToRecord(
     rating?: number;
     note?: string;
   }[],
-): Record<string, CriterionScore> {
-  const record: Record<string, CriterionScore> = {};
+): ComparisonWorkspaceData["options"][number]["scores"] {
+  const record: ComparisonWorkspaceData["options"][number]["scores"] = {};
   for (const s of scoresArray) {
     record[s.criterionId] = {
+      criterionId: s.criterionId,
       value: s.value ?? s.displayValue,
       displayValue: s.displayValue,
-      rating: s.rating as CriterionScore["rating"],
+      rating:
+        s.rating as ComparisonWorkspaceData["options"][number]["scores"][string]["rating"],
       note: s.note,
     };
   }
   return record;
-}
-
-/**
- * Normalizes a raw ComparisonWorkspaceData response from the LLM.
- * Converts the scores array into a Record<string, CriterionScore> for each option.
- */
-export function normalizeComparisonData(raw: ComparisonWorkspaceData): ComparisonWorkspaceData {
-  return {
-    ...raw,
-    options: raw.options.map((opt) => ({
-      ...opt,
-      scores: Array.isArray(opt.scores)
-        ? scoresArrayToRecord(opt.scores as any)
-        : opt.scores,
-    })),
-  };
 }
 
 /**
@@ -74,7 +61,9 @@ export function getMatrixCellBg(rating?: number): string {
 /**
  * Returns a variant-aware button class for comparison actions.
  */
-export function getActionClasses(variant?: "primary" | "secondary" | "ghost"): string {
+export function getActionClasses(
+  variant?: "primary" | "secondary" | "ghost",
+): string {
   switch (variant) {
     case "primary":
       return "bg-slate-900 text-white hover:bg-slate-800 shadow-sm";
