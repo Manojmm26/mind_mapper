@@ -134,7 +134,7 @@ function OutlineNodeItem({
       </div>
 
       {hasChildren && isExpanded && (
-        <div className={cn('space-y-1 border-l border-slate-200/80', compact ? 'ml-3 pl-2' : 'ml-4 pl-3')}>
+        <div className={cn('space-y-1 border-l border-slate-200/80', compact ? 'ml-2 pl-1' : 'ml-4 pl-3')}>
           {item.children.map((child) => (
             <OutlineNodeItem
               key={child.id}

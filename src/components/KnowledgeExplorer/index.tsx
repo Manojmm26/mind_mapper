@@ -38,6 +38,7 @@ import {
   X,
   ZoomIn,
   ZoomOut,
+  Settings2,
 } from "lucide-react";
 import { useKnowledgeExplorer } from "./useKnowledgeExplorer";
 import { drawNodeCard, drawEdge } from "./renderers";
@@ -219,6 +220,8 @@ export function KnowledgeExplorer({
     handlePointerUp,
     handleWheel,
   } = useKnowledgeExplorer({ initialData, onExit });
+
+  const [toolsMenuOpen, setToolsMenuOpen] = React.useState(false);
 
   // ─── Canvas Rendering ──────────────────────────────────────────────────
 
@@ -427,10 +430,20 @@ export function KnowledgeExplorer({
 
   // ─── Render ──────────────────────────────────────────────────────────────
 
+  const closeAllOverlays = () => {
+    setSearchOpen(false);
+    setAddChildOpen(false);
+    setCompareMode(false);
+    setStatsPanelOpen(false);
+    setDetailPanelOpen(false);
+    setHelpOpen(false);
+    setShowCollected(false);
+  };
+
   return (
     <div className="relative flex h-screen w-full flex-col overflow-hidden bg-slate-950 text-slate-100">
       {/* Top Bar */}
-      <div className="relative z-20 flex items-center justify-between border-b border-white/10 bg-slate-900/80 px-4 py-3 backdrop-blur-xl">
+      <div className="relative z-20 flex items-center gap-4 border-b border-white/10 bg-slate-900/80 px-4 py-3 backdrop-blur-xl">
         <div className="flex items-center gap-3">
           {onExit && (
             <button
@@ -485,8 +498,9 @@ export function KnowledgeExplorer({
           </button>
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-2">
+        {/* Actions - Scrollable */}
+        <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
+          <div className="flex items-center gap-2 min-w-max">
           {/* Node Count Badge */}
           <div className="hidden sm:flex items-center gap-1 rounded-xl bg-slate-800/60 px-2.5 py-1.5 text-[10px] font-semibold text-slate-400">
             <span className="text-cyan-400">{nodes.length}</span> nodes
@@ -562,214 +576,99 @@ export function KnowledgeExplorer({
             <ArrowRight size={18} className="rotate-180" />
           </button>
 
-          {/* Presentation Mode */}
-          <button
-            onClick={() => setPresentationMode((prev) => !prev)}
-            className={`rounded-xl p-2 transition-colors ${
-              presentationMode
-                ? "bg-amber-500/20 text-amber-300"
-                : "text-slate-400 hover:bg-white/10 hover:text-white"
-            }`}
-            title="Presentation mode (P)"
-          >
-            <Play size={18} />
-          </button>
+          </div>
+        </div>
 
-          {/* Add Child */}
-          {focusNode && (
+        <div className="flex items-center gap-2">
+          {/* Map Tools Dropdown */}
+          <div className="relative">
             <button
-              onClick={() => setAddChildOpen(true)}
-              className="rounded-xl p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
-              title="Add child node (N)"
+              onClick={() => setToolsMenuOpen((prev) => !prev)}
+              className="flex items-center gap-2 rounded-xl border border-white/10 bg-slate-800/60 px-3 py-2 text-sm text-slate-300 transition-colors hover:bg-slate-700/60 hover:text-white"
             >
-              <Plus size={18} />
+              <Settings2 size={16} />
+              <span className="hidden sm:inline">Map Tools</span>
             </button>
-          )}
 
-          {/* Search */}
-          <button
-            onClick={() => setSearchOpen(true)}
-            className="rounded-xl p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
-            title="Search nodes (/)"
-          >
-            <Search size={18} />
-          </button>
-
-          {/* Node Detail */}
-          {focusNode && (
-            <button
-              onClick={() => setDetailPanelOpen((prev) => !prev)}
-              className={`rounded-xl p-2 transition-colors ${
-                detailPanelOpen
-                  ? "bg-purple-500/20 text-purple-300"
-                  : "text-slate-400 hover:bg-white/10 hover:text-white"
-              }`}
-              title="Node details (D)"
-            >
-              <Eye size={18} />
-            </button>
-          )}
-
-          {/* Stats Dashboard */}
-          <button
-            onClick={() => setStatsPanelOpen((prev) => !prev)}
-            className={`rounded-xl p-2 transition-colors ${
-              statsPanelOpen
-                ? "bg-emerald-500/20 text-emerald-300"
-                : "text-slate-400 hover:bg-white/10 hover:text-white"
-            }`}
-            title="Stats dashboard (S)"
-          >
-            <BarChart3 size={18} />
-          </button>
-
-          {/* Story Mode */}
-          <button
-            onClick={() => {
-              setStoryMode((prev) => !prev);
-              if (!storyMode) setStoryIndex(0);
-            }}
-            className={`rounded-xl p-2 transition-colors ${
-              storyMode
-                ? "bg-violet-500/20 text-violet-300"
-                : "text-slate-400 hover:bg-white/10 hover:text-white"
-            }`}
-            title="Story mode (T)"
-          >
-            <BookOpen size={18} />
-          </button>
-
-          {/* Focus Mode */}
-          {focusNode && (
-            <button
-              onClick={() => setFocusMode((prev) => !prev)}
-              className={`rounded-xl p-2 transition-colors ${
-                focusMode
-                  ? "bg-rose-500/20 text-rose-300"
-                  : "text-slate-400 hover:bg-white/10 hover:text-white"
-              }`}
-              title="Focus mode (X)"
-            >
-              <Focus size={18} />
-            </button>
-          )}
-
-          {/* Edge Creation */}
-          {focusNode && (
-            <button
-              onClick={() =>
-                edgeCreation
-                  ? setEdgeCreation(null)
-                  : handleStartEdgeCreation(focusNode.id)
-              }
-              className={`rounded-xl p-2 transition-colors ${
-                edgeCreation
-                  ? "bg-orange-500/20 text-orange-300"
-                  : "text-slate-400 hover:bg-white/10 hover:text-white"
-              }`}
-              title={edgeCreation ? "Click target to connect" : "Create edge"}
-            >
-              <Link size={18} />
-            </button>
-          )}
-
-          {/* Compare Mode */}
-          <button
-            onClick={() => {
-              if (compareMode) {
-                resetCompare();
-                setCompareMode(false);
-              } else {
-                setCompareMode(true);
-              }
-            }}
-            className={`rounded-xl p-2 transition-colors ${
-              compareMode
-                ? "bg-indigo-500/20 text-indigo-300"
-                : "text-slate-400 hover:bg-white/10 hover:text-white"
-            }`}
-            title="Compare nodes (B)"
-          >
-            <GitCompare size={18} />
-          </button>
-
-          {/* Mini-map Toggle */}
-          <button
-            onClick={() => setMinimapOpen((prev) => !prev)}
-            className={`rounded-xl p-2 transition-colors ${
-              minimapOpen
-                ? "bg-teal-500/20 text-teal-300"
-                : "text-slate-400 hover:bg-white/10 hover:text-white"
-            }`}
-            title="Toggle mini-map (M)"
-          >
-            <MapIcon size={18} />
-          </button>
+            {toolsMenuOpen && (
+              <div className="absolute right-0 top-full mt-2 w-52 z-50 overflow-hidden rounded-xl border border-slate-700 bg-slate-800/95 p-1.5 shadow-2xl backdrop-blur-xl">
+                {[
+                  {
+                    icon: Plus, label: "Add Child Node", key: "N", show: !!focusNode,
+                    onClick: () => { closeAllOverlays(); setAddChildOpen(true); setToolsMenuOpen(false); }
+                  },
+                  {
+                    icon: Eye, label: "Node Details", key: "D", show: !!focusNode,
+                    onClick: () => { const op = detailPanelOpen; closeAllOverlays(); if (!op) setDetailPanelOpen(true); setToolsMenuOpen(false); }
+                  },
+                  {
+                    icon: Focus, label: "Focus Mode", key: "X", show: !!focusNode,
+                    onClick: () => { setFocusMode((prev) => !prev); setToolsMenuOpen(false); }
+                  },
+                  {
+                    icon: Link, label: "Create Edge", show: !!focusNode,
+                    onClick: () => { edgeCreation ? setEdgeCreation(null) : handleStartEdgeCreation(focusNode.id!); setToolsMenuOpen(false); }
+                  },
+                  { divider: true, show: true },
+                  {
+                    icon: GitCompare, label: "Compare Nodes", key: "B", show: true,
+                    onClick: () => { const op = compareMode; closeAllOverlays(); if (op) resetCompare(); else setCompareMode(true); setToolsMenuOpen(false); }
+                  },
+                  {
+                    icon: BookOpen, label: "Story Mode", key: "T", show: true,
+                    onClick: () => { setStoryMode((p) => !p); if (!storyMode) setStoryIndex(0); setToolsMenuOpen(false); }
+                  },
+                  {
+                    icon: BarChart3, label: "Statistics", key: "S", show: true,
+                    onClick: () => { const op = statsPanelOpen; closeAllOverlays(); if (!op) setStatsPanelOpen(true); setToolsMenuOpen(false); }
+                  },
+                  {
+                    icon: Play, label: "Presentation", key: "P", show: true,
+                    onClick: () => { setPresentationMode((prev) => !prev); setToolsMenuOpen(false); }
+                  },
+                  { divider: true, show: mode === "overview" },
+                  {
+                    icon: MapIcon, label: "Mini-Map", key: "M", show: mode === "overview",
+                    onClick: () => { setMinimapOpen((p) => !p); setToolsMenuOpen(false); }
+                  },
+                ].map((item, i) => {
+                  if (!item.show) return null;
+                  if (item.divider) return <div key={i} className="my-1 border-t border-slate-700/50" />;
+                  
+                  const Icon = item.icon!;
+                  return (
+                    <button
+                      key={i}
+                      onClick={item.onClick}
+                      className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-xs text-slate-300 hover:bg-cyan-500/20 hover:text-cyan-100"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Icon size={14} />
+                        <span>{item.label}</span>
+                      </div>
+                      {item.key && <kbd className="opacity-40 font-mono text-[10px]">{item.key}</kbd>}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
           {/* Help */}
           <button
-            onClick={() => setHelpOpen((prev) => !prev)}
+            onClick={() => {
+              const isOpen = helpOpen;
+              closeAllOverlays();
+              if (!isOpen) setHelpOpen(true);
+            }}
             className="rounded-xl p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
             title="Keyboard shortcuts (?)"
           >
             <HelpCircle size={18} />
           </button>
+        </div>
 
-          {/* Recently Viewed */}
-          {recentlyViewed.length > 0 && (
-            <div className="hidden lg:flex items-center gap-1 text-xs text-slate-500">
-              <span>Recent:</span>
-              {recentlyViewed.slice(0, 4).map((id) => {
-                const node = nodeMap.get(id);
-                if (!node) return null;
-                return (
-                  <button
-                    key={id}
-                    onClick={() => handleSelectNode(id)}
-                    className="rounded-md px-2 py-1 text-slate-400 transition-colors hover:bg-white/5 hover:text-cyan-300"
-                  >
-                    {node.data.label.length > 12
-                      ? `${node.data.label.slice(0, 12)}…`
-                      : node.data.label}
-                  </button>
-                );
-              })}
-            </div>
-          )}
 
-          {/* Navigation Trail */}
-          {navigationTrail.length > 1 && (
-            <div className="hidden md:flex items-center gap-1 max-w-xs overflow-hidden">
-              <span className="text-[10px] text-slate-500 shrink-0">
-                Trail:
-              </span>
-              {navigationTrail.slice(-4).map((id, i, arr) => {
-                const node = nodeMap.get(id);
-                if (!node) return null;
-                return (
-                  <React.Fragment key={id}>
-                    {i > 0 && (
-                      <span className="text-slate-600 text-[10px]">›</span>
-                    )}
-                    <button
-                      onClick={() =>
-                        handleSelectNode(
-                          navigationTrail[
-                            navigationTrail.length - arr.length + i
-                          ],
-                        )
-                      }
-                      className="shrink-0 rounded-md px-2 py-1 text-[10px] font-medium text-slate-400 transition-colors hover:bg-white/10 hover:text-cyan-300"
-                    >
-                      {node.data.label.length > 15
-                        ? `${node.data.label.slice(0, 15)}…`
-                        : node.data.label}
-                    </button>
-                  </React.Fragment>
-                );
-              })}
-            </div>
-          )}
 
           {/* Sidebar Toggle */}
           <button
@@ -783,7 +682,6 @@ export function KnowledgeExplorer({
             )}
           </button>
         </div>
-      </div>
 
       {/* Main Content */}
       <div className="relative flex flex-1 overflow-hidden">
@@ -964,12 +862,14 @@ export function KnowledgeExplorer({
             <button
               onClick={() => {
                 if (cameraRef.current && nodes.length > 0) {
+                  // Calculate bounds with padding for all nodes
+                  const padding = 80;
                   const bounds = nodes.reduce(
                     (acc, n) => ({
-                      minX: Math.min(acc.minX, n.x),
-                      minY: Math.min(acc.minY, n.y),
-                      maxX: Math.max(acc.maxX, n.x + n.width),
-                      maxY: Math.max(acc.maxY, n.y + n.height),
+                      minX: Math.min(acc.minX, n.x - padding),
+                      minY: Math.min(acc.minY, n.y - padding),
+                      maxX: Math.max(acc.maxX, n.x + n.width + padding),
+                      maxY: Math.max(acc.maxY, n.y + n.height + padding),
                     }),
                     {
                       minX: Infinity,
@@ -978,15 +878,18 @@ export function KnowledgeExplorer({
                       maxY: -Infinity,
                     },
                   );
-                  cameraRef.current.fitToBounds(
-                    bounds,
-                    size.width,
-                    size.height,
-                    {
-                      duration: ANIMATION_DURATION.normal,
-                      easing: Easing.easeInOutCubic,
-                    },
-                  );
+                  // Only fit if we have valid bounds
+                  if (bounds.minX !== Infinity) {
+                    cameraRef.current.fitToBounds(
+                      bounds,
+                      size.width,
+                      size.height,
+                      {
+                        duration: ANIMATION_DURATION.normal,
+                        easing: Easing.easeInOutCubic,
+                      },
+                    );
+                  }
                 }
               }}
               className="rounded-xl p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
@@ -1012,7 +915,11 @@ export function KnowledgeExplorer({
                   <ChevronUp size={16} />
                 </button>
                 <button
-                  onClick={() => handleToggleCollect(focusId)}
+                  onClick={() => {
+                    handleToggleCollect(focusId);
+                    setError(collectedIds.has(focusId) ? "Node unsaved" : "Node saved to collection");
+                    setTimeout(() => setError(null), 2000);
+                  }}
                   className={`rounded-xl p-2 transition-colors ${
                     collectedIds.has(focusId)
                       ? "bg-cyan-500/20 text-cyan-300"
@@ -1800,8 +1707,8 @@ export function KnowledgeExplorer({
             </div>
           )}
 
-          {/* Mini-Map */}
-          {minimapOpen && nodes.length > 10 && (
+          {/* Mini-Map - Only in Overview Mode */}
+          {mode === "overview" && minimapOpen && nodes.length > 10 && (
             <div className="pointer-events-auto absolute bottom-20 right-4 w-48 h-36 rounded-xl border border-white/10 bg-slate-900/90 shadow-xl backdrop-blur-xl overflow-hidden">
               <canvas
                 ref={(canvas) => {
@@ -2232,7 +2139,8 @@ export function KnowledgeExplorer({
                             ),
                           )
                         }
-                        className="w-full rounded-lg border border-white/10 bg-slate-800 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50"
+                        className="w-full max-w-full rounded-lg border border-white/10 bg-slate-800 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50 truncate"
+                        style={{ textOverflow: 'ellipsis' }}
                       />
                     </div>
                     <div>
@@ -2255,7 +2163,8 @@ export function KnowledgeExplorer({
                           )
                         }
                         rows={4}
-                        className="w-full rounded-lg border border-white/10 bg-slate-800 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50"
+                        className="w-full max-w-full rounded-lg border border-white/10 bg-slate-800 px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50 resize-y"
+                        style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
                       />
                     </div>
                     <div className="flex gap-2">
@@ -2292,11 +2201,11 @@ export function KnowledgeExplorer({
                                   : "text-slate-300 hover:bg-white/5"
                               }`}
                             >
-                              <div className="font-medium">
+                              <div className="font-medium truncate" title={child.data.label}>
                                 {child.data.label}
                               </div>
                               {child.data.description && (
-                                <div className="mt-0.5 line-clamp-2 text-xs text-slate-500">
+                                <div className="mt-0.5 line-clamp-2 text-xs text-slate-500 break-words">
                                   {child.data.description}
                                 </div>
                               )}

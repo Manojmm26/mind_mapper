@@ -133,7 +133,7 @@ export function WikiExplorer({
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 rounded-2xl bg-slate-100 p-1 mb-4">
+      <div className="flex flex-wrap gap-2 rounded-2xl bg-slate-100 p-1 mb-4">
         {tabs.map((tab) => (
           <button
             key={tab.id}

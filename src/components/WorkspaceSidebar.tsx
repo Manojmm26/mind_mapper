@@ -68,7 +68,7 @@ export function WorkspaceSidebar({
               : String(root?.data?.description || 'Browse the map through branches, search, and node details.')}
           </p>
         </div>
-        <div className="grid grid-cols-3 gap-2 text-center">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center">
           <div className="rounded-2xl bg-slate-50 px-2 py-3">
             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Nodes</p>
             <p className="mt-1 text-lg font-black text-slate-900">{nodes.length}</p>
@@ -84,7 +84,7 @@ export function WorkspaceSidebar({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1 text-sm font-bold text-slate-500">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1 text-sm font-bold text-slate-500">
         <button
           type="button"
           onClick={() => onChangeView('map')}
@@ -112,7 +112,7 @@ export function WorkspaceSidebar({
             type="button"
             onClick={() => onChangeView('compare')}
             className={cn(
-              'col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 transition-colors',
+              'sm:col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 transition-colors',
               activeView === 'compare' ? 'bg-white text-slate-950 shadow-sm' : 'hover:text-slate-700'
             )}
           >

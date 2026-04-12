@@ -272,7 +272,8 @@ export function useKnowledgeExplorer({
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const cameraRef = useRef<CameraController>(null);
+  const cameraRef = useRef<CameraController | null>(null);
+  const cameraModeRef = useRef<ExplorerMode | null>(null);
   const viewportRef = useRef<ViewportState>({ x: 0, y: 0, scale: 1 });
   const interactionRef = useRef<{
     type: "pan" | "drag";
@@ -492,28 +493,42 @@ export function useKnowledgeExplorer({
   useEffect(() => {
     if (size.width === 0 || size.height === 0) return;
 
-    cameraRef.current = new CameraController(
-      { x: 0, y: 0, scale: 1 },
-      (state) => setViewport(state),
-    );
-
-    if (nodes.length > 0) {
-      const bounds = nodes.reduce(
-        (acc, n) => ({
-          minX: Math.min(acc.minX, n.x),
-          minY: Math.min(acc.minY, n.y),
-          maxX: Math.max(acc.maxX, n.x + n.width),
-          maxY: Math.max(acc.maxY, n.y + n.height),
-        }),
-        { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
+    if (!cameraRef.current) {
+      cameraRef.current = new CameraController(
+        { x: 0, y: 0, scale: 1 },
+        (state) => setViewport(state),
       );
-
-      cameraRef.current.fitToBounds(bounds, size.width, size.height, {
-        duration: ANIMATION_DURATION.normal,
-        easing: Easing.easeOutExpo,
-      });
     }
-  }, [size.width, size.height]);
+
+    if (nodes.length > 0 && cameraModeRef.current !== mode) {
+      cameraModeRef.current = mode;
+
+      if (mode === "overview") {
+        const bounds = nodes.reduce(
+          (acc, n) => ({
+            minX: Math.min(acc.minX, n.x),
+            minY: Math.min(acc.minY, n.y),
+            maxX: Math.max(acc.maxX, n.x + n.width),
+            maxY: Math.max(acc.maxY, n.y + n.height),
+          }),
+          { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
+        );
+
+        cameraRef.current.fitToBounds(bounds, size.width, size.height, {
+          duration: ANIMATION_DURATION.normal,
+          easing: Easing.easeOutExpo,
+        });
+      } else {
+        cameraRef.current.animateTo(
+          { x: 0, y: 0, scale: 1 },
+          {
+            duration: ANIMATION_DURATION.normal,
+            easing: Easing.easeOutExpo,
+          }
+        );
+      }
+    }
+  }, [size.width, size.height, nodes.length, mode]);
 
   // ─── Resize Observer ─────────────────────────────────────────────────────
 
@@ -1260,24 +1275,33 @@ export function useKnowledgeExplorer({
 
       switch (e.key) {
         case "ArrowUp":
-        case "ArrowLeft":
           e.preventDefault();
           if (presentationMode) setPresentationMode(false);
           else handleGoParent();
           break;
         case "ArrowDown":
-        case "ArrowRight":
           e.preventDefault();
-          if (presentationMode && focusId) {
-            const children = childrenMap[focusId] || [];
-            if (children.length > 0) {
-              const currentIndex = children.indexOf(selectedId || "");
-              const nextIndex = (currentIndex + 1) % children.length;
-              handleSelectNode(children[nextIndex]);
-            }
-          } else {
+          {
             const children = childrenMap[focusId || ""] || [];
             if (children.length > 0) handleSelectNode(children[0]);
+          }
+          break;
+        case "ArrowLeft":
+        case "ArrowRight":
+          e.preventDefault();
+          if (focusId) {
+            const parentId = parentMap[focusId];
+            if (parentId) {
+              const siblings = childrenMap[parentId] || [];
+              if (siblings.length > 1) {
+                const currentIndex = siblings.indexOf(focusId);
+                if (currentIndex !== -1) {
+                  const step = e.key === "ArrowRight" ? 1 : -1;
+                  const nextIndex = (currentIndex + step + siblings.length) % siblings.length;
+                  handleSelectNode(siblings[nextIndex]);
+                }
+              }
+            }
           }
           break;
         case "Escape":

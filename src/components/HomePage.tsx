@@ -138,7 +138,7 @@ export function HomePage({
               type="button"
               onClick={() => onWorkflowModeChange("compare")}
               disabled={isLoading}
-              className={`flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+              className={`flex flex-1 sm:flex-none items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
                 workflowMode === "compare"
                   ? "bg-white text-slate-900 shadow-sm"
                   : "text-slate-500 hover:text-slate-700"
@@ -210,7 +210,7 @@ export function HomePage({
             </div>
 
             {/* Upload Buttons Grid */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isLoading}
@@ -314,7 +314,7 @@ export function HomePage({
           <div className="relative w-full max-w-4xl max-h-[90vh]">
             <button
               onClick={onCloseWikiExplorer}
-              className="absolute -top-3 -right-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-700 shadow-lg ring-1 ring-slate-200 transition-all hover:bg-slate-50 hover:scale-105"
+              className="absolute top-2 right-2 sm:-top-3 sm:-right-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-700 shadow-lg ring-1 ring-slate-200 transition-all hover:bg-slate-50 hover:scale-105"
               aria-label="Close Knowledge Base"
             >
               <X size={20} />

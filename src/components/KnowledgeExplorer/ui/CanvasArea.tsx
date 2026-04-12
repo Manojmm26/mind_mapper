@@ -244,12 +244,14 @@ export function CanvasArea({
           <button
             onClick={() => {
               if (cameraRef.current && nodes.length > 0) {
+                // Calculate bounds with padding for all nodes
+                const padding = 80;
                 const bounds = nodes.reduce(
                   (acc, n) => ({
-                    minX: Math.min(acc.minX, n.x),
-                    minY: Math.min(acc.minY, n.y),
-                    maxX: Math.max(acc.maxX, n.x + n.width),
-                    maxY: Math.max(acc.maxY, n.y + n.height),
+                    minX: Math.min(acc.minX, n.x - padding),
+                    minY: Math.min(acc.minY, n.y - padding),
+                    maxX: Math.max(acc.maxX, n.x + n.width + padding),
+                    maxY: Math.max(acc.maxY, n.y + n.height + padding),
                   }),
                   {
                     minX: Infinity,
@@ -258,15 +260,18 @@ export function CanvasArea({
                     maxY: -Infinity,
                   },
                 );
-                cameraRef.current.fitToBounds(
-                  bounds,
-                  size.width,
-                  size.height,
-                  {
-                    duration: ANIMATION_DURATION.normal,
-                    easing: Easing.easeInOutCubic,
-                  },
-                );
+                // Only fit if we have valid bounds
+                if (bounds.minX !== Infinity) {
+                  cameraRef.current.fitToBounds(
+                    bounds,
+                    size.width,
+                    size.height,
+                    {
+                      duration: ANIMATION_DURATION.normal,
+                      easing: Easing.easeInOutCubic,
+                    },
+                  );
+                }
               }
             }}
             className="rounded-xl p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
