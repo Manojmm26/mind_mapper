@@ -1,12 +1,29 @@
-import React, { useCallback } from "react";
-import { PretextShowcase } from "./components/PretextShowcase";
+import React, { Suspense, lazy, useCallback } from "react";
 import { HomePage } from "./components/HomePage";
-import { WorkspaceViewComponent } from "./components/WorkspaceView";
 import { useAppState } from "./hooks/useAppState";
 import { useAppHandlers } from "./hooks/useAppHandlers";
 import { useWiki } from "./hooks/useWiki";
-import { WikiPage } from "./config/wikiSchema";
 import { Node, Edge } from "@xyflow/react";
+
+const PretextShowcase = lazy(() =>
+  import("./components/PretextShowcase").then((module) => ({
+    default: module.PretextShowcase,
+  })),
+);
+
+const WorkspaceViewComponent = lazy(() =>
+  import("./components/WorkspaceView").then((module) => ({
+    default: module.WorkspaceViewComponent,
+  })),
+);
+
+function FullScreenLoadingMessage({ message }: { message: string }) {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-slate-950/95 px-6 text-center text-sm font-semibold text-slate-100">
+      {message}
+    </div>
+  );
+}
 
 export default function App() {
   const state = useAppState();
@@ -77,32 +94,40 @@ export default function App() {
 
   // Pretext showcase experience
   if (state.experience === "pretext") {
-    return <PretextShowcase onExit={() => state.setExperience("classic")} />;
+    return (
+      <Suspense fallback={<FullScreenLoadingMessage message="Loading showcase…" />}>
+        <PretextShowcase onExit={() => state.setExperience("classic")} />
+      </Suspense>
+    );
   }
 
   // Workspace view (when a map is loaded)
   if (state.workspaceGraph.nodes.length > 0) {
     return (
-      <WorkspaceViewComponent
-        isMobile={state.isMobile}
-        outlineFullscreen={state.outlineFullscreen}
-        workspaceGraph={state.workspaceGraph}
-        workspaceRoot={state.workspaceRoot}
-        workflowMode={state.workflowMode}
-        activeView={state.activeView}
-        setActiveView={state.setActiveView}
-        comparisonData={state.comparisonData}
-        selectedNodeId={state.selectedNodeId}
-        searchQuery={state.searchQuery}
-        setSearchQuery={state.setSearchQuery}
-        handleSelectNode={state.handleSelectNode}
-        handleSaveMap={handlers.handleSaveMap}
-        resetWorkspaceState={state.resetWorkspaceState}
-        setExperience={state.setExperience}
-        mapData={state.mapData}
-        savedNodes={state.savedNodes}
-        savedEdges={state.savedEdges}
-      />
+      <Suspense
+        fallback={<FullScreenLoadingMessage message="Loading workspace…" />}
+      >
+        <WorkspaceViewComponent
+          isMobile={state.isMobile}
+          outlineFullscreen={state.outlineFullscreen}
+          workspaceGraph={state.workspaceGraph}
+          workspaceRoot={state.workspaceRoot}
+          workflowMode={state.workflowMode}
+          activeView={state.activeView}
+          setActiveView={state.setActiveView}
+          comparisonData={state.comparisonData}
+          selectedNodeId={state.selectedNodeId}
+          searchQuery={state.searchQuery}
+          setSearchQuery={state.setSearchQuery}
+          handleSelectNode={state.handleSelectNode}
+          handleSaveMap={handlers.handleSaveMap}
+          resetWorkspaceState={state.resetWorkspaceState}
+          setExperience={state.setExperience}
+          mapData={state.mapData}
+          savedNodes={state.savedNodes}
+          savedEdges={state.savedEdges}
+        />
+      </Suspense>
     );
   }
 

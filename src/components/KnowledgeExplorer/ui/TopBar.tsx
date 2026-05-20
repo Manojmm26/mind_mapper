@@ -51,6 +51,7 @@ export interface TopBarProps {
   storyMode: boolean;
   setStoryMode: (mode: boolean) => void;
   storyIndex: number;
+  setStoryIndex: (index: number) => void;
   focusMode: boolean;
   setFocusMode: (mode: boolean) => void;
   edgeCreation: string | null;
@@ -97,6 +98,7 @@ export function TopBar({
   storyMode,
   setStoryMode,
   storyIndex,
+  setStoryIndex,
   focusMode,
   setFocusMode,
   edgeCreation,

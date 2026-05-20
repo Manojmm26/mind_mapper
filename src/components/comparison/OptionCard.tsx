@@ -29,6 +29,7 @@ const domainSummaryLabels: Record<ComparisonDomain, string> = {
 };
 
 interface OptionCardProps {
+  key?: string;
   option: ComparisonOption;
   criteria: ComparisonCriterion[];
   index: number;

@@ -237,5 +237,243 @@ Create a comprehensive, domain-agnostic comparison workspace that can be shown i
     },
   });
 
-  return parseAndValidate(response, validateComparisonWorkspace);
+  return normalizeComparisonData(
+    parseAndValidate(response, validateComparisonWorkspace),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Streaming Mind Map Generation
+// ---------------------------------------------------------------------------
+
+interface StreamParserState {
+  buffer: string;
+  parsedNodeIds: Set<string>;
+  parsedEdgeIds: Set<string>;
+  nodes: NodeData[];
+  edges: EdgeData[];
+}
+
+export function createIncrementalParser(
+  onUpdate: (nodes: NodeData[], edges: EdgeData[]) => void
+) {
+  const state: StreamParserState = {
+    buffer: "",
+    parsedNodeIds: new Set(),
+    parsedEdgeIds: new Set(),
+    nodes: [],
+    edges: [],
+  };
+
+  function appendChunk(chunk: string) {
+    state.buffer += chunk;
+    
+    let updated = false;
+
+    // 1. Extract nodes
+    const nodesRegex = /"nodes"\s*:\s*\[/g;
+    const nodesMatch = nodesRegex.exec(state.buffer);
+    if (nodesMatch) {
+      let index = nodesMatch.index + nodesMatch[0].length;
+      let braceCount = 0;
+      let inString = false;
+      let escape = false;
+      let startIdx = -1;
+
+      for (let i = index; i < state.buffer.length; i++) {
+        const char = state.buffer[i];
+        if (escape) {
+          escape = false;
+          continue;
+        }
+        if (char === '\\') {
+          escape = true;
+          continue;
+        }
+        if (char === '"') {
+          inString = !inString;
+          continue;
+        }
+        if (!inString) {
+          if (char === '{') {
+            if (braceCount === 0) {
+              startIdx = i;
+            }
+            braceCount++;
+          } else if (char === '}') {
+            braceCount--;
+            if (braceCount === 0 && startIdx !== -1) {
+              const nodeStr = state.buffer.substring(startIdx, i + 1);
+              try {
+                const node = JSON.parse(nodeStr) as NodeData;
+                if (node && node.id && !state.parsedNodeIds.has(node.id)) {
+                  state.parsedNodeIds.add(node.id);
+                  state.nodes.push(node);
+                  updated = true;
+                }
+              } catch (e) {
+                // Incomplete or invalid JSON
+              }
+            }
+          } else if (char === ']') {
+            break;
+          }
+        }
+      }
+    }
+
+    // 2. Extract edges
+    const edgesRegex = /"edges"\s*:\s*\[/g;
+    const edgesMatch = edgesRegex.exec(state.buffer);
+    if (edgesMatch) {
+      let index = edgesMatch.index + edgesMatch[0].length;
+      let braceCount = 0;
+      let inString = false;
+      let escape = false;
+      let startIdx = -1;
+
+      for (let i = index; i < state.buffer.length; i++) {
+        const char = state.buffer[i];
+        if (escape) {
+          escape = false;
+          continue;
+        }
+        if (char === '\\') {
+          escape = true;
+          continue;
+        }
+        if (char === '"') {
+          inString = !inString;
+          continue;
+        }
+        if (!inString) {
+          if (char === '{') {
+            if (braceCount === 0) {
+              startIdx = i;
+            }
+            braceCount++;
+          } else if (char === '}') {
+            braceCount--;
+            if (braceCount === 0 && startIdx !== -1) {
+              const edgeStr = state.buffer.substring(startIdx, i + 1);
+              try {
+                const edge = JSON.parse(edgeStr) as EdgeData;
+                if (edge && edge.source && edge.target) {
+                  const edgeKey = `${edge.source}-${edge.target}`;
+                  if (!state.parsedEdgeIds.has(edgeKey)) {
+                    state.parsedEdgeIds.add(edgeKey);
+                    state.edges.push(edge);
+                    updated = true;
+                  }
+                }
+              } catch (e) {
+                // Incomplete or invalid JSON
+              }
+            }
+          } else if (char === ']') {
+            break;
+          }
+        }
+      }
+    }
+
+    if (updated) {
+      onUpdate([...state.nodes], [...state.edges]);
+    }
+  }
+
+  return { appendChunk, state };
+}
+
+export async function generateMindMapStream(
+  promptType: "topic" | "document",
+  input: string,
+  onUpdate: (nodes: NodeData[], edges: EdgeData[]) => void,
+  wikiContext?: WikiContext,
+): Promise<MindMapData> {
+  const ai = getAI();
+  
+  let basePrompt = "";
+  if (promptType === "document") {
+    basePrompt = `You are an expert knowledge architect analyzing a document to build a comprehensive, hierarchical mind map.
+
+## Your Task
+1. Identify the single central theme or thesis — this becomes the ROOT node.
+2. Extract major topics/sections as LEVEL 1 children of the root.
+3. For each major topic, extract sub-topics as LEVEL 2 children.
+4. Continue decomposing into LEVEL 3 and LEVEL 4 where the document provides enough detail.
+5. Every node MUST have a meaningful, specific description — never use generic filler.
+
+## Structural Rules
+- Build a proper TREE: one root, with branches going deeper into detail.
+- Every non-root node must connect to exactly one parent via an edge.
+- Aim for 20-60 nodes depending on document complexity.
+- Labels: concise (max 6 words). Descriptions: specific and informative (1-2 sentences).
+- Add metadata when it helps: node type, 1-3 tags, importance, confidence, sourceHint, and nextStep.
+- Do NOT create disconnected nodes. Every node must be reachable from the root.
+- Prefer depth over breadth — 3-4 levels of hierarchy is better than 15 flat siblings.
+
+## Output Format
+- Return structured JSON matching the MindMapData schema.
+- Include metadata on nodes: type, tags, importance, confidence, sourceHint.
+- Keep labels concise (max 6 words), descriptions specific and educational (1-2 sentences).
+
+Document content:
+"""
+${input.substring(0, 50000)}
+"""`;
+  } else {
+    basePrompt = `You are an expert educator and knowledge architect. A user wants to learn about: "${input}"
+
+Your task is to create a comprehensive, well-organized mind map that serves as a learning roadmap.
+
+## Step 1 — Think Deeply About the Topic
+- What are the foundational concepts someone must understand first?
+- What are the major pillars/categories within this topic?
+- What are the practical applications, tools, or techniques?
+- What are common misconceptions or advanced nuances?
+
+## Step 2 — Build the Mind Map
+- The ROOT node should be the topic title with a description summarizing what this map covers.
+- LEVEL 1: Major categories or pillars (aim for 4-8 branches).
+- LEVEL 2: Key concepts within each category (2-5 per branch).
+- LEVEL 3+: Specific details, examples, techniques, or sub-concepts.
+
+## Structural Rules
+- Build a proper TREE: one root, branching into increasing specificity.
+- Every non-root node connects to exactly one parent.
+- Target 30-70 nodes for a rich, useful map.
+- Labels: concise (max 6 words). Descriptions: specific and educational (1-2 sentences that actually teach something).
+- Add metadata when relevant: node type, 1-3 tags, importance, confidence, sourceHint, and nextStep.
+- Do NOT create disconnected nodes.
+- Do NOT be superficial — go deep enough that each leaf node contains actionable or specific knowledge.
+- Organize logically: foundational concepts first, advanced topics later in the hierarchy.`;
+  }
+
+  const prompt = wikiContext?.contextString
+    ? `${basePrompt}${wikiContext.contextString}${WIKI_INSTRUCTIONS}`
+    : basePrompt;
+
+  const responseStream = await ai.models.generateContentStream({
+    model: "gemini-3-flash-preview",
+    contents: prompt,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: mindMapSchemaGenAI,
+    },
+  });
+
+  const parser = createIncrementalParser(onUpdate);
+  let fullText = "";
+
+  for await (const chunk of responseStream) {
+    const text = chunk.text;
+    if (text) {
+      fullText += text;
+      parser.appendChunk(text);
+    }
+  }
+
+  // Final parsing and validation to guarantee full structured output
+  return validateMindMap(JSON.parse(fullText));
 }

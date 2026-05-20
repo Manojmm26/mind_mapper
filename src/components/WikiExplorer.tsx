@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Suspense, lazy, useState } from "react";
 import {
   BookOpen,
   Clock,
@@ -13,7 +13,7 @@ import {
   Search,
 } from "lucide-react";
 import { useWiki } from "../hooks/useWiki";
-import { KnowledgeGraph } from "./KnowledgeGraph";
+import { exportWikiToJSON } from "../services/wikiService";
 import {
   WikiBrowseTab,
   WikiActivityLogTab,
@@ -21,6 +21,12 @@ import {
   WikiStatsTab,
   WikiQueryTab,
 } from "./wikiExplorer";
+
+const KnowledgeGraph = lazy(() =>
+  import("./KnowledgeGraph").then((module) => ({
+    default: module.KnowledgeGraph,
+  })),
+);
 
 type WikiTab = "browse" | "graph" | "query" | "logs" | "lint" | "stats";
 
@@ -34,7 +40,6 @@ export function WikiExplorer({
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const handleExportJSON = async () => {
-    const { exportWikiToJSON } = await import("../services/wikiService");
     const json = await exportWikiToJSON();
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -162,16 +167,25 @@ export function WikiExplorer({
 
         {activeTab === "graph" && (
           <div className="h-full min-h-[400px] rounded-[20px] border border-white/60 bg-white/80 shadow-sm overflow-hidden">
-            <KnowledgeGraph
-              wikiIndex={wiki.wikiIndex}
-              conceptIndex={wiki.conceptIndex}
-            />
+            <Suspense
+              fallback={
+                <div className="flex h-full items-center justify-center text-sm font-semibold text-slate-500">
+                  Loading knowledge graph…
+                </div>
+              }
+            >
+              <KnowledgeGraph
+                wikiIndex={wiki.wikiIndex}
+                conceptIndex={wiki.conceptIndex}
+              />
+            </Suspense>
           </div>
         )}
 
         {activeTab === "query" && (
           <WikiQueryTab
             wikiIndex={wiki.wikiIndex}
+            conceptIndex={wiki.conceptIndex}
             isLoading={wiki.isLoading}
             onLoadPage={onLoadPage ?? (() => {})}
           />

@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { Type } from "@google/genai";
+import { z } from "zod";
 
 // ---------------------------------------------------------------------------
 // Schema Version
@@ -296,7 +296,7 @@ export interface ComparisonWorkspaceData {
 export function validateMindMap(data: unknown): MindMapData {
   const result = mindMapSchema.safeParse(data);
   if (!result.success) {
-    const errors = result.error.errors
+    const errors = result.error.issues
       .map((e) => `${e.path.join(".")}: ${e.message}`)
       .join("; ");
     throw new Error(`Invalid mind map data: ${errors}`);
@@ -309,7 +309,7 @@ export function validateComparisonWorkspace(
 ): ComparisonWorkspaceDataRaw {
   const result = comparisonWorkspaceSchema.safeParse(data);
   if (!result.success) {
-    const errors = result.error.errors
+    const errors = result.error.issues
       .map((e) => `${e.path.join(".")}: ${e.message}`)
       .join("; ");
     throw new Error(`Invalid comparison workspace data: ${errors}`);
@@ -335,292 +335,237 @@ export function scoresToRecord(
  * Normalizes raw LLM response (scores as array) into UI-ready format (scores as Record).
  */
 export function normalizeComparisonData(
-  raw: ComparisonWorkspaceDataRaw,
+  raw: ComparisonWorkspaceDataRaw | ComparisonWorkspaceData,
 ): ComparisonWorkspaceData {
   return {
-    ...raw,
+    ...(raw as any),
     options: raw.options.map((opt) => ({
       ...opt,
       scores: Array.isArray(opt.scores)
         ? scoresToRecord(opt.scores as unknown as CriterionScore[])
         : opt.scores,
     })),
-  };
+  } as ComparisonWorkspaceData;
 }
 
-// ---------------------------------------------------------------------------
-// Google GenAI Schemas (manually written to guarantee correctness)
-// ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // Google GenAI Schemas (manually written to guarantee correctness)
+  // ---------------------------------------------------------------------------
 
-const _nodeSchemaGenAI = {
-  type: Type.OBJECT,
-  properties: {
-    id: {
-      type: Type.STRING,
-      description: "A unique identifier (e.g., 'node_0', 'node_1').",
+  const _nodeSchemaGenAI = {
+    type: Type.OBJECT,
+    properties: {
+      id: {
+        type: Type.STRING,
+        description: "A unique identifier (e.g., 'node_0', 'node_1').",
+      },
+      label: {
+        type: Type.STRING,
+        description: "A short, concise title for this concept (max 6 words).",
+      },
+      description: {
+        type: Type.STRING,
+        description:
+          "A clear 1-2 sentence explanation of this concept. Be specific and informative, not generic.",
+      },
+      type: {
+        type: Type.STRING,
+        enum: [
+          "topic",
+          "concept",
+          "example",
+          "question",
+          "action",
+          "decision",
+          "source",
+        ],
+        description: "Optional semantic role for the node.",
+      },
+      tags: {
+        type: Type.ARRAY,
+        items: { type: Type.STRING },
+        description: "Optional short tags that help filter or cluster this node.",
+      },
+      importance: {
+        type: Type.STRING,
+        enum: ["high", "medium", "low"],
+        description: "Optional priority marker.",
+      },
+      confidence: {
+        type: Type.STRING,
+        enum: ["high", "medium", "low"],
+        description: "Optional confidence marker.",
+      },
+      sourceHint: {
+        type: Type.STRING,
+        description: "Optional note describing where this idea comes from.",
+      },
+      nextStep: {
+        type: Type.STRING,
+        description: "Optional next action or follow-up.",
+      },
     },
-    label: {
-      type: Type.STRING,
-      description: "A short, concise title for this concept (max 6 words).",
-    },
-    description: {
-      type: Type.STRING,
-      description:
-        "A clear 1-2 sentence explanation of this concept. Be specific and informative, not generic.",
-    },
-    type: {
-      type: Type.STRING,
-      enum: [
-        "topic",
-        "concept",
-        "example",
-        "question",
-        "action",
-        "decision",
-        "source",
-      ],
-      description: "Optional semantic role for the node.",
-    },
-    tags: {
-      type: Type.ARRAY,
-      items: { type: Type.STRING },
-      description: "Optional short tags that help filter or cluster this node.",
-    },
-    importance: {
-      type: Type.STRING,
-      enum: ["high", "medium", "low"],
-      description: "Optional priority marker.",
-    },
-    confidence: {
-      type: Type.STRING,
-      enum: ["high", "medium", "low"],
-      description: "Optional confidence marker.",
-    },
-    sourceHint: {
-      type: Type.STRING,
-      description: "Optional note describing where this idea comes from.",
-    },
-    nextStep: {
-      type: Type.STRING,
-      description: "Optional next action or follow-up.",
-    },
-  },
-  required: ["id", "label", "description"],
-};
+    required: ["id", "label", "description"],
+  };
 
-const _edgeSchemaGenAI = {
-  type: Type.OBJECT,
-  properties: {
-    source: {
-      type: Type.STRING,
-      description: "The ID of the parent/source node.",
+  const _edgeSchemaGenAI = {
+    type: Type.OBJECT,
+    properties: {
+      source: {
+        type: Type.STRING,
+        description: "The ID of the parent/source node.",
+      },
+      target: {
+        type: Type.STRING,
+        description: "The ID of the child/target node.",
+      },
+      label: {
+        type: Type.STRING,
+        description: "A brief label describing the relationship.",
+      },
     },
-    target: {
-      type: Type.STRING,
-      description: "The ID of the child/target node.",
-    },
-    label: {
-      type: Type.STRING,
-      description: "A brief label describing the relationship.",
-    },
-  },
-  required: ["source", "target"],
-};
+    required: ["source", "target"],
+  };
 
-const _comparisonCriterionSchemaGenAI = {
-  type: Type.OBJECT,
-  properties: {
-    id: { type: Type.STRING },
-    label: { type: Type.STRING },
-    description: { type: Type.STRING },
-    weight: { type: Type.INTEGER, description: "Importance weight from 1-10." },
-    type: {
-      type: Type.STRING,
-      enum: ["numeric", "categorical", "boolean", "text"],
-      description: "The data type for this criterion's values.",
+  const _comparisonCriterionSchemaGenAI = {
+    type: Type.OBJECT,
+    properties: {
+      id: { type: Type.STRING },
+      label: { type: Type.STRING },
+      description: { type: Type.STRING },
+      weight: { type: Type.INTEGER, description: "Importance weight from 1-10." },
+      type: {
+        type: Type.STRING,
+        enum: ["numeric", "categorical", "boolean", "text"],
+        description: "The data type for this criterion's values.",
+      },
+      unit: { type: Type.STRING, description: "Optional unit of measurement." },
     },
-    unit: { type: Type.STRING, description: "Optional unit of measurement." },
-  },
-  required: ["id", "label", "type"],
-};
+    required: ["id", "label", "type"],
+  };
 
-const _criterionScoreSchemaGenAI = {
-  type: Type.OBJECT,
-  properties: {
-    criterionId: {
-      type: Type.STRING,
-      description: "ID of the criterion this score belongs to.",
+  const _criterionScoreSchemaGenAI = {
+    type: Type.OBJECT,
+    properties: {
+      criterionId: {
+        type: Type.STRING,
+        description: "ID of the criterion this score belongs to.",
+      },
+      value: { type: Type.STRING, description: "Raw score value." },
+      displayValue: {
+        type: Type.STRING,
+        description: "Human-readable display value.",
+      },
+      rating: { type: Type.INTEGER, description: "Rating from 1-5." },
+      note: { type: Type.STRING, description: "Optional explanatory note." },
     },
-    value: { type: Type.STRING, description: "Raw score value." },
-    displayValue: {
-      type: Type.STRING,
-      description: "Human-readable display value.",
-    },
-    rating: { type: Type.INTEGER, description: "Rating from 1-5." },
-    note: { type: Type.STRING, description: "Optional explanatory note." },
-  },
-  required: ["criterionId", "displayValue"],
-};
+    required: ["criterionId", "displayValue"],
+  };
 
-const _comparisonActionSchemaGenAI = {
-  type: Type.OBJECT,
-  properties: {
-    label: { type: Type.STRING },
-    href: { type: Type.STRING },
-    variant: { type: Type.STRING, enum: ["primary", "secondary", "ghost"] },
-  },
-  required: ["label", "href"],
-};
+  const _comparisonActionSchemaGenAI = {
+    type: Type.OBJECT,
+    properties: {
+      label: { type: Type.STRING },
+      href: { type: Type.STRING },
+      variant: { type: Type.STRING, enum: ["primary", "secondary", "ghost"] },
+    },
+    required: ["label", "href"],
+  };
 
-const _comparisonOptionSchemaGenAI = {
-  type: Type.OBJECT,
-  properties: {
-    id: { type: Type.STRING },
-    name: { type: Type.STRING },
-    summary: { type: Type.STRING },
-    scores: {
-      type: Type.ARRAY,
-      items: _criterionScoreSchemaGenAI,
-      description: "Array of scores, one per criterion.",
+  const _comparisonOptionSchemaGenAI = {
+    type: Type.OBJECT,
+    properties: {
+      id: { type: Type.STRING },
+      name: { type: Type.STRING },
+      summary: { type: Type.STRING },
+      scores: {
+        type: Type.ARRAY,
+        items: _criterionScoreSchemaGenAI,
+        description: "Array of scores, one per criterion.",
+      },
+      tags: { type: Type.ARRAY, items: { type: Type.STRING } },
+      metadata: {
+        type: Type.OBJECT,
+        additionalProperties: { type: Type.STRING },
+        description: "Domain-specific metadata.",
+      },
+      actions: { type: Type.ARRAY, items: _comparisonActionSchemaGenAI },
     },
-    tags: { type: Type.ARRAY, items: { type: Type.STRING } },
-    metadata: {
-      type: Type.OBJECT,
-      additionalProperties: { type: Type.STRING },
-      description: "Domain-specific metadata.",
-    },
-    actions: { type: Type.ARRAY, items: _comparisonActionSchemaGenAI },
-  },
-  required: ["id", "name", "summary", "scores"],
-};
+    required: ["id", "name", "summary", "scores"],
+  };
 
-const _comparisonDataExportSchemaGenAI = {
-  type: Type.OBJECT,
-  properties: {
-    version: { type: Type.STRING, enum: ["1.0.0"] },
-    topic: {
-      type: Type.STRING,
-      description: "The original topic or query being compared.",
+  export const mindMapSchemaGenAI = {
+    type: Type.OBJECT,
+    properties: {
+      version: { type: Type.STRING, enum: ["1.0.0"] },
+      nodes: {
+        type: Type.ARRAY,
+        items: _nodeSchemaGenAI,
+        minItems: 1,
+        description: "All nodes in the mind map, from root to leaves.",
+      },
+      edges: {
+        type: Type.ARRAY,
+        items: _edgeSchemaGenAI,
+        description:
+          "Directed edges representing parent-child or relational links.",
+      },
     },
-    domainType: {
-      type: Type.STRING,
-      enum: [
-        "products",
-        "tools",
-        "services",
-        "approaches",
-        "strategies",
-        "concepts",
-      ],
-      description: "The domain category.",
-    },
-    overview: {
-      type: Type.STRING,
-      description: "A short overview of the comparison landscape.",
-    },
-    recommendedApproach: {
-      type: Type.STRING,
-      description: "Guidance on how to evaluate the available options.",
-    },
-    criteria: {
-      type: Type.ARRAY,
-      items: _comparisonCriterionSchemaGenAI,
-      description: "Key decision criteria.",
-    },
-    options: {
-      type: Type.ARRAY,
-      items: _comparisonOptionSchemaGenAI,
-      description: "Recommended options.",
-    },
-    nextSteps: {
-      type: Type.ARRAY,
-      items: { type: Type.STRING },
-      description: "Concrete next steps.",
-    },
-  },
-  required: [
-    "topic",
-    "domainType",
-    "overview",
-    "recommendedApproach",
-    "criteria",
-    "options",
-    "nextSteps",
-  ],
-};
+    required: ["nodes", "edges"],
+  };
 
-export const mindMapSchemaGenAI = {
-  type: Type.OBJECT,
-  properties: {
-    version: { type: Type.STRING, enum: ["1.0.0"] },
-    nodes: {
-      type: Type.ARRAY,
-      items: _nodeSchemaGenAI,
-      minItems: 1,
-      description: "All nodes in the mind map, from root to leaves.",
+  export const comparisonWorkspaceSchemaGenAI = {
+    type: Type.OBJECT,
+    properties: {
+      version: { type: Type.STRING, enum: ["1.0.0"] },
+      topic: {
+        type: Type.STRING,
+        description: "The original topic or query being compared.",
+      },
+      domainType: {
+        type: Type.STRING,
+        enum: [
+          "products",
+          "tools",
+          "services",
+          "approaches",
+          "strategies",
+          "concepts",
+        ],
+        description: "The domain category.",
+      },
+      overview: {
+        type: Type.STRING,
+        description: "A short overview of the comparison landscape.",
+      },
+      recommendedApproach: {
+        type: Type.STRING,
+        description: "Guidance on how to evaluate the available options.",
+      },
+      criteria: {
+        type: Type.ARRAY,
+        items: _comparisonCriterionSchemaGenAI,
+        description: "Key decision criteria.",
+      },
+      options: {
+        type: Type.ARRAY,
+        items: _comparisonOptionSchemaGenAI,
+        description: "Recommended options.",
+      },
+      nextSteps: {
+        type: Type.ARRAY,
+        items: { type: Type.STRING },
+        description: "Concrete next steps.",
+      },
+      map: mindMapSchemaGenAI,
     },
-    edges: {
-      type: Type.ARRAY,
-      items: _edgeSchemaGenAI,
-      description:
-        "Directed edges representing parent-child or relational links.",
-    },
-  },
-  required: ["nodes", "edges"],
-};
-
-export const comparisonWorkspaceSchemaGenAI = {
-  type: Type.OBJECT,
-  properties: {
-    version: { type: Type.STRING, enum: ["1.0.0"] },
-    topic: {
-      type: Type.STRING,
-      description: "The original topic or query being compared.",
-    },
-    domainType: {
-      type: Type.STRING,
-      enum: [
-        "products",
-        "tools",
-        "services",
-        "approaches",
-        "strategies",
-        "concepts",
-      ],
-      description: "The domain category.",
-    },
-    overview: {
-      type: Type.STRING,
-      description: "A short overview of the comparison landscape.",
-    },
-    recommendedApproach: {
-      type: Type.STRING,
-      description: "Guidance on how to evaluate the available options.",
-    },
-    criteria: {
-      type: Type.ARRAY,
-      items: _comparisonCriterionSchemaGenAI,
-      description: "Key decision criteria.",
-    },
-    options: {
-      type: Type.ARRAY,
-      items: _comparisonOptionSchemaGenAI,
-      description: "Recommended options.",
-    },
-    nextSteps: {
-      type: Type.ARRAY,
-      items: { type: Type.STRING },
-      description: "Concrete next steps.",
-    },
-    map: mindMapSchemaGenAI,
-  },
-  required: [
-    "topic",
-    "domainType",
-    "overview",
-    "recommendedApproach",
-    "criteria",
-    "options",
-    "nextSteps",
-  ],
-};
+    required: [
+      "topic",
+      "domainType",
+      "overview",
+      "recommendedApproach",
+      "criteria",
+      "options",
+      "nextSteps",
+    ],
+  };

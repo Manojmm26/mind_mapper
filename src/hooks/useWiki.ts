@@ -10,13 +10,22 @@
  * wiki.ingestMindMap(mapData, "document", "my-research.pdf");
  */
 
-import { useState, useCallback, useEffect } from "react";
+import {
+  useState,
+  useCallback,
+  useEffect,
+  createContext,
+  useContext,
+  createElement,
+  type ReactNode,
+} from "react";
 import { MindMapData, ComparisonWorkspaceData } from "../services/llmService";
 import { WikiPage, IngestionSource } from "../config/wikiSchema";
 import {
   getWikiIndex,
   getAllWikiPages,
   getWikiStats,
+  getWikiPage,
   getLogs,
   addLogEntry,
   generateId,
@@ -72,7 +81,9 @@ export interface UseWikiReturn {
   clearWiki: () => Promise<void>;
 }
 
-export function useWiki(): UseWikiReturn {
+const WikiContext = createContext<UseWikiReturn | null>(null);
+
+function useProvideWiki(): UseWikiReturn {
   const [wikiIndex, setWikiIndex] = useState<WikiIndexEntry[]>([]);
   const [conceptIndex, setConceptIndex] = useState<ConceptIndex | null>(null);
   const [logs, setLogs] = useState<WikiLogEntry[]>([]);
@@ -222,7 +233,6 @@ export function useWiki(): UseWikiReturn {
 
   const loadWikiPage = useCallback(
     async (pageId: string): Promise<WikiPage | null> => {
-      const { getWikiPage } = await import("../services/wikiService");
       return getWikiPage(pageId);
     },
     [],
@@ -286,4 +296,20 @@ export function useWiki(): UseWikiReturn {
     refreshWiki,
     clearWiki,
   };
+}
+
+export function WikiProvider({ children }: { children: ReactNode }) {
+  const wiki = useProvideWiki();
+
+  return createElement(WikiContext.Provider, { value: wiki }, children);
+}
+
+export function useWiki(): UseWikiReturn {
+  const wiki = useContext(WikiContext);
+
+  if (!wiki) {
+    throw new Error("useWiki must be used within a WikiProvider.");
+  }
+
+  return wiki;
 }

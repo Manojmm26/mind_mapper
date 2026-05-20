@@ -1,4 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type Dispatch,
+  type RefObject,
+  type SetStateAction,
+} from "react";
 import { Edge, Node } from "@xyflow/react";
 import { ComparisonWorkspaceData, MindMapData } from "../services/llmService";
 import { convertTreeToGraph, findRootNode, toFlowGraph } from "../utils/mapData";
@@ -35,59 +43,66 @@ function syncExperienceInUrl(experience: AppExperience) {
 export interface AppState {
   // Derived
   isMobile: boolean;
-  outlineFullscreen: { ref: React.RefObject<HTMLDivElement | null>; toggle: () => void; isFullscreen: boolean };
+  outlineFullscreen: {
+    elementRef: RefObject<HTMLDivElement | null>;
+    isFullscreen: boolean;
+    isSupported: boolean;
+    enterFullscreen: () => Promise<void>;
+    exitFullscreen: () => Promise<void>;
+    toggleFullscreen: () => Promise<void>;
+  };
   workspaceGraph: { nodes: Node[]; edges: Edge[] };
   workspaceRoot: Node | null;
 
   // Experience
   experience: AppExperience;
-  setExperience: React.Dispatch<React.SetStateAction<AppExperience>>;
+  setExperience: Dispatch<SetStateAction<AppExperience>>;
 
   // Workflow
   workflowMode: "learn" | "compare";
-  setWorkflowMode: React.Dispatch<React.SetStateAction<"learn" | "compare">>;
+  setWorkflowMode: Dispatch<SetStateAction<"learn" | "compare">>;
   activeView: "map" | "outline" | "compare";
-  setActiveView: React.Dispatch<React.SetStateAction<"map" | "outline" | "compare">>;
+  setActiveView: Dispatch<SetStateAction<"map" | "outline" | "compare">>;
 
   // Loading
   isLoading: boolean;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsLoading: Dispatch<SetStateAction<boolean>>;
   loadingMessage: string;
-  setLoadingMessage: React.Dispatch<React.SetStateAction<string>>;
+  setLoadingMessage: Dispatch<SetStateAction<string>>;
 
   // Errors
   error: string;
-  setError: React.Dispatch<React.SetStateAction<string>>;
+  setError: Dispatch<SetStateAction<string>>;
 
   // Map data (AI-generated)
   mapData: MindMapData | null;
-  setMapData: React.Dispatch<React.SetStateAction<MindMapData | null>>;
+  setMapData: Dispatch<SetStateAction<MindMapData | null>>;
 
   // Comparison data
   comparisonData: ComparisonWorkspaceData | null;
-  setComparisonData: React.Dispatch<React.SetStateAction<ComparisonWorkspaceData | null>>;
+  setComparisonData: Dispatch<SetStateAction<ComparisonWorkspaceData | null>>;
 
   // Saved/loaded map data
   savedNodes: Node[] | null;
-  setSavedNodes: React.Dispatch<React.SetStateAction<Node[] | null>>;
+  setSavedNodes: Dispatch<SetStateAction<Node[] | null>>;
   savedEdges: Edge[] | null;
-  setSavedEdges: React.Dispatch<React.SetStateAction<Edge[] | null>>;
+  setSavedEdges: Dispatch<SetStateAction<Edge[] | null>>;
 
   // Inputs
   topicInput: string;
-  setTopicInput: React.Dispatch<React.SetStateAction<string>>;
+  setTopicInput: Dispatch<SetStateAction<string>>;
   searchQuery: string;
-  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+  setSearchQuery: Dispatch<SetStateAction<string>>;
   selectedNodeId: string | null;
-  setSelectedNodeId: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedNodeId: Dispatch<SetStateAction<string | null>>;
 
   // Refs
-  fileInputRef: React.RefObject<HTMLInputElement | null>;
-  jsonInputRef: React.RefObject<HTMLInputElement | null>;
+  fileInputRef: RefObject<HTMLInputElement>;
+  jsonInputRef: RefObject<HTMLInputElement>;
 
   // Wiki explorer modal
   showWikiExplorer: boolean;
-  setShowWikiExplorer: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowWikiExplorer: Dispatch<SetStateAction<boolean>>;
 
   // Actions
   resetWorkspaceState: () => void;

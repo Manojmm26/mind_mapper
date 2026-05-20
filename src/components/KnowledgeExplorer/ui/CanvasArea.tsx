@@ -1,6 +1,7 @@
 import React from "react";
 import {
   ArrowLeft,
+  ArrowRight,
   ChevronUp,
   Edit3,
   Loader2,
@@ -15,8 +16,8 @@ import { CameraController, Easing } from "../../../services/cameraService";
 import { ANIMATION_DURATION } from "../constants";
 
 export interface CanvasAreaProps {
-  wrapperRef: React.RefObject<HTMLDivElement | null>;
-  canvasRef: React.RefObject<HTMLCanvasElement | null>;
+  wrapperRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLCanvasElement>;
   cameraRef: React.RefObject<CameraController | null>;
   handlePointerDown: (e: React.PointerEvent) => void;
   handlePointerMove: (e: React.PointerEvent) => void;
@@ -41,7 +42,7 @@ export interface CanvasAreaProps {
   handleGoParent: () => void;
   handleSelectNode: (nodeId: string) => void;
   showCollected: boolean;
-  setShowCollected: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowCollected: (show: boolean) => void;
   nodes: ExplorerNode[];
   size: { width: number; height: number };
   handleGoHome: () => void;
@@ -194,7 +195,7 @@ export function CanvasArea({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setShowCollected((prev) => !prev);
+                    setShowCollected(!showCollected);
                   }}
                   className={`pointer-events-auto flex items-center gap-1 rounded-md px-2 py-1 transition-colors ${
                     showCollected

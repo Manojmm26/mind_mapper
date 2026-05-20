@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import {
   BrainCircuit,
   FileJson,
@@ -13,7 +13,12 @@ import {
   X,
 } from "lucide-react";
 import { EXAMPLE_MAP } from "../exampleData";
-import { WikiExplorer } from "./WikiExplorer";
+
+const WikiExplorer = lazy(() =>
+  import("./WikiExplorer").then((module) => ({
+    default: module.WikiExplorer,
+  })),
+);
 
 export interface HomePageProps {
   workflowMode: "learn" | "compare";
@@ -320,7 +325,15 @@ export function HomePage({
               <X size={20} />
             </button>
             <div className="rounded-2xl bg-white dark:bg-gray-900 shadow-2xl overflow-hidden">
-              <WikiExplorer onLoadPage={onLoadWikiPage} />
+              <Suspense
+                fallback={
+                  <div className="flex min-h-[420px] items-center justify-center bg-white px-6 text-sm font-semibold text-slate-600">
+                    Loading knowledge base…
+                  </div>
+                }
+              >
+                <WikiExplorer onLoadPage={onLoadWikiPage} />
+              </Suspense>
             </div>
           </div>
         </div>

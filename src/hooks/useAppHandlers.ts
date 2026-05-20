@@ -1,15 +1,12 @@
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { Edge, Node } from "@xyflow/react";
-import {
+import type {
   ComparisonWorkspaceData,
   MindMapData,
-  generateComparisonWorkspaceFromTopic,
-  generateMindMap,
-  generateMindMapFromTopic,
 } from "../services/llmService";
 import { normalizeComparisonData } from "../utils/comparisonHelpers";
-import { extractTextFromFile } from "../services/pdfService";
-import { convertTreeToGraph, toFlowGraph } from "../utils/mapData";
+import { convertTreeToGraph, toFlowGraph, createFlowNode, createFlowEdge } from "../utils/mapData";
+import { getLayoutedElements } from "../services/layoutService";
 import { EXAMPLE_MAP } from "../exampleData";
 import { UseWikiReturn } from "./useWiki";
 import { buildWikiContext } from "../services/wikiPromptEnhancer";
@@ -35,8 +32,8 @@ export interface UseAppHandlersConfig {
   topicInput: string;
 
   // Refs
-  fileInputRef: React.RefObject<HTMLInputElement | null>;
-  jsonInputRef: React.RefObject<HTMLInputElement | null>;
+  fileInputRef: React.RefObject<HTMLInputElement>;
+  jsonInputRef: React.RefObject<HTMLInputElement>;
 
   // Wiki integration
   wiki: UseWikiReturn;
@@ -77,6 +74,7 @@ export function useAppHandlers({
       resetWorkspaceState();
 
       try {
+        const { extractTextFromFile } = await import("../services/pdfService");
         const text = await extractTextFromFile(file);
 
         // Try parsing as JSON first (saved map or tree)
@@ -121,8 +119,32 @@ export function useAppHandlers({
           ? buildWikiContext(file.name, wiki.wikiIndex, wiki.conceptIndex)
           : undefined;
 
-        const data = await generateMindMap(text, wikiCtx);
+        const { generateMindMapStream } = await import("../services/llmService");
+        let hasTransported = false;
+        const data = await generateMindMapStream(
+          "document",
+          text,
+          (streamNodes, streamEdges) => {
+            const flowNodes = streamNodes.map((n) => createFlowNode(n));
+            const flowEdges = streamEdges.map((e) => createFlowEdge(e));
+            const layouted = getLayoutedElements(flowNodes, flowEdges);
+            setSavedNodes(layouted.nodes as Node[]);
+            setSavedEdges(layouted.edges);
+            setMapData({ nodes: [], edges: [] });
+            
+            setLoadingMessage(`Expanding mind map... (${streamNodes.length} nodes resolved)`);
+            if (streamNodes.length > 0 && !hasTransported) {
+              hasTransported = true;
+              setIsLoading(false);
+              setWorkflowMode("learn");
+              setActiveView("map");
+            }
+          },
+          wikiCtx
+        );
         setMapData(data);
+        setSavedNodes(null);
+        setSavedEdges(null);
         setWorkflowMode("learn");
         setActiveView("map");
 
@@ -170,8 +192,15 @@ export function useAppHandlers({
       try {
         if (workflowMode === "compare") {
           setLoadingMessage(`Comparing options for "${topic}"...`);
-          const raw = await generateComparisonWorkspaceFromTopic(topic);
-          const data = normalizeComparisonData(raw);
+          const wikiCtx = wiki.conceptIndex
+            ? buildWikiContext(topic, wiki.wikiIndex, wiki.conceptIndex)
+            : undefined;
+
+          const { generateComparisonWorkspaceFromTopic } = await import(
+            "../services/llmService"
+          );
+          const raw = await generateComparisonWorkspaceFromTopic(topic, wikiCtx);
+          const data = raw;
           setComparisonData(data);
           setMapData(data.map ?? { nodes: [], edges: [] });
           setActiveView("compare");
@@ -184,8 +213,35 @@ export function useAppHandlers({
             ? buildWikiContext(topic, wiki.wikiIndex, wiki.conceptIndex)
             : undefined;
 
-          const data = await generateMindMapFromTopic(topic, wikiCtx);
+          const { generateMindMapStream } = await import(
+            "../services/llmService"
+          );
+          let hasTransported = false;
+          const data = await generateMindMapStream(
+            "topic",
+            topic,
+            (streamNodes, streamEdges) => {
+              const flowNodes = streamNodes.map((n) => createFlowNode(n));
+              const flowEdges = streamEdges.map((e) => createFlowEdge(e));
+              const layouted = getLayoutedElements(flowNodes, flowEdges);
+              setSavedNodes(layouted.nodes as Node[]);
+              setSavedEdges(layouted.edges);
+              setMapData({ nodes: [], edges: [] });
+              
+              setLoadingMessage(`Expanding mind map... (${streamNodes.length} nodes resolved)`);
+              if (streamNodes.length > 0 && !hasTransported) {
+                hasTransported = true;
+                setIsLoading(false);
+                setWorkflowMode("learn");
+                setActiveView("map");
+              }
+            },
+            wikiCtx
+          );
           setMapData(data);
+          setSavedNodes(null);
+          setSavedEdges(null);
+          setWorkflowMode("learn");
           setActiveView("map");
 
           await wiki.ingestMindMap(data, "topic", topic);

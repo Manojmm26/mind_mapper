@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect, useRef } from "react";
+import React, { useMemo, useCallback, useEffect } from "react";
 import {
   ReactFlow,
   Controls,
@@ -192,20 +192,11 @@ export function KnowledgeGraph({
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const prevNodesRef = useRef<Node[]>([]);
-  const prevEdgesRef = useRef<Edge[]>([]);
 
-  // Sync layouted data with React Flow state only when data actually changes
+  // Sync layouted data whenever the computed layout changes, even if counts stay the same.
   useEffect(() => {
-    if (
-      layoutedNodes.length !== prevNodesRef.current.length ||
-      layoutedEdges.length !== prevEdgesRef.current.length
-    ) {
-      setNodes(layoutedNodes);
-      setEdges(layoutedEdges);
-      prevNodesRef.current = layoutedNodes;
-      prevEdgesRef.current = layoutedEdges;
-    }
+    setNodes(layoutedNodes);
+    setEdges(layoutedEdges);
   }, [layoutedNodes, layoutedEdges, setNodes, setEdges]);
 
   const onNodeClickHandler = useCallback(

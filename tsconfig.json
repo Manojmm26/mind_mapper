@@ -13,8 +13,14 @@
     "moduleResolution": "bundler",
     "isolatedModules": true,
     "moduleDetection": "force",
-    "allowJs": true,
+    "allowJs": false,
     "jsx": "react-jsx",
+    "types": [
+      "node",
+      "vite/client"
+    ],
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
     "paths": {
       "@/*": [
         "./*"
@@ -22,5 +28,13 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
-  }
+  },
+  "include": [
+    "src",
+    "vite.config.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
 }

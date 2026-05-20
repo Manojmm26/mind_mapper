@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   CameraController,
   Easing,
@@ -52,6 +52,7 @@ interface UseKnowledgeExplorerReturn {
   mapData: MindMapData;
   setMapData: React.Dispatch<React.SetStateAction<MindMapData>>;
   nodes: ExplorerNode[];
+  setNodes: React.Dispatch<React.SetStateAction<ExplorerNode[]>>;
   edges: ExplorerEdge[];
   focusId: string | null;
   setFocusId: (id: string | null) => void;
@@ -1271,6 +1272,16 @@ export function useKnowledgeExplorer({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement;
+      if (
+        activeEl &&
+        (activeEl.tagName === "INPUT" ||
+          activeEl.tagName === "TEXTAREA" ||
+          activeEl.getAttribute("contenteditable") === "true")
+      ) {
+        return;
+      }
+
       if (view === "edit" || expandPrompt.open) return;
 
       switch (e.key) {
@@ -1445,6 +1456,7 @@ export function useKnowledgeExplorer({
     mapData,
     setMapData,
     nodes,
+    setNodes,
     edges,
     focusId,
     setFocusId,

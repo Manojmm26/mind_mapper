@@ -1,6 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { WikiPage } from "../config/wikiSchema";
 import { getWikiPage, WikiIndexEntry } from "./wikiService";
+import { ConceptIndex } from "./wikiIndex";
 
 let aiInstance: GoogleGenAI | null = null;
 
@@ -88,6 +89,35 @@ function parseResponse<T>(response: any): T {
   }
 }
 
+function tokenizeQuery(query: string) {
+  return query
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .map((term) => term.trim())
+    .filter((term) => term.length >= 2);
+}
+
+function scoreText(text: string | undefined, query: string, terms: string[]) {
+  if (!text) {
+    return 0;
+  }
+
+  const lowerText = text.toLowerCase();
+  let score = 0;
+
+  if (lowerText.includes(query)) {
+    score += Math.max(8, query.length);
+  }
+
+  for (const term of terms) {
+    if (lowerText.includes(term)) {
+      score += 3;
+    }
+  }
+
+  return score;
+}
+
 // ---------------------------------------------------------------------------
 // Query Logic
 // ---------------------------------------------------------------------------
@@ -99,26 +129,81 @@ function parseResponse<T>(response: any): T {
 async function fetchRelevantPages(
   query: string,
   index: WikiIndexEntry[],
+  conceptIndex?: ConceptIndex | null,
   maxPages: number = 5,
 ): Promise<WikiPage[]> {
-  const lowerQuery = query.toLowerCase();
-  const results = index.filter(
-    (entry) =>
-      entry.title.toLowerCase().includes(lowerQuery) ||
-      entry.summary.toLowerCase().includes(lowerQuery) ||
-      entry.tags.some((tag) => tag.toLowerCase().includes(lowerQuery)) ||
-      (entry.sourceName && entry.sourceName.toLowerCase().includes(lowerQuery)),
-  );
+  const lowerQuery = query.toLowerCase().trim();
+  const terms = tokenizeQuery(query);
+  const conceptBoosts = new Map<string, number>();
 
-  const topResults = results.slice(0, maxPages);
+  if (conceptIndex) {
+    for (const concept of Object.values(conceptIndex.concepts)) {
+      const conceptScore =
+        scoreText(concept.label, lowerQuery, terms) * 2 +
+        (concept.tags || []).reduce(
+          (sum, tag) => sum + scoreText(tag, lowerQuery, terms),
+          0,
+        );
 
-  const pages: WikiPage[] = [];
-  for (const entry of topResults) {
-    const page = await getWikiPage(entry.id);
-    if (page) pages.push(page);
+      if (conceptScore <= 0) {
+        continue;
+      }
+
+      for (const pageId of concept.pageIds) {
+        conceptBoosts.set(pageId, (conceptBoosts.get(pageId) || 0) + conceptScore);
+      }
+    }
   }
 
-  return pages;
+  const scoredEntries = index
+    .map((entry) => {
+      const titleScore = scoreText(entry.title, lowerQuery, terms) * 4;
+      const summaryScore = scoreText(entry.summary, lowerQuery, terms) * 2;
+      const tagScore = entry.tags.reduce(
+        (sum, tag) => sum + scoreText(tag, lowerQuery, terms) * 3,
+        0,
+      );
+      const sourceScore = scoreText(entry.sourceName, lowerQuery, terms);
+      const totalScore =
+        titleScore +
+        summaryScore +
+        tagScore +
+        sourceScore +
+        (conceptBoosts.get(entry.id) || 0);
+
+      return { entry, score: totalScore };
+    })
+    .filter(({ score }) => score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, maxPages * 2);
+
+  const loadedPages = await Promise.all(
+    scoredEntries.map(async ({ entry, score }) => {
+      const page = await getWikiPage(entry.id);
+      if (!page) {
+        return null;
+      }
+
+      const nodeScore = page.nodes.reduce(
+        (sum, node) =>
+          sum +
+          scoreText(node.label, lowerQuery, terms) * 2 +
+          scoreText(node.description, lowerQuery, terms),
+        0,
+      );
+
+      return {
+        page,
+        score: score + nodeScore,
+      };
+    }),
+  );
+
+  return loadedPages
+    .filter((item): item is { page: WikiPage; score: number } => Boolean(item))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, maxPages)
+    .map(({ page }) => page);
 }
 
 /**
@@ -129,9 +214,15 @@ async function fetchRelevantPages(
 export async function queryWiki(
   query: string,
   wikiIndex: WikiIndexEntry[],
+  conceptIndex?: ConceptIndex | null,
   maxPages: number = 5,
 ): Promise<WikiQueryResult> {
-  const relevantPages = await fetchRelevantPages(query, wikiIndex, maxPages);
+  const relevantPages = await fetchRelevantPages(
+    query,
+    wikiIndex,
+    conceptIndex,
+    maxPages,
+  );
 
   if (relevantPages.length === 0) {
     return {
@@ -143,7 +234,6 @@ export async function queryWiki(
     };
   }
 
-  // Build context from relevant pages
   const context = relevantPages
     .map(
       (page) => `

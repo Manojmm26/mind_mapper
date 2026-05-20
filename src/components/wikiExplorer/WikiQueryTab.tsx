@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { WikiIndexEntry } from "../../services/wikiService";
 import { queryWiki, WikiQueryResult } from "../../services/wikiQuery";
+import { ConceptIndex } from "../../services/wikiIndex";
 
 // Simple markdown-to-HTML renderer for basic formatting
 function renderMarkdown(text: string): string {
@@ -44,12 +45,14 @@ function renderMarkdown(text: string): string {
 
 export interface WikiQueryTabProps {
   wikiIndex: WikiIndexEntry[];
+  conceptIndex: ConceptIndex | null;
   isLoading: boolean;
   onLoadPage: (pageId: string) => void;
 }
 
 export function WikiQueryTab({
   wikiIndex,
+  conceptIndex,
   isLoading,
   onLoadPage,
 }: WikiQueryTabProps) {
@@ -66,7 +69,7 @@ export function WikiQueryTab({
     setResult(null);
 
     try {
-      const res = await queryWiki(query, wikiIndex);
+      const res = await queryWiki(query, wikiIndex, conceptIndex);
       setResult(res);
     } catch (err: any) {
       setError(err.message || "Failed to query the knowledge base.");

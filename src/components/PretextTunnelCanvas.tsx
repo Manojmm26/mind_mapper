@@ -213,14 +213,14 @@ function buildTunnelScene(
 
   const compact = size.width < 1120 || size.height < 760;
   const itemsPerRing = compact ? 3 : 4;
-  const baseRadiusX = compact ? 260 : 330;
-  const baseRadiusY = compact ? 90 : 118;
+  const baseRadiusX = compact ? 420 : 540;
+  const baseRadiusY = compact ? 120 : 160;
 
   for (let index = 0; index < childNodes.length; index += itemsPerRing) {
     const ringNodes = childNodes.slice(index, index + itemsPerRing);
     const ringIndex = Math.floor(index / itemsPerRing);
-    const startAngle = compact ? -0.88 : -0.96;
-    const endAngle = compact ? 0.88 : 0.96;
+    const startAngle = compact ? -1.05 : -1.15;
+    const endAngle = compact ? 1.05 : 1.15;
 
     ringNodes.forEach((node, ringNodeIndex) => {
       const angle =
@@ -232,8 +232,8 @@ function buildTunnelScene(
         id: node.id,
         node,
         role: 'child',
-        targetX: Math.sin(angle) * (baseRadiusX + ringIndex * (compact ? 130 : 170)),
-        targetY: Math.cos(angle) * (baseRadiusY + ringIndex * (compact ? 34 : 48)) - 110,
+        targetX: Math.sin(angle) * (baseRadiusX + ringIndex * (compact ? 160 : 220)),
+        targetY: Math.cos(angle) * (baseRadiusY + ringIndex * (compact ? 45 : 60)) - 140,
         targetZ: 250 + ringIndex * (compact ? 170 : 210),
         targetOpacity: ringIndex === 0 ? 0.98 : compact ? 0.72 : 0.8,
         interactive: true,
@@ -306,6 +306,16 @@ function drawTunnelCard(
   visitedSet: Set<string>
 ) {
   const { node, role, opacity, descendantCount } = visual;
+
+  // Cinematic Depth-of-Field Blur based on z-depth
+  let blurAmount = 0;
+  if (role === 'child') {
+    blurAmount = Math.min(6, Math.max(0, (visual.z - 200) / 90));
+  } else if (role === 'parent') {
+    blurAmount = 0.8;
+  }
+  context.filter = blurAmount > 0.1 ? `blur(${blurAmount.toFixed(1)}px)` : 'none';
+
   const palette = getNodePalette(node);
   const isFocused = role === 'focus';
   const isHovered = node.id === hoveredNodeId;
@@ -398,6 +408,7 @@ function drawTunnelCard(
     context.fillText(descendantCount === 1 ? '1 deeper branch' : `${descendantCount} deeper branches`, paddingX + 10, Math.min(cursorY, height - 36) + 5);
   }
 
+  context.filter = 'none';
   context.restore();
 }
 
@@ -414,9 +425,9 @@ export function PretextTunnelCanvas({
   const projectedRectsRef = useRef<Record<string, ProjectedRect>>({});
   const pointerRef = useRef<PointerState>({ x: 0.5, y: 0.5 });
   const starsRef = useRef<StarPoint[]>([]);
+  const hoveredNodeIdRef = useRef<string | null>(null);
 
   const [size, setSize] = useState<Size>({ width: 0, height: 0 });
-  const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
 
   const nodeMap = useMemo(() => new Map(layout.nodes.map((node) => [node.id, node])), [layout.nodes]);
   const descendantCounts = useMemo(() => buildDescendantCountMap(layout.childrenMap), [layout.childrenMap]);
@@ -550,6 +561,18 @@ export function PretextTunnelCanvas({
     if (!canvas || !size.width || !size.height) {
       return;
     }
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(size.width * dpr);
+    canvas.height = Math.floor(size.height * dpr);
+    canvas.style.width = `${size.width}px`;
+    canvas.style.height = `${size.height}px`;
+  }, [size]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !size.width || !size.height) {
+      return;
+    }
 
     const context = canvas.getContext('2d');
     if (!context) {
@@ -560,11 +583,6 @@ export function PretextTunnelCanvas({
 
     const draw = () => {
       const dpr = window.devicePixelRatio || 1;
-      canvas.width = Math.floor(size.width * dpr);
-      canvas.height = Math.floor(size.height * dpr);
-      canvas.style.width = `${size.width}px`;
-      canvas.style.height = `${size.height}px`;
-
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
       context.clearRect(0, 0, size.width, size.height);
 
@@ -610,9 +628,30 @@ export function PretextTunnelCanvas({
         const spread = 0.18 + z * 1.32;
         const x = size.width * 0.5 + star.x * size.width * 0.48 * spread + (pointer.x - 0.5) * 36 * z;
         const y = size.height * 0.5 + star.y * size.height * 0.38 * spread + (pointer.y - 0.5) * 24 * z;
-        const radius = 0.5 + z * 1.7;
+        const radius = 0.5 + z * 2.4;
+        const alpha = star.alpha * (0.3 + z * 0.8);
+        
+        let color = `rgba(224,242,254,${alpha})`;
+        if (index % 5 === 0) {
+          color = `rgba(165,243,252,${alpha})`; // Soft Cyan
+        } else if (index % 7 === 0) {
+          color = `rgba(233,213,255,${alpha})`; // Soft Purple
+        }
 
-        context.fillStyle = `rgba(226,232,240,${star.alpha * (0.3 + z * 0.8)})`;
+        // Star glowing background blur aura for close particles
+        if (z > 0.6) {
+          const glowRadius = radius * 3.5;
+          const glow = context.createRadialGradient(x, y, 0, x, y, glowRadius);
+          const colorHex = index % 5 === 0 ? "#22d3ee" : index % 7 === 0 ? "#c084fc" : "#38bdf8";
+          glow.addColorStop(0, hexToRgba(colorHex, alpha * 0.26));
+          glow.addColorStop(1, "rgba(0,0,0,0)");
+          context.fillStyle = glow;
+          context.beginPath();
+          context.arc(x, y, glowRadius, 0, Math.PI * 2);
+          context.fill();
+        }
+
+        context.fillStyle = color;
         context.beginPath();
         context.arc(x, y, radius, 0, Math.PI * 2);
         context.fill();
@@ -748,7 +787,7 @@ export function PretextTunnelCanvas({
 
           context.save();
           context.translate(cardX, cardY);
-          drawTunnelCard(context, visual, renderScale, hoveredNodeId, highlightedChildId, visitedSet);
+          drawTunnelCard(context, visual, renderScale, hoveredNodeIdRef.current, highlightedChildId, visitedSet);
           context.restore();
         });
 
@@ -758,7 +797,7 @@ export function PretextTunnelCanvas({
 
     frameId = window.requestAnimationFrame(draw);
     return () => window.cancelAnimationFrame(frameId);
-  }, [focusId, highlightedChildId, hoveredNodeId, size.height, size.width, visitedSet]);
+  }, [focusId, highlightedChildId, size.height, size.width, visitedSet]);
 
   const getPointerHit = (clientX: number, clientY: number) => {
     const bounds = wrapperRef.current?.getBoundingClientRect();
@@ -770,7 +809,7 @@ export function PretextTunnelCanvas({
     const localY = clientY - bounds.top;
 
     return (
-      Object.values(projectedRectsRef.current)
+      (Object.values(projectedRectsRef.current) as ProjectedRect[])
         .filter((rect) => rect.interactive)
         .sort((left, right) => left.width - right.width)
         .reverse()
@@ -790,7 +829,12 @@ export function PretextTunnelCanvas({
     }
 
     const hit = getPointerHit(event.clientX, event.clientY);
-    setHoveredNodeId(hit?.id || null);
+    const hitId = hit?.id || null;
+    hoveredNodeIdRef.current = hitId;
+
+    if (wrapperRef.current) {
+      wrapperRef.current.style.cursor = hit ? 'pointer' : 'default';
+    }
 
     if (hit && currentChildIds.includes(hit.id)) {
       setHighlightedChildId(hit.id);
@@ -849,11 +893,13 @@ export function PretextTunnelCanvas({
       onPointerMove={handlePointerMove}
       onPointerLeave={() => {
         pointerRef.current = { x: 0.5, y: 0.5 };
-        setHoveredNodeId(null);
+        hoveredNodeIdRef.current = null;
+        if (wrapperRef.current) {
+          wrapperRef.current.style.cursor = 'default';
+        }
       }}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
-      style={{ cursor: hoveredNodeId ? 'pointer' : 'default' }}
     >
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
@@ -866,7 +912,7 @@ export function PretextTunnelCanvas({
       </div>
 
       <div className="pointer-events-auto absolute inset-x-0 bottom-4 flex justify-center px-4">
-        <div className="w-full max-w-[760px] rounded-[30px] border border-white/12 bg-slate-950/42 p-4 text-slate-100 shadow-[0_24px_80px_rgba(2,6,23,0.4)] backdrop-blur-2xl">
+        <div className="w-full max-w-[760px] rounded-[30px] border border-white/12 bg-slate-950/92 p-4 text-slate-100 shadow-[0_24px_80px_rgba(2,6,23,0.4)] backdrop-blur-2xl">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em] text-cyan-200/80">

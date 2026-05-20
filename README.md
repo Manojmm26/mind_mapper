@@ -10,7 +10,7 @@
 
 ## ✨ Key Features
 
-- **🚀 AI-Powered Extraction**: leverages Gemini 3.5 Flash to analyze PDF, TXT, or Markdown files and generate comprehensive mind maps.
+- **🚀 AI-Powered Extraction**: leverages Gemini directly in the frontend to analyze PDF, TXT, or Markdown files and generate comprehensive mind maps.
 - **🎨 Interactive Visualization**: Built with `@xyflow/react` (React Flow), providing a smooth, draggable, and zoomable interface.
 - **⚖️ Comparison Workspace**: Compare products, tools, or topics with matched options, evaluation criteria, and a linked decision map.
 - **📁 Multi-Format Support**:
@@ -53,19 +53,19 @@
    ```
 
 3. **Configure Environment**:
-   Create a `.env` file in the root directory (you can copy `.env.example`):
+    Create a `.env` file in the root directory (you can copy `.env.example`):
    ```bash
    cp .env.example .env
    ```
-   Add your API key:
+    Add your API key:
    ```env
    GEMINI_API_KEY=your_gemini_api_key_here
    ```
 
 4. **Start Development Server**:
-   ```bash
-   npm run dev
-   ```
+    ```bash
+    npm run dev
+    ```
 
 ---
 
@@ -86,6 +86,14 @@
 4. **Save/Load**:
     - Click the "Save" icon on the map to download a JSON version.
     - Use "Load Saved Map (JSON)" on the home screen to restore a previous session.
+
+---
+
+## 🧩 Architecture Notes
+
+- **Frontend**: React + Vite UI with lazy-loaded wiki, workspace, and Pretext experiences.
+- **Persistence**: Wiki pages, index entries, and activity logs are stored locally in IndexedDB.
+- **Bundle strategy**: heavy graph, Pretext, PDF, and wiki experiences are split into separate chunks to keep the initial load lighter.
 
 ---
 

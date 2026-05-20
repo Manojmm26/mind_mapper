@@ -46,6 +46,7 @@ import { hexToRgba } from "./utils";
 import {
   COLORS,
   VIEWPORT,
+  PERFORMANCE,
   LERP_FACTORS,
   PARALLAX_SMOOTHING,
   ANIMATION_DURATION,
@@ -91,6 +92,7 @@ export function KnowledgeExplorer({
     setView,
     mapData,
     nodes,
+    setNodes,
     edges,
     focusId,
     setFocusId,
@@ -228,6 +230,16 @@ export function KnowledgeExplorer({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || size.width === 0 || size.height === 0) return;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(size.width * dpr);
+    canvas.height = Math.floor(size.height * dpr);
+    canvas.style.width = `${size.width}px`;
+    canvas.style.height = `${size.height}px`;
+  }, [size]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || size.width === 0 || size.height === 0) return;
 
     let frameId: number;
 
@@ -236,11 +248,6 @@ export function KnowledgeExplorer({
       if (!ctx) return;
 
       const dpr = window.devicePixelRatio || 1;
-      canvas.width = Math.floor(size.width * dpr);
-      canvas.height = Math.floor(size.height * dpr);
-      canvas.style.width = `${size.width}px`;
-      canvas.style.height = `${size.height}px`;
-
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       // Background
@@ -375,7 +382,7 @@ export function KnowledgeExplorer({
           (x + sn.node.width / 2) * viewport.scale + viewport.x;
         const nodeScreenY =
           (y + sn.node.height / 2) * viewport.scale + viewport.y;
-        const margin = VIEWPORT.viewportMargin;
+        const margin = PERFORMANCE.viewportMargin;
         if (
           nodeScreenX < -margin ||
           nodeScreenX > size.width + margin ||
@@ -603,7 +610,7 @@ export function KnowledgeExplorer({
                   },
                   {
                     icon: Focus, label: "Focus Mode", key: "X", show: !!focusNode,
-                    onClick: () => { setFocusMode((prev) => !prev); setToolsMenuOpen(false); }
+                    onClick: () => { setFocusMode(!focusMode); setToolsMenuOpen(false); }
                   },
                   {
                     icon: Link, label: "Create Edge", show: !!focusNode,
@@ -616,7 +623,7 @@ export function KnowledgeExplorer({
                   },
                   {
                     icon: BookOpen, label: "Story Mode", key: "T", show: true,
-                    onClick: () => { setStoryMode((p) => !p); if (!storyMode) setStoryIndex(0); setToolsMenuOpen(false); }
+                    onClick: () => { setStoryMode(!storyMode); if (!storyMode) setStoryIndex(0); setToolsMenuOpen(false); }
                   },
                   {
                     icon: BarChart3, label: "Statistics", key: "S", show: true,
@@ -624,12 +631,12 @@ export function KnowledgeExplorer({
                   },
                   {
                     icon: Play, label: "Presentation", key: "P", show: true,
-                    onClick: () => { setPresentationMode((prev) => !prev); setToolsMenuOpen(false); }
+                    onClick: () => { setPresentationMode(!presentationMode); setToolsMenuOpen(false); }
                   },
                   { divider: true, show: mode === "overview" },
                   {
                     icon: MapIcon, label: "Mini-Map", key: "M", show: mode === "overview",
-                    onClick: () => { setMinimapOpen((p) => !p); setToolsMenuOpen(false); }
+                    onClick: () => { setMinimapOpen(!minimapOpen); setToolsMenuOpen(false); }
                   },
                 ].map((item, i) => {
                   if (!item.show) return null;
@@ -802,7 +809,7 @@ export function KnowledgeExplorer({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setShowCollected((prev) => !prev);
+                      setShowCollected(!showCollected);
                     }}
                     className={`pointer-events-auto flex items-center gap-1 rounded-md px-2 py-1 transition-colors ${
                       showCollected

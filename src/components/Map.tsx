@@ -47,10 +47,23 @@ const themeColors: Record<string, string[]> = {
   pink: ['#f472b6', '#ec4899', '#db2777', '#be185d', '#9d174d'],
 };
 
-const getDepthMap = (nodes: Node[], edges: Edge[]) => {
+interface GraphMetadata {
+  nodeMap: Map<string, Node>;
+  parentMap: Record<string, string | undefined>;
+  childrenMap: Record<string, string[]>;
+  inDegree: Record<string, number>;
+  depths: Record<string, number>;
+  roots: string[];
+}
+
+const buildGraphMetadata = (nodes: Node[], edges: Edge[]): GraphMetadata => {
   const inDegree: Record<string, number> = {};
+  const parentMap: Record<string, string | undefined> = {};
   const childrenMap: Record<string, string[]> = {};
   const depths: Record<string, number> = {};
+  const nodeMap = new globalThis.Map<string, Node>(
+    nodes.map((node) => [node.id, node] as [string, Node])
+  );
 
   nodes.forEach((node) => {
     inDegree[node.id] = 0;
@@ -64,9 +77,12 @@ const getDepthMap = (nodes: Node[], edges: Edge[]) => {
     if (childrenMap[edge.source]) {
       childrenMap[edge.source].push(edge.target);
     }
+    parentMap[edge.target] = edge.source;
   });
 
-  const roots = nodes.filter((node) => inDegree[node.id] === 0);
+  const roots = nodes
+    .filter((node) => inDegree[node.id] === 0)
+    .map((node) => node.id);
 
   const visit = (nodeId: string, depth: number) => {
     if (depths[nodeId] !== undefined) {
@@ -77,14 +93,25 @@ const getDepthMap = (nodes: Node[], edges: Edge[]) => {
     (childrenMap[nodeId] || []).forEach((childId) => visit(childId, depth + 1));
   };
 
-  roots.forEach((root) => visit(root.id, 0));
+  roots.forEach((rootId) => visit(rootId, 0));
 
-  return { depths, childrenMap };
+  return {
+    nodeMap,
+    parentMap,
+    childrenMap,
+    inDegree,
+    depths,
+    roots,
+  };
 };
 
 const applyEdgeThemes = (currentEdges: Edge[], themedNodes: Node[]) => {
+  const themedNodeMap = new globalThis.Map<string, Node>(
+    themedNodes.map((node) => [node.id, node] as [string, Node])
+  );
+
   return currentEdges.map((edge) => {
-    const targetNode = themedNodes.find((node) => node.id === edge.target);
+    const targetNode = themedNodeMap.get(edge.target);
     const themeFamily = (targetNode?.data?.themeFamily as string) || 'slate';
     const themeLevel = Math.min(Math.max((targetNode?.data?.themeLevel as number) || 0, 0), 4);
     const familyColors = themeColors[themeFamily] || themeColors.slate;
@@ -104,11 +131,7 @@ const prepareGraph = (rawNodes: Node[], rawEdges: Edge[]) => {
 
 const revealSelectedPath = (currentNodes: Node[], currentEdges: Edge[], selectedNodeId?: string | null) => {
   const selectedSet = new Set(selectedNodeId ? [selectedNodeId] : []);
-  const parentMap: Record<string, string | undefined> = {};
-
-  currentEdges.forEach((edge) => {
-    parentMap[edge.target] = edge.source;
-  });
+  const { parentMap } = buildGraphMetadata(currentNodes, currentEdges);
 
   let currentId = selectedNodeId || undefined;
   while (currentId && parentMap[currentId]) {
@@ -129,7 +152,7 @@ const revealSelectedPath = (currentNodes: Node[], currentEdges: Edge[], selected
 };
 
 const collapseToOverview = (currentNodes: Node[], currentEdges: Edge[]) => {
-  const { depths, childrenMap } = getDepthMap(currentNodes, currentEdges);
+  const { depths, childrenMap } = buildGraphMetadata(currentNodes, currentEdges);
 
   return currentNodes.map((node) => ({
     ...node,
@@ -152,25 +175,8 @@ const expandAllNodes = (currentNodes: Node[]) => {
 };
 
 const assignThemes = (nodes: Node[], edges: Edge[]) => {
+  const { inDegree, childrenMap, roots } = buildGraphMetadata(nodes, edges);
   const nodeThemes: Record<string, { family: string, level: number }> = {};
-  const inDegree: Record<string, number> = {};
-  const childrenMap: Record<string, string[]> = {};
-  
-  nodes.forEach(n => {
-    inDegree[n.id] = 0;
-    childrenMap[n.id] = [];
-  });
-  
-  edges.forEach(e => {
-    if (inDegree[e.target] !== undefined) {
-      inDegree[e.target]++;
-    }
-    if (childrenMap[e.source]) {
-      childrenMap[e.source].push(e.target);
-    }
-  });
-
-  const roots = nodes.filter(n => inDegree[n.id] === 0);
   let themeIndex = 0;
 
   const traverse = (nodeId: string, currentFamily: string, currentLevel: number, isTrunk: boolean) => {
@@ -200,8 +206,8 @@ const assignThemes = (nodes: Node[], edges: Edge[]) => {
     }
   };
 
-  roots.forEach(root => {
-    traverse(root.id, 'slate', 0, true);
+  roots.forEach(rootId => {
+    traverse(rootId, 'slate', 0, true);
   });
 
   // Fallback for any disconnected nodes
@@ -222,35 +228,7 @@ const assignThemes = (nodes: Node[], edges: Edge[]) => {
 };
 
 const applyDefaultCollapse = (nodes: Node[], edges: Edge[]) => {
-  const inDegree: Record<string, number> = {};
-  const childrenMap: Record<string, string[]> = {};
-  
-  nodes.forEach(n => {
-    inDegree[n.id] = 0;
-    childrenMap[n.id] = [];
-  });
-  
-  edges.forEach(e => {
-    if (inDegree[e.target] !== undefined) {
-      inDegree[e.target]++;
-    }
-    if (childrenMap[e.source]) {
-      childrenMap[e.source].push(e.target);
-    }
-  });
-
-  const roots = nodes.filter(n => inDegree[n.id] === 0);
-  const depths: Record<string, number> = {};
-
-  const traverse = (nodeId: string, depth: number) => {
-    if (depths[nodeId] !== undefined) return;
-    depths[nodeId] = depth;
-    (childrenMap[nodeId] || []).forEach(childId => {
-      traverse(childId, depth + 1);
-    });
-  };
-
-  roots.forEach(root => traverse(root.id, 0));
+  const { depths, childrenMap } = buildGraphMetadata(nodes, edges);
 
   return nodes.map(n => {
     const depth = depths[n.id] || 0;
@@ -270,47 +248,47 @@ const applyDefaultCollapse = (nodes: Node[], edges: Edge[]) => {
   });
 };
 
-const getVisibleNodes = (nodes: Node[], edges: Edge[]) => {
+const getVisibleNodes = (
+  nodes: Node[],
+  edges: Edge[],
+  metadata: GraphMetadata = buildGraphMetadata(nodes, edges),
+) => {
   const visible = new Set<string>();
-  const roots = nodes.filter(n => !edges.some(e => e.target === n.id)).map(n => n.id);
-  roots.forEach(r => visible.add(r));
+  const queue = [...metadata.roots];
 
-  let changed = true;
-  while (changed) {
-    changed = false;
-    for (const edge of edges) {
-      if (visible.has(edge.source)) {
-        const sourceNode = nodes.find(n => n.id === edge.source);
-        if (!sourceNode?.data?.isCollapsed) {
-          if (!visible.has(edge.target)) {
-            visible.add(edge.target);
-            changed = true;
-          }
-        }
+  queue.forEach((rootId) => visible.add(rootId));
+
+  while (queue.length > 0) {
+    const nodeId = queue.shift()!;
+    const sourceNode = metadata.nodeMap.get(nodeId);
+    if (sourceNode?.data?.isCollapsed) {
+      continue;
+    }
+
+    for (const childId of metadata.childrenMap[nodeId] || []) {
+      if (!visible.has(childId)) {
+        visible.add(childId);
+        queue.push(childId);
       }
     }
   }
+
   return visible;
 };
 
 const updateLayout = (currentNodes: Node[], currentEdges: Edge[]) => {
-  const childrenCount: Record<string, number> = {};
-  const parentMap: Record<string, string> = {};
-  
-  currentEdges.forEach(e => {
-    childrenCount[e.source] = (childrenCount[e.source] || 0) + 1;
-    if (!parentMap[e.target]) {
-      parentMap[e.target] = e.source;
-    }
-  });
-
-  const visibleNodeIds = getVisibleNodes(currentNodes, currentEdges);
-
+  const metadata = buildGraphMetadata(currentNodes, currentEdges);
+  const collapsedNodeIds = new Set(
+    currentNodes
+      .filter((node) => Boolean(node.data?.isCollapsed))
+      .map((node) => node.id),
+  );
+  const visibleNodeIds = getVisibleNodes(currentNodes, currentEdges, metadata);
   const visibleNodes = currentNodes.filter(n => visibleNodeIds.has(n.id));
   const visibleEdges = currentEdges.filter(e => 
     visibleNodeIds.has(e.source) && 
     visibleNodeIds.has(e.target) && 
-    !currentNodes.find(n => n.id === e.source)?.data?.isCollapsed
+    !collapsedNodeIds.has(e.source)
   );
 
   const { nodes: layoutedVisibleNodes } = getLayoutedElements(visibleNodes, visibleEdges, 'LR');
@@ -332,9 +310,9 @@ const updateLayout = (currentNodes: Node[], currentEdges: Edge[]) => {
     if (isVisible) {
       targetPos = layoutPositions[n.id] || n.position;
     } else {
-      let ancestor = parentMap[n.id];
+      let ancestor = metadata.parentMap[n.id];
       while (ancestor && !visibleNodeIds.has(ancestor)) {
-        ancestor = parentMap[ancestor];
+        ancestor = metadata.parentMap[ancestor];
       }
       if (ancestor && layoutPositions[ancestor]) {
         targetPos = layoutPositions[ancestor];
@@ -354,13 +332,13 @@ const updateLayout = (currentNodes: Node[], currentEdges: Edge[]) => {
       },
       data: {
         ...n.data,
-        hasChildren: (childrenCount[n.id] || 0) > 0
+        hasChildren: (metadata.childrenMap[n.id]?.length || 0) > 0
       }
     };
   });
 
   const finalEdges = currentEdges.map(e => {
-    const isVisible = visibleNodeIds.has(e.source) && visibleNodeIds.has(e.target) && !currentNodes.find(n => n.id === e.source)?.data?.isCollapsed;
+    const isVisible = visibleNodeIds.has(e.source) && visibleNodeIds.has(e.target) && !collapsedNodeIds.has(e.source);
     return {
       ...e,
       hidden: false, // Never hide edges so they can animate
