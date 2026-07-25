@@ -1,8 +1,9 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import {
   ReactFlow,
   MiniMap,
   Controls,
+  ControlButton,
   Background,
   useNodesState,
   useEdgesState,
@@ -14,6 +15,7 @@ import {
   Panel,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { Maximize, Minimize } from 'lucide-react';
 import { CustomNode } from './CustomNode';
 import { getLayoutedElements } from '../services/layoutService';
 import { MindMapData } from '../services/llmService';
@@ -419,13 +421,52 @@ export function Map({ data, onSave, initialNodes, initialEdges, selectedNodeId, 
     setEdges(layoutedEdges);
   }, [nodes, edges, setNodes, setEdges]);
 
+  const handleCollapseToLevel = useCallback((targetDepth: number) => {
+    const { depths, childrenMap } = buildGraphMetadata(nodes, edges);
+    const nextNodes = nodes.map((node) => ({
+      ...node,
+      selected: false,
+      data: {
+        ...node.data,
+        isCollapsed: (childrenMap[node.id] || []).length > 0 && (depths[node.id] || 0) >= targetDepth,
+      },
+    }));
+    const { nodes: layoutedNodes, edges: layoutedEdges } = updateLayout(nextNodes, edges);
+    setNodes(layoutedNodes);
+    setEdges(layoutedEdges);
+  }, [nodes, edges, setNodes, setEdges]);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFSChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFSChange);
+    return () => document.removeEventListener('fullscreenchange', handleFSChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      const target = containerRef.current || document.documentElement;
+      if (target.requestFullscreen) {
+        target.requestFullscreen().catch(() => {});
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+  };
+
   const handleSave = () => {
     onSave(nodes, edges);
   };
 
   return (
     <MapContext.Provider value={{ onToggle: handleToggle }}>
-      <div className="h-full w-full">
+      <div ref={containerRef} className="h-full w-full relative bg-slate-950">
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -437,32 +478,61 @@ export function Map({ data, onSave, initialNodes, initialEdges, selectedNodeId, 
           fitView
           className="workspace-map-canvas"
         >
-          <Controls className="workspace-map-controls" />
+          <Controls className="workspace-map-controls !m-4 !border !border-white/80 !bg-white/90 !p-1.5 !shadow-xl !backdrop-blur-xl !rounded-2xl">
+            <ControlButton
+              onClick={toggleFullscreen}
+              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen mode"}
+              aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen mode"}
+            >
+              {isFullscreen ? <Minimize size={14} /> : <Maximize size={14} />}
+            </ControlButton>
+          </Controls>
           <MiniMap
             zoomable
             pannable
-            className="!rounded-2xl !border !border-slate-200 !bg-white/90 !shadow-lg"
+            className="!m-4 !rounded-2xl !border !border-white/80 !bg-white/90 !shadow-xl !backdrop-blur-xl"
             nodeColor={(node) => String(node.style?.borderColor || '#94a3b8')}
           />
           <Background variant={BackgroundVariant.Dots} gap={18} size={1.4} color="#cbd5e1" />
-          <Panel position="top-left" className="flex items-center gap-2 rounded-2xl border border-white/70 bg-white/85 p-2 shadow-lg backdrop-blur-xl">
+          <Panel position="top-left" className="flex items-center gap-1.5 rounded-2xl border border-white/80 bg-white/90 p-1.5 shadow-xl backdrop-blur-xl">
             <button
+              type="button"
               onClick={handleExpandAll}
-              className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100"
+              className="rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-100"
             >
               Expand all
             </button>
+            <div className="h-4 w-px bg-slate-200" />
             <button
+              type="button"
+              onClick={() => handleCollapseToLevel(1)}
+              className="rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100"
+              title="Collapse to primary branches (Depth 1)"
+            >
+              Depth 1
+            </button>
+            <button
+              type="button"
+              onClick={() => handleCollapseToLevel(2)}
+              className="rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100"
+              title="Collapse to sub-branches (Depth 2)"
+            >
+              Depth 2
+            </button>
+            <div className="h-4 w-px bg-slate-200" />
+            <button
+              type="button"
               onClick={handleCollapseAll}
-              className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100"
+              className="rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-100"
             >
               Collapse layers
             </button>
           </Panel>
-          <Panel position="top-right" className="rounded-2xl border border-white/70 bg-white/85 p-2 shadow-lg backdrop-blur-xl">
+          <Panel position="top-right" className="rounded-2xl border border-white/80 bg-white/90 p-1.5 shadow-xl backdrop-blur-xl">
             <button
+              type="button"
               onClick={handleSave}
-              className="rounded-xl bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
+              className="rounded-xl bg-slate-950 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-slate-800 shadow-sm"
             >
               Save map
             </button>

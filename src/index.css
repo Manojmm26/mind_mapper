@@ -43,6 +43,10 @@
     transition: d 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
 }
 
+html {
+    overflow-x: hidden;
+}
+
 body {
     background: linear-gradient(180deg, #eef4ff 0%, #f8fafc 48%, #fffdf9 100%);
     color: #0f172a;

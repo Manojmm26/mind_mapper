@@ -1,7 +1,8 @@
-import React, { useMemo, useCallback, useEffect } from "react";
+import React, { useMemo, useCallback, useEffect, useState, useRef } from "react";
 import {
   ReactFlow,
   Controls,
+  ControlButton,
   Background,
   MiniMap,
   MarkerType,
@@ -13,6 +14,7 @@ import {
   useNodesState,
   useEdgesState,
 } from "@xyflow/react";
+import { Maximize, Minimize } from "lucide-react";
 import dagre from "dagre";
 import { WikiIndexEntry } from "../services/wikiService";
 import { ConceptIndex } from "../services/wikiIndex";
@@ -231,8 +233,32 @@ export function KnowledgeGraph({
     );
   }
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFSChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFSChange);
+    return () => document.removeEventListener("fullscreenchange", handleFSChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      const target = containerRef.current || document.documentElement;
+      if (target.requestFullscreen) {
+        target.requestFullscreen().catch(() => {});
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+  };
+
   return (
-    <div className="h-full w-full rounded-xl border border-gray-200 bg-gray-50 overflow-hidden">
+    <div ref={containerRef} className="h-full w-full rounded-xl border border-gray-200 bg-gray-50 overflow-hidden">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -249,7 +275,15 @@ export function KnowledgeGraph({
           animated: true,
         }}
       >
-        <Controls className="!bg-white !border-gray-200 !shadow-sm" />
+        <Controls className="!bg-white !border-gray-200 !shadow-sm">
+          <ControlButton
+            onClick={toggleFullscreen}
+            title={isFullscreen ? "Exit Fullscreen" : "Fullscreen mode"}
+            aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen mode"}
+          >
+            {isFullscreen ? <Minimize size={14} /> : <Maximize size={14} />}
+          </ControlButton>
+        </Controls>
         <MiniMap
           className="!bg-white !border-gray-200 !shadow-sm"
           nodeStrokeWidth={3}

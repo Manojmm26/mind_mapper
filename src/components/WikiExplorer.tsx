@@ -11,6 +11,7 @@ import {
   Sparkles,
   X,
   Search,
+  Archive,
 } from "lucide-react";
 import { useWiki } from "../hooks/useWiki";
 import { exportWikiToJSON } from "../services/wikiService";
@@ -64,6 +65,17 @@ export function WikiExplorer({
     URL.revokeObjectURL(url);
   };
 
+  const handleExportVaultZip = async () => {
+    const { exportObsidianVaultZip } = await import("../services/wikiMarkdownExport");
+    const zipBlob = await exportObsidianVaultZip(wiki.conceptIndex || undefined);
+    const url = URL.createObjectURL(zipBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `obsidian-wiki-vault-${new Date().toISOString().split("T")[0]}.zip`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handleClearWiki = async () => {
     await wiki.clearWiki();
     setShowClearConfirm(false);
@@ -106,6 +118,14 @@ export function WikiExplorer({
         </div>
 
         <div className="flex items-center gap-1.5">
+          <button
+            onClick={handleExportVaultZip}
+            className="flex items-center gap-1.5 rounded-xl bg-indigo-50 px-3 py-2 text-xs font-bold text-indigo-700 transition-colors hover:bg-indigo-100"
+            title="Export Obsidian Vault (.zip)"
+          >
+            <Archive size={15} />
+            <span className="hidden md:inline">Obsidian Vault</span>
+          </button>
           <button
             onClick={handleExportMarkdown}
             className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"

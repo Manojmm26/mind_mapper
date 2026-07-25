@@ -5,8 +5,10 @@ import {
   ChevronUp,
   Edit3,
   Loader2,
+  Maximize,
   Maximize2,
   MessageSquare,
+  Minimize,
   Save,
   ZoomIn,
   ZoomOut,
@@ -75,6 +77,29 @@ export function CanvasArea({
   handleGoHome,
   focusId,
 }: CanvasAreaProps) {
+  const [isFullscreen, setIsFullscreen] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleFSChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFSChange);
+    return () => document.removeEventListener("fullscreenchange", handleFSChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      const target = wrapperRef.current?.parentElement || wrapperRef.current || document.documentElement;
+      if (target.requestFullscreen) {
+        target.requestFullscreen().catch(() => {});
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+  };
+
   return (
     <div className="relative flex flex-1 overflow-hidden">
       {/* Canvas */}
@@ -279,6 +304,17 @@ export function CanvasArea({
             title="Fit view"
           >
             <Maximize2 size={16} />
+          </button>
+          <button
+            onClick={toggleFullscreen}
+            className={`rounded-xl p-2 transition-colors ${
+              isFullscreen
+                ? "bg-cyan-500/20 text-cyan-300"
+                : "text-slate-400 hover:bg-white/10 hover:text-white"
+            }`}
+            title={isFullscreen ? "Exit Fullscreen" : "Fullscreen mode"}
+          >
+            {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
           </button>
           <div className="mx-1 h-6 w-px bg-white/10" />
           <button

@@ -382,11 +382,71 @@ export function useAppHandlers({
     setSelectedNodeId,
   ]);
 
+  const handleSelectMapExample = useCallback(
+    (_name: string, data: MindMapData) => {
+      const exampleGraph = toFlowGraph(data);
+      setSavedNodes(exampleGraph.nodes);
+      setSavedEdges(exampleGraph.edges);
+      setComparisonData(null);
+      setWorkflowMode("learn");
+      setMapData({ nodes: [], edges: [] });
+      setActiveView("map");
+      setError("");
+      setSearchQuery("");
+      setSelectedNodeId(null);
+    },
+    [
+      setSavedNodes,
+      setSavedEdges,
+      setComparisonData,
+      setWorkflowMode,
+      setMapData,
+      setActiveView,
+      setError,
+      setSearchQuery,
+      setSelectedNodeId,
+    ],
+  );
+
+  const handleSelectCompareExample = useCallback(
+    (data: ComparisonWorkspaceData) => {
+      const normalized = normalizeComparisonData(data);
+      const flowGraph = normalized.map
+        ? toFlowGraph(normalized.map)
+        : { nodes: [], edges: [] };
+      setSavedNodes(flowGraph.nodes);
+      setSavedEdges(flowGraph.edges);
+      setComparisonData({
+        ...normalized,
+        map: normalized.map ?? { nodes: [], edges: [] },
+      });
+      setWorkflowMode("compare");
+      setActiveView("compare");
+      setMapData({ nodes: [], edges: [] });
+      setError("");
+      setSearchQuery("");
+      setSelectedNodeId(null);
+    },
+    [
+      setSavedNodes,
+      setSavedEdges,
+      setComparisonData,
+      setWorkflowMode,
+      setActiveView,
+      setMapData,
+      setError,
+      setSearchQuery,
+      setSelectedNodeId,
+    ],
+  );
+
   return {
     handleFileUpload,
     handleTopicSubmit,
     handleJsonUpload,
     handleSaveMap,
     handleLoadExample,
+    handleSelectMapExample,
+    handleSelectCompareExample,
   };
 }

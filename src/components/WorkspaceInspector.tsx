@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { Edge, Node } from '@xyflow/react';
-import { ArrowRight, CircleDashed, Compass, Flag, Layers3, Link2, Tag } from 'lucide-react';
+import { ArrowRight, BookmarkPlus, Check, CircleDashed, Compass, Flag, Layers3, Tag } from 'lucide-react';
 import { ComparisonWorkspaceData } from '../services/llmService';
 import { buildGraphMaps } from '../utils/mapData';
 import { cn } from '../utils/cn';
+import { saveWikiPage, generateId } from '../services/wikiService';
+import { NodeType } from '../config/wikiSchema';
 
 interface WorkspaceInspectorProps {
   nodes: Node[];
@@ -27,11 +30,63 @@ export function WorkspaceInspector({
   comparisonData,
   onSelectNode,
 }: WorkspaceInspectorProps) {
+  const [savedToWiki, setSavedToWiki] = useState(false);
   const { nodeMap, parentMap, childrenMap, depthMap, root } = buildGraphMaps(nodes, edges);
   const selectedNode = selectedNodeId ? nodeMap.get(selectedNodeId) : root || null;
   const parentNode = selectedNode ? nodeMap.get(parentMap[selectedNode.id] || '') : null;
   const childNodes = selectedNode ? (childrenMap[selectedNode.id] || []).map((childId) => nodeMap.get(childId)).filter(Boolean) as Node[] : [];
   const tags = Array.isArray(selectedNode?.data?.tags) ? (selectedNode?.data?.tags as string[]) : [];
+
+  const handleSaveBranchToWiki = async () => {
+    if (!selectedNode) return;
+
+    const pageId = generateId();
+    const title = String(selectedNode.data?.label || 'Untitled Concept');
+    const summary = String(selectedNode.data?.description || 'Extracted concept from workspace mind map.');
+
+    const wikiNodes = [selectedNode, ...childNodes].map((n) => ({
+      id: n.id,
+      label: String(n.data?.label || ''),
+      description: String(n.data?.description || ''),
+      metadata: {
+        type: (n.data?.type as NodeType) || 'concept',
+        importance: (n.data?.importance as "high" | "medium" | "low") || 'medium',
+        tags: Array.isArray(n.data?.tags) ? (n.data?.tags as string[]) : [],
+        nextStep: n.data?.nextStep as string | undefined,
+      },
+    }));
+
+    const wikiEdges = edges
+      .filter((e) => e.source === selectedNode.id || e.target === selectedNode.id)
+      .map((e) => ({
+        source: e.source,
+        target: e.target,
+        label: e.label as string | undefined,
+      }));
+
+    const now = new Date().toISOString();
+
+    await saveWikiPage({
+      id: pageId,
+      title,
+      sourceType: 'topic',
+      sourceName: 'Workspace Mind Map',
+      createdAt: now,
+      updatedAt: now,
+      nodes: wikiNodes,
+      edges: wikiEdges,
+      metadata: {
+        summary,
+        tags: tags.length > 0 ? tags : ['mind-map'],
+        nodeCount: wikiNodes.length,
+        version: 1,
+        relatedPages: [],
+      },
+    });
+
+    setSavedToWiki(true);
+    setTimeout(() => setSavedToWiki(false), 2500);
+  };
 
   return (
     <aside className="flex h-full flex-col gap-5 overflow-y-auto rounded-[32px] border border-white/60 bg-white/75 p-5 shadow-[0_12px_60px_rgba(15,23,42,0.1)] backdrop-blur-2xl scrollbar-hide">
@@ -41,9 +96,32 @@ export function WorkspaceInspector({
             <Compass size={12} />
             Inspector
           </div>
-          <div className="flex items-center gap-1.5 rounded-full bg-cyan-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-cyan-700">
-            <Layers3 size={11} />
-            Depth {depthMap[selectedNode?.id || ''] ?? 0}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleSaveBranchToWiki}
+              disabled={savedToWiki}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] transition-all",
+                savedToWiki
+                  ? "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200"
+                  : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100 ring-1 ring-indigo-100"
+              )}
+              title="Save selected concept branch to Knowledge Wiki"
+            >
+              {savedToWiki ? (
+                <>
+                  <Check size={11} /> Saved to Wiki
+                </>
+              ) : (
+                <>
+                  <BookmarkPlus size={11} /> Save to Wiki
+                </>
+              )}
+            </button>
+            <div className="flex items-center gap-1.5 rounded-full bg-cyan-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-cyan-700">
+              <Layers3 size={11} />
+              Depth {depthMap[selectedNode?.id || ''] ?? 0}
+            </div>
           </div>
         </div>
         <h3 className="mt-5 text-2xl font-black leading-tight tracking-tight text-slate-950">

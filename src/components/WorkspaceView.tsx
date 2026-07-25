@@ -14,6 +14,7 @@ import { Map } from "./Map";
 import { MobileMapView } from "./MobileMapView";
 import { WorkspaceInspector } from "./WorkspaceInspector";
 import { WorkspaceSidebar, WorkspaceView } from "./WorkspaceSidebar";
+import { ModelSelector } from "./ModelSelector";
 import { ComparisonWorkspaceData, MindMapData } from "../services/llmService";
 
 export interface WorkspaceViewComponentProps {
@@ -189,6 +190,7 @@ export function WorkspaceViewComponent({
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
+              <ModelSelector />
               <button
                 type="button"
                 onClick={() => setExperience("pretext")}

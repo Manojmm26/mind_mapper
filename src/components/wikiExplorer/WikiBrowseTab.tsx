@@ -63,8 +63,11 @@ export function WikiBrowseTab({
       ) : filteredPages.length === 0 ? (
         /* Empty State */
         <div className="flex flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-200 bg-slate-50/50 py-16 text-slate-500">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 mb-4">
-            <FileText size={24} className="text-slate-400" />
+          <div className="relative mb-4 flex h-16 w-16 items-center justify-center">
+            <div className="absolute inset-0 rounded-full bg-cyan-400/20 blur-xl animate-pulse" />
+            <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-400 shadow-md ring-1 ring-slate-100">
+              <FileText size={24} className="text-cyan-600" />
+            </div>
           </div>
           <p className="text-sm font-bold text-slate-700">
             {searchQuery

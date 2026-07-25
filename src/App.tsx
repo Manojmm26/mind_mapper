@@ -11,6 +11,12 @@ const PretextShowcase = lazy(() =>
   })),
 );
 
+const GalleryPageComponent = lazy(() =>
+  import("./components/GalleryPage").then((module) => ({
+    default: module.GalleryPage,
+  })),
+);
+
 const WorkspaceViewComponent = lazy(() =>
   import("./components/WorkspaceView").then((module) => ({
     default: module.WorkspaceViewComponent,
@@ -101,6 +107,25 @@ export default function App() {
     );
   }
 
+  // Gallery page experience
+  if (state.experience === "gallery") {
+    return (
+      <Suspense fallback={<FullScreenLoadingMessage message="Loading gallery…" />}>
+        <GalleryPageComponent
+          onBack={() => state.setExperience("classic")}
+          onSelectMapExample={(name, data) => {
+            state.setExperience("classic");
+            handlers.handleSelectMapExample(name, data);
+          }}
+          onSelectCompareExample={(data) => {
+            state.setExperience("classic");
+            handlers.handleSelectCompareExample(data);
+          }}
+        />
+      </Suspense>
+    );
+  }
+
   // Workspace view (when a map is loaded)
   if (state.workspaceGraph.nodes.length > 0) {
     return (
@@ -145,7 +170,10 @@ export default function App() {
       onFileUpload={handlers.handleFileUpload}
       onJsonUpload={handlers.handleJsonUpload}
       onLoadExample={handlers.handleLoadExample}
+      onSelectMapExample={handlers.handleSelectMapExample}
+      onSelectCompareExample={handlers.handleSelectCompareExample}
       onOpenShowcase={() => state.setExperience("pretext")}
+      onOpenGallery={() => state.setExperience("gallery")}
       onOpenWikiExplorer={() => state.setShowWikiExplorer(true)}
       showWikiExplorer={state.showWikiExplorer}
       onCloseWikiExplorer={() => state.setShowWikiExplorer(false)}

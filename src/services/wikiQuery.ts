@@ -2,6 +2,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { WikiPage } from "../config/wikiSchema";
 import { getWikiPage, WikiIndexEntry } from "./wikiService";
 import { ConceptIndex } from "./wikiIndex";
+import { getActiveGeminiModel } from "../config/aiConfig";
 
 let aiInstance: GoogleGenAI | null = null;
 
@@ -248,7 +249,7 @@ ${page.nodes.map((n) => `- ${n.label}: ${n.description || "No description"}`).jo
 
   const ai = getAI();
   const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
+    model: getActiveGeminiModel(),
     contents: `You are a knowledgeable assistant answering questions based on a personal wiki knowledge base.
 
 User Query: "${query}"

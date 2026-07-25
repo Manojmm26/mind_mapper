@@ -4,15 +4,21 @@ import {
   FileJson,
   GraduationCap,
   Loader2,
-  Play,
   Scale,
   Send,
   Sparkles,
   Upload,
   BookOpen,
   X,
+  Library,
+  ArrowRight,
+  Layers,
+  Network,
+  Shield,
 } from "lucide-react";
+import { ModelSelector } from "./ModelSelector";
 import { EXAMPLE_MAP } from "../exampleData";
+import { MindMapData, ComparisonWorkspaceData } from "../services/llmService";
 
 const WikiExplorer = lazy(() =>
   import("./WikiExplorer").then((module) => ({
@@ -32,7 +38,10 @@ export interface HomePageProps {
   onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onJsonUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onLoadExample: () => void;
+  onSelectMapExample?: (name: string, data: MindMapData) => void;
+  onSelectCompareExample?: (data: ComparisonWorkspaceData) => void;
   onOpenShowcase: () => void;
+  onOpenGallery: () => void;
   onOpenWikiExplorer: () => void;
   showWikiExplorer: boolean;
   onCloseWikiExplorer: () => void;
@@ -53,7 +62,10 @@ export function HomePage({
   onFileUpload,
   onJsonUpload,
   onLoadExample,
+  onSelectMapExample,
+  onSelectCompareExample,
   onOpenShowcase,
+  onOpenGallery,
   onOpenWikiExplorer,
   showWikiExplorer,
   onCloseWikiExplorer,
@@ -62,12 +74,20 @@ export function HomePage({
   jsonInputRef,
 }: HomePageProps) {
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(125,211,252,0.26),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(253,186,116,0.28),transparent_25%),linear-gradient(180deg,#eef6ff_0%,#f8fafc_45%,#fffdf8_100%)] animate-theme-shift flex flex-col items-center justify-center overflow-hidden p-4">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(148,163,184,0.14)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.14)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_58%_at_50%_0%,#000_60%,transparent_100%)] opacity-60" />
-      <div className="absolute left-[-10%] top-[-18%] h-[42rem] w-[42rem] rounded-full bg-cyan-200/35 blur-[140px]" />
-      <div className="absolute bottom-[-20%] right-[-8%] h-[36rem] w-[36rem] rounded-full bg-amber-200/30 blur-[120px]" />
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(125,211,252,0.26),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(253,186,116,0.28),transparent_25%),linear-gradient(180deg,#eef6ff_0%,#f8fafc_45%,#fffdf8_100%)] animate-theme-shift flex flex-col items-center py-16 p-4 sm:p-8 relative">
+      {/* Fixed viewport decorations — position:fixed keeps them out of document flow so they never cause overflow */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden -z-0">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(148,163,184,0.14)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.14)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_58%_at_50%_0%,#000_60%,transparent_100%)] opacity-60" />
+        <div className="absolute left-[-10%] top-[-18%] h-[42rem] w-[42rem] rounded-full bg-cyan-200/35 blur-[140px]" />
+        <div className="absolute bottom-[-20%] right-[-8%] h-[36rem] w-[36rem] rounded-full bg-amber-200/30 blur-[120px]" />
+      </div>
 
-      <div className="relative z-10 w-full max-w-xl rounded-[34px] border border-white/80 bg-white/76 p-8 shadow-[0_30px_120px_rgba(15,23,42,0.12)] backdrop-blur-2xl sm:p-10">
+      <div className="absolute top-4 right-4 z-20">
+        <ModelSelector />
+      </div>
+
+      <div className="relative z-10 w-full max-w-5xl space-y-10">
+        <div className="w-full rounded-[34px] border border-white/80 bg-white/76 p-8 shadow-[0_30px_120px_rgba(15,23,42,0.12)] backdrop-blur-2xl sm:p-10">
         <div className="space-y-8">
           {/* Header */}
           <div className="text-center space-y-4">
@@ -158,7 +178,7 @@ export function HomePage({
           <form onSubmit={onTopicSubmit} className="space-y-4">
             <div className="group relative">
               <div className="theme-accent-bg absolute -inset-0.5 rounded-2xl blur opacity-10 transition-all duration-1000 group-hover:opacity-20" />
-              <div className="relative flex items-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm focus-within:theme-accent-border transition-all duration-1000">
+              <div className="relative flex items-center overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm transition-all duration-300 focus-within:border-cyan-500 focus-within:ring-4 focus-within:ring-cyan-500/15 focus-within:shadow-md">
                 <div className="pl-5 pr-3 text-cyan-600">
                   <Sparkles
                     size={20}
@@ -180,7 +200,7 @@ export function HomePage({
                 <button
                   type="submit"
                   disabled={isLoading || !topicInput.trim()}
-                  className="theme-accent-bg mr-3 rounded-xl p-3 text-white shadow-md transition-all hover:opacity-90 disabled:opacity-30"
+                  className="theme-accent-bg mr-3 rounded-xl p-3 text-white shadow-md transition-all hover:opacity-90 disabled:opacity-30 active:scale-95"
                 >
                   {isLoading ? (
                     <Loader2 size={18} className="animate-spin" />
@@ -289,29 +309,58 @@ export function HomePage({
               accept=".json"
               className="hidden"
             />
+          </div>
+        </div>
+      </div>
 
-            {/* Load Example Button */}
-            <button
-              onClick={onLoadExample}
-              disabled={isLoading}
-              className="group relative w-full rounded-2xl bg-slate-200/50 p-[2px] transition-all duration-500 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-orange-400"
-            >
-              <div className="flex w-full items-center justify-center gap-3 rounded-[14px] bg-white py-4 transition-colors group-hover:bg-white">
-                <Play
-                  size={16}
-                  className="text-cyan-600 transition-transform group-hover:scale-125"
-                />
-                <span className="text-sm font-bold text-slate-700">
-                  Example:{" "}
-                  <span className="font-extrabold text-orange-600">
-                    {EXAMPLE_MAP.name}
-                  </span>
-                </span>
+      {/* Knowledge Showcase Entry */}
+      <div className="w-full rounded-[34px] border border-white/80 bg-white/76 shadow-[0_20px_80px_rgba(15,23,42,0.09)] backdrop-blur-2xl overflow-hidden">
+        {/* Top gradient band */}
+        <div className="h-1.5 w-full bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-500" />
+        <div className="p-6 sm:p-8">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            {/* Left: text */}
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-cyan-200 bg-cyan-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-widest text-cyan-700">
+                <Sparkles size={11} />
+                Interactive Portfolio Showcase
               </div>
+              <h2 className="text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
+                27 Curated Knowledge Maps
+              </h2>
+              <p className="max-w-md text-sm leading-6 text-slate-500">
+                Explore deeply researched mind maps and decision matrices — from 47-node foundations to
+                <strong className="font-semibold text-slate-700"> 792-node masterclasses</strong> across
+                software, system design, science, and business.
+              </p>
+              {/* Mini stat pills */}
+              <div className="flex flex-wrap gap-2 pt-1">
+                {[
+                  { icon: <Layers size={11} />, text: "22 Mind Maps", color: "bg-blue-50 text-blue-700 border-blue-200" },
+                  { icon: <Scale size={11} />, text: "5 Decision Matrices", color: "bg-amber-50 text-amber-700 border-amber-200" },
+                  { icon: <Shield size={11} />, text: "777-node Security Map", color: "bg-red-50 text-red-700 border-red-200" },
+                  { icon: <Network size={11} />, text: "792-node Networks Map", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+                ].map(({ icon, text, color }) => (
+                  <span key={text} className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${color}`}>
+                    {icon}{text}
+                  </span>
+                ))}
+              </div>
+            </div>
+            {/* Right: CTA */}
+            <button
+              type="button"
+              onClick={onOpenGallery}
+              className="group flex shrink-0 items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-4 text-sm font-bold text-white shadow-lg shadow-cyan-500/25 transition-all hover:shadow-xl hover:shadow-cyan-500/30 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Library size={18} />
+              Browse Showcase
+              <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
             </button>
           </div>
         </div>
       </div>
+    </div>
 
       {/* Wiki Explorer Modal */}
       {showWikiExplorer && (

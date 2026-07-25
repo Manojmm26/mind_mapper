@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { WikiContext } from "./wikiPromptEnhancer";
+import { getActiveGeminiModel } from "../config/aiConfig";
 import {
   mindMapSchemaGenAI,
   comparisonWorkspaceSchemaGenAI,
@@ -126,7 +127,7 @@ ${text.substring(0, 50000)}
     : basePrompt;
 
   const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
+    model: getActiveGeminiModel(),
     contents: prompt,
     config: {
       responseMimeType: "application/json",
@@ -177,7 +178,7 @@ Your task is to create a comprehensive, well-organized mind map that serves as a
     : basePrompt;
 
   const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
+    model: getActiveGeminiModel(),
     contents: prompt,
     config: {
       responseMimeType: "application/json",
@@ -229,7 +230,7 @@ Create a comprehensive, domain-agnostic comparison workspace that can be shown i
     : basePrompt;
 
   const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
+    model: getActiveGeminiModel(),
     contents: prompt,
     config: {
       responseMimeType: "application/json",
@@ -455,7 +456,7 @@ Your task is to create a comprehensive, well-organized mind map that serves as a
     : basePrompt;
 
   const responseStream = await ai.models.generateContentStream({
-    model: "gemini-3-flash-preview",
+    model: getActiveGeminiModel(),
     contents: prompt,
     config: {
       responseMimeType: "application/json",

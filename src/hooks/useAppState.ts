@@ -13,7 +13,7 @@ import { convertTreeToGraph, findRootNode, toFlowGraph } from "../utils/mapData"
 import { useMediaQuery } from "./useMediaQuery";
 import { useElementFullscreen } from "./useElementFullscreen";
 
-type AppExperience = "classic" | "pretext";
+type AppExperience = "classic" | "pretext" | "gallery";
 export type { AppExperience };
 
 function getInitialExperience(): AppExperience {
@@ -22,7 +22,9 @@ function getInitialExperience(): AppExperience {
   }
 
   const params = new URLSearchParams(window.location.search);
-  return params.get("experience") === "pretext" ? "pretext" : "classic";
+  if (params.get("experience") === "pretext") return "pretext";
+  if (params.get("experience") === "gallery") return "gallery";
+  return "classic";
 }
 
 function syncExperienceInUrl(experience: AppExperience) {
@@ -33,6 +35,8 @@ function syncExperienceInUrl(experience: AppExperience) {
   const url = new URL(window.location.href);
   if (experience === "pretext") {
     url.searchParams.set("experience", "pretext");
+  } else if (experience === "gallery") {
+    url.searchParams.set("experience", "gallery");
   } else {
     url.searchParams.delete("experience");
   }
