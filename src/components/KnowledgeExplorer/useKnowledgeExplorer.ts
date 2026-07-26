@@ -274,6 +274,7 @@ export function useKnowledgeExplorer({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cameraRef = useRef<CameraController | null>(null);
+  const rafPendingRef = useRef(false);
   const cameraModeRef = useRef<ExplorerMode | null>(null);
   const viewportRef = useRef<ViewportState>({ x: 0, y: 0, scale: 1 });
   const interactionRef = useRef<{
@@ -1192,31 +1193,43 @@ export function useKnowledgeExplorer({
       const interaction = interactionRef.current;
       if (!interaction || interaction.pointerId !== e.pointerId) return;
 
-      if (interaction.type === "pan") {
-        const dx = e.clientX - interaction.startX;
-        const dy = e.clientY - interaction.startY;
-        setViewport({
-          ...interaction.originViewport!,
-          x: interaction.originViewport!.x + dx,
-          y: interaction.originViewport!.y + dy,
-        });
-      } else if (interaction.type === "drag" && interaction.nodeId) {
-        const world = getWorldPoint(e.clientX, e.clientY);
-        const dx = world.x - interaction.startX;
-        const dy = world.y - interaction.startY;
+      if (rafPendingRef.current) return;
+      rafPendingRef.current = true;
 
-        setNodes((prev) =>
-          prev.map((n) =>
-            n.id === interaction.nodeId
-              ? {
-                  ...n,
-                  x: (interaction.originNodePos?.x ?? n.x) + dx,
-                  y: (interaction.originNodePos?.y ?? n.y) + dy,
-                }
-              : n,
-          ),
-        );
-      }
+      const clientX = e.clientX;
+      const clientY = e.clientY;
+
+      requestAnimationFrame(() => {
+        rafPendingRef.current = false;
+        const currentInteraction = interactionRef.current;
+        if (!currentInteraction) return;
+
+        if (currentInteraction.type === "pan") {
+          const dx = clientX - currentInteraction.startX;
+          const dy = clientY - currentInteraction.startY;
+          setViewport({
+            ...currentInteraction.originViewport!,
+            x: currentInteraction.originViewport!.x + dx,
+            y: currentInteraction.originViewport!.y + dy,
+          });
+        } else if (currentInteraction.type === "drag" && currentInteraction.nodeId) {
+          const world = getWorldPoint(clientX, clientY);
+          const dx = world.x - currentInteraction.startX;
+          const dy = world.y - currentInteraction.startY;
+
+          setNodes((prev) =>
+            prev.map((n) =>
+              n.id === currentInteraction.nodeId
+                ? {
+                    ...n,
+                    x: (currentInteraction.originNodePos?.x ?? n.x) + dx,
+                    y: (currentInteraction.originNodePos?.y ?? n.y) + dy,
+                  }
+                : n,
+            ),
+          );
+        }
+      });
     },
     [getWorldPoint, mode, size.width, size.height],
   );

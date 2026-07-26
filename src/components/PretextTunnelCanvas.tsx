@@ -307,14 +307,7 @@ function drawTunnelCard(
 ) {
   const { node, role, opacity, descendantCount } = visual;
 
-  // Cinematic Depth-of-Field Blur based on z-depth
-  let blurAmount = 0;
-  if (role === 'child') {
-    blurAmount = Math.min(6, Math.max(0, (visual.z - 200) / 90));
-  } else if (role === 'parent') {
-    blurAmount = 0.8;
-  }
-  context.filter = blurAmount > 0.1 ? `blur(${blurAmount.toFixed(1)}px)` : 'none';
+  context.filter = 'none';
 
   const palette = getNodePalette(node);
   const isFocused = role === 'focus';
@@ -332,9 +325,14 @@ function drawTunnelCard(
   context.globalAlpha = opacity;
 
   context.save();
-  context.shadowColor = isFocused || isHighlighted || isHovered ? hexToRgba(palette.accent, 0.4) : palette.shadow;
-  context.shadowBlur = isFocused ? 36 : isHighlighted || isHovered ? 28 : 18;
-  context.shadowOffsetY = isFocused ? 20 : 12;
+  if (isFocused || isHighlighted || isHovered) {
+    context.shadowColor = hexToRgba(palette.accent, 0.4);
+    context.shadowBlur = isFocused ? 28 : 20;
+    context.shadowOffsetY = isFocused ? 14 : 8;
+  } else {
+    context.shadowColor = 'transparent';
+    context.shadowBlur = 0;
+  }
   context.beginPath();
   context.roundRect(0, 0, width, height, radius);
   context.fillStyle = isFocused ? 'rgba(10,17,32,0.97)' : palette.surface;

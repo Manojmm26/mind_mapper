@@ -6,6 +6,7 @@ import {
   type PretextMapNode,
   type PretextThemeFamily,
 } from '../services/pretextMapLayout';
+import { computeViewportBounds } from '../services/spatialGrid';
 
 interface PretextMindMapCanvasProps {
   layout: PretextGraphLayout;
@@ -250,11 +251,31 @@ export function PretextMindMapCanvas({ layout, selectedNodeId, onSelectNode, fit
       context.clearRect(0, 0, size.width, size.height);
       drawCanvasGrid(context, size.width, size.height, viewport);
 
+      const bounds = computeViewportBounds(viewport.x, viewport.y, viewport.scale, size.width, size.height, 120);
+      const isFar = viewport.scale < 0.35;
+      const isMid = viewport.scale >= 0.35 && viewport.scale < 0.75;
+
+      const visibleNodesMap = new Map<string, PretextMapNode>();
+      nodes.forEach((node) => {
+        if (
+          node.x + node.width >= bounds.minX &&
+          node.x <= bounds.maxX &&
+          node.y + node.height >= bounds.minY &&
+          node.y <= bounds.maxY
+        ) {
+          visibleNodesMap.set(node.id, node);
+        }
+      });
+
       context.save();
       context.translate(viewport.x, viewport.y);
       context.scale(viewport.scale, viewport.scale);
 
       layout.edges.forEach((edge) => {
+        if (!visibleNodesMap.has(edge.source) && !visibleNodesMap.has(edge.target)) {
+          return;
+        }
+
         const source = nodeMap.get(edge.source);
         const target = nodeMap.get(edge.target);
         if (!source || !target) {
@@ -277,7 +298,7 @@ export function PretextMindMapCanvas({ layout, selectedNodeId, onSelectNode, fit
         context.stroke();
       });
 
-      const orderedNodes = [...nodes].sort((left, right) => {
+      const orderedVisibleNodes = Array.from(visibleNodesMap.values()).sort((left, right) => {
         if (left.id === selectedNodeId) {
           return 1;
         }
@@ -287,7 +308,7 @@ export function PretextMindMapCanvas({ layout, selectedNodeId, onSelectNode, fit
         return left.depth - right.depth;
       });
 
-      orderedNodes.forEach((node) => {
+      orderedVisibleNodes.forEach((node) => {
         const palette = getNodePalette(node);
         const isSelected = node.id === selectedNodeId;
         const radius = node.depth === 0 ? 28 : 24;
@@ -295,9 +316,14 @@ export function PretextMindMapCanvas({ layout, selectedNodeId, onSelectNode, fit
         const paddingY = node.depth === 0 ? 24 : 18;
 
         context.save();
-        context.shadowColor = isSelected ? hexToRgba(palette.accent, 0.28) : palette.shadow;
-        context.shadowBlur = isSelected ? 26 : 18;
-        context.shadowOffsetY = 12;
+        if (!isFar && (isSelected || !isMid)) {
+          context.shadowColor = isSelected ? hexToRgba(palette.accent, 0.28) : palette.shadow;
+          context.shadowBlur = isSelected ? 26 : 18;
+          context.shadowOffsetY = 12;
+        } else {
+          context.shadowColor = 'transparent';
+          context.shadowBlur = 0;
+        }
         context.beginPath();
         context.roundRect(node.x, node.y, node.width, node.height, radius);
         context.fillStyle = palette.surface;

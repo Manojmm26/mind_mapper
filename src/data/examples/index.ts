@@ -25,6 +25,11 @@ import { COMPUTER_NETWORKS_EXAMPLE } from "./computerNetworks";
 import { DATA_ENGINEERING_EXAMPLE } from "./dataEngineering";
 import { OPERATING_SYSTEMS_EXAMPLE } from "./operatingSystems";
 import { KUBERNETES_CLOUD_NATIVE_EXAMPLE } from "./kubernetesCloudNative";
+import { AUTONOMOUS_ROBOTICS_EXAMPLE } from "./autonomousRobotics";
+import { COMPILER_INTERNALS_EXAMPLE } from "./compilerInternals";
+import { GPU_COMPUTING_EXAMPLE } from "./gpuComputing";
+import { BIOINFORMATICS_EXAMPLE } from "./bioinformatics";
+import { EMBEDDED_SYSTEMS_EXAMPLE } from "./embeddedSystems";
 
 // ── Decision Matrices ──────────────────────────────────────────────────────
 import { DB_COMPARISON_EXAMPLE } from "./dbComparison";
@@ -123,6 +128,45 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     icon: "Shield",
     gradient: "from-orange-500 to-red-600",
     data: DEVSECOPS_EXAMPLE,
+  },
+  {
+    id: "autonomous-robotics",
+    title: "Autonomous Driving & Robotics Systems",
+    category: "Software & AI",
+    type: "map",
+    description: "777-node robotics blueprint: Denavit-Hartenberg kinematics, SE(3)/SO(3) Lie algebra, EKF/UKF sensor fusion, Graph SLAM, BEV perception, MPC trajectory planning, ROS 2, and ISO 26262 ASIL-D safety.",
+    nodeCount: 777,
+    depthCount: 5,
+    tags: ["Robotics", "SLAM", "ROS 2", "MPC", "777 Nodes"],
+    icon: "Cpu",
+    gradient: "from-amber-500 to-red-600",
+    data: AUTONOMOUS_ROBOTICS_EXAMPLE,
+  },
+  {
+    id: "compiler-internals",
+    title: "Compilers, Language Runtimes & Code Generation",
+    category: "Software & AI",
+    type: "map",
+    description: "777-node compiler masterclass: Flex/Bison parsing, Hindley-Milner type inference, SSA intermediate representations, Chaitin-Briggs graph coloring register allocation, JIT compilation, and LSP server protocol.",
+    nodeCount: 777,
+    depthCount: 5,
+    tags: ["Compiler", "LLVM", "JIT", "LSP", "777 Nodes"],
+    icon: "Layers",
+    gradient: "from-indigo-500 to-purple-700",
+    data: COMPILER_INTERNALS_EXAMPLE,
+  },
+  {
+    id: "gpu-computing",
+    title: "Parallel & GPU Computing from First Principles",
+    category: "Software & AI",
+    type: "map",
+    description: "777-node GPU architecture guide: NVIDIA Streaming Multiprocessors, SIMT execution, CUDA memory hierarchies, warp shuffles, memory coalescing, NVLink RDMA, Triton Python GPU kernels, and Nsight profiling.",
+    nodeCount: 777,
+    depthCount: 5,
+    tags: ["CUDA", "GPU", "NVLink", "Triton", "777 Nodes"],
+    icon: "Cpu",
+    gradient: "from-emerald-500 to-green-700",
+    data: GPU_COMPUTING_EXAMPLE,
   },
   {
     id: "web-frontend",
@@ -360,6 +404,32 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     icon: "BarChart",
     gradient: "from-orange-500 to-amber-700",
     data: DATA_ENGINEERING_EXAMPLE,
+  },
+  {
+    id: "bioinformatics",
+    title: "Computational Genomics & Bioinformatics",
+    category: "Science",
+    type: "map",
+    description: "777-node genomics guide: Illumina NGS & Oxford Nanopore sequencing, Burrows-Wheeler BWT FM-Index, AlphaFold3 Evoformer spatial attention, GATK variant calling, single-cell RNA-Seq, and CRISPR Cas9/base editing.",
+    nodeCount: 777,
+    depthCount: 5,
+    tags: ["Genomics", "AlphaFold", "CRISPR", "RNA-Seq", "777 Nodes"],
+    icon: "Atom",
+    gradient: "from-teal-500 to-cyan-700",
+    data: BIOINFORMATICS_EXAMPLE,
+  },
+  {
+    id: "embedded-systems",
+    title: "Embedded Systems & Real-Time OS (RTOS)",
+    category: "Science",
+    type: "map",
+    description: "777-node RTOS blueprint: ARM Cortex-M architecture, NVIC interrupt vectoring, SPI/I2C/CAN-FD bus protocols, FreeRTOS priority inheritance mutexes, MPU memory protection, and bare-metal linker scripts.",
+    nodeCount: 777,
+    depthCount: 5,
+    tags: ["Embedded", "ARM", "FreeRTOS", "CAN Bus", "777 Nodes"],
+    icon: "Cpu",
+    gradient: "from-blue-600 to-indigo-800",
+    data: EMBEDDED_SYSTEMS_EXAMPLE,
   },
   {
     id: "quantum-computing",

@@ -451,12 +451,14 @@ function drawNodeCard(
   context.globalAlpha = opacity;
 
   context.save();
-  context.shadowColor =
-    isHovered || isHighlighted
-      ? hexToRgba(palette.accent, 0.4)
-      : palette.shadow;
-  context.shadowBlur = isFocused ? 34 : isHovered || isHighlighted ? 28 : 18;
-  context.shadowOffsetY = isFocused ? 18 : 10;
+  if (isFocused || isHovered || isHighlighted) {
+    context.shadowColor = hexToRgba(palette.accent, 0.4);
+    context.shadowBlur = isFocused ? 28 : 20;
+    context.shadowOffsetY = isFocused ? 14 : 8;
+  } else {
+    context.shadowColor = "transparent";
+    context.shadowBlur = 0;
+  }
   context.beginPath();
   context.roundRect(0, 0, width, height, radius);
   context.fillStyle = isFocused ? "rgba(10,17,32,0.96)" : palette.surface;

@@ -44,16 +44,26 @@ export function drawNodeCard(
   const width = node.width;
   const height = node.height;
 
+  // LOD Thresholds
+  const isFar = scale < 0.35;
+  const isMid = scale >= 0.35 && scale < 0.75;
+
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(scale, scale);
   ctx.globalAlpha = opacity;
 
-  ctx.shadowColor = isSelected
-    ? hexToRgba(palette.accent, 0.28)
-    : palette.shadow;
-  ctx.shadowBlur = isSelected ? 26 : isHovered ? 22 : 18;
-  ctx.shadowOffsetY = 12;
+  // Only render heavy drop shadows at near zoom levels or when selected/hovered
+  if (!isFar && (isSelected || isHovered || !isMid)) {
+    ctx.shadowColor = isSelected
+      ? hexToRgba(palette.accent, 0.28)
+      : palette.shadow;
+    ctx.shadowBlur = isSelected ? 26 : isHovered ? 22 : 18;
+    ctx.shadowOffsetY = 12;
+  } else {
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+  }
 
   ctx.beginPath();
   ctx.roundRect(0, 0, width, height, radius);
@@ -124,7 +134,7 @@ export function drawNodeCard(
     cursorY += titleStyle.lineHeight;
   });
 
-  if (node.badges.length > 0 && !node.isEditing) {
+  if (!isFar && node.badges.length > 0 && !node.isEditing) {
     cursorY += 10;
     drawBadgeRow(
       ctx,
@@ -138,6 +148,7 @@ export function drawNodeCard(
   }
 
   if (
+    !isFar &&
     node.description &&
     node.description.lines.length > 0 &&
     !node.isEditing
@@ -170,7 +181,7 @@ export function drawNodeCard(
     });
   }
 
-  if (node.tags.length > 0 && !node.isEditing) {
+  if (!isFar && node.tags.length > 0 && !node.isEditing) {
     cursorY += 12;
     const tagBg =
       node.depth === 0

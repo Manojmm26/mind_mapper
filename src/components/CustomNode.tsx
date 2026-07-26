@@ -97,7 +97,7 @@ export const CustomNode = memo(({ id, data, isConnectable, selected }: NodeProps
     <div className={cn(
       "w-[300px] min-h-[120px] rounded-[22px] border shadow-sm",
       theme.bg, theme.border,
-      "relative flex flex-col overflow-visible transition-all hover:-translate-y-0.5 hover:shadow-xl",
+      "relative flex flex-col overflow-visible transition-shadow hover:shadow-xl",
       selected && 'ring-2 ring-cyan-300 ring-offset-4 ring-offset-slate-50 shadow-[0_20px_50px_rgba(14,165,233,0.18)]'
     )}>
       <Handle

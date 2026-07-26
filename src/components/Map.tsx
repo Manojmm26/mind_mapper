@@ -475,6 +475,9 @@ export function Map({ data, onSave, initialNodes, initialEdges, selectedNodeId, 
           onConnect={onConnect}
           onNodeClick={(_, node) => onSelectNode?.(node.id)}
           nodeTypes={nodeTypes}
+          onlyRenderVisibleElements
+          minZoom={0.08}
+          maxZoom={2.5}
           fitView
           className="workspace-map-canvas"
         >
