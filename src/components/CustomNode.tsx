@@ -89,6 +89,7 @@ export const CustomNode = memo(({ id, data, isConnectable, selected }: NodeProps
   
   const themeFamily = (data.themeFamily as string) || 'slate';
   const themeLevel = Math.min(Math.max((data.themeLevel as number) || 0, 0), 4);
+  const theme = (themes[themeFamily] || themes.slate)[themeLevel] || themes.slate[0];
   
   const assessmentStatus = data.assessmentStatus as "mastered" | "review" | "gap" | undefined;
 
