@@ -58,11 +58,11 @@ export function AssessmentWorkspace({
   onExportReport,
 }: AssessmentWorkspaceProps) {
   if (stage === "self_report" && stage1Data) {
-    return <SelfReportWizard topic={stage1Data.topic} concepts={stage1Data.concepts} onComplete={onSelfReportSubmit} />;
+    return <SelfReportWizard data={stage1Data} onSubmit={onSelfReportSubmit} />;
   }
 
   if (stage === "mcq" && stage2Data) {
-    return <McqVerificationWizard topic={stage1Data?.topic || ""} mcqs={stage2Data.mcqs} onComplete={onMcqSubmit} />;
+    return <McqVerificationWizard data={stage2Data} onSubmit={onMcqSubmit} />;
   }
 
   if (stage === "reassess" && stage1Data) {

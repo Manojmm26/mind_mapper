@@ -44,9 +44,8 @@ export function ReassessmentWizard({
   if (stage2Data && stage2Data.mcqs.length > 0) {
     return (
       <McqVerificationWizard
-        topic={stage1Data.topic}
-        mcqs={stage2Data.mcqs}
-        onComplete={onMcqSubmit}
+        data={stage2Data}
+        onSubmit={onMcqSubmit}
       />
     );
   }
