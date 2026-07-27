@@ -569,3 +569,335 @@ export function normalizeComparisonData(
       "nextSteps",
     ],
   };
+
+// ---------------------------------------------------------------------------
+// Assessment Schemas (Stage 1 Diagnostic Tree & Stage 2 Targeted MCQs)
+// ---------------------------------------------------------------------------
+
+export const assessmentConceptSchema = z.object({
+  id: z.string().describe("Unique identifier for this concept (e.g., 'c_1', 'c_2')."),
+  label: z.string().max(100).describe("Short title for this concept (max 6 words)."),
+  description: z.string().describe("Specific 1-2 sentence description of this concept."),
+  category: z.string().describe("Pillar or section name (e.g., 'Foundations', 'Core Architecture', 'Advanced Usage')."),
+  question: z.string().describe("Clear self-report question prompt (e.g., 'Do you understand how query, key, and value vectors interact in self-attention?')."),
+  parentId: z.string().optional().describe("Parent concept ID if this is a sub-concept."),
+  level: z.number().int().min(1).max(4).describe("Hierarchy level (1 for main pillars, 2-3 for sub-concepts)."),
+});
+
+export const assessmentStage1Schema = z.object({
+  version: z.literal(SCHEMA_VERSION).optional(),
+  topic: z.string().describe("The topic being assessed."),
+  overview: z.string().describe("Brief 1-2 sentence diagnostic summary of what this assessment evaluates."),
+  concepts: z
+    .array(assessmentConceptSchema)
+    .min(5)
+    .max(16)
+    .describe("Array of 8-15 diagnostic concepts structured in a logical hierarchy."),
+});
+
+export const mcqQuestionSchema = z.object({
+  id: z.string().describe("Unique ID for this question."),
+  conceptId: z.string().describe("ID of the concept this question tests."),
+  conceptLabel: z.string().describe("Title of the concept being tested."),
+  question: z.string().describe("Multiple-choice question testing actual understanding."),
+  options: z
+    .array(z.string())
+    .length(4)
+    .describe("Array of exactly 4 answer choices."),
+  correctIndex: z
+    .number()
+    .int()
+    .min(0)
+    .max(3)
+    .describe("0-based index of the correct answer option."),
+  explanation: z
+    .string()
+    .describe("Educational explanation of why the correct option is right and others are wrong."),
+});
+
+export const assessmentStage2Schema = z.object({
+  version: z.literal(SCHEMA_VERSION).optional(),
+  topic: z.string(),
+  mcqs: z
+    .array(mcqQuestionSchema)
+    .min(1)
+    .max(5)
+    .describe("Array of 3-5 targeted verification questions for flagged/mastered concepts."),
+});
+
+// ---------------------------------------------------------------------------
+// Study Roadmap Schema (Tailored Action Plan)
+// ---------------------------------------------------------------------------
+
+export const resourceSchema = z.object({
+  title: z.string(),
+  type: z.enum(["article", "documentation", "video", "book", "hands-on"]),
+  description: z.string(),
+});
+
+export const studyMilestoneSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  estimatedHours: z.number().describe("Estimated hours needed to master this milestone."),
+  targetConcepts: z.array(z.string()).describe("List of concept labels addressed in this milestone."),
+  keyTakeaways: z.array(z.string()).describe("Key skills or understanding gained upon completion."),
+  recommendedResources: z.array(resourceSchema).describe("Curated learning resources."),
+  practiceTask: z.string().describe("Concrete practice exercise or project prompt."),
+});
+
+export const studyRoadmapSchema = z.object({
+  version: z.literal(SCHEMA_VERSION).optional(),
+  topic: z.string(),
+  overview: z.string().describe("Customized learning path overview based on identified knowledge gaps."),
+  totalEstimatedHours: z.number(),
+  milestones: z
+    .array(studyMilestoneSchema)
+    .min(2)
+    .max(6)
+    .describe("Sequential learning milestones prioritizing missing knowledge."),
+});
+
+// ---------------------------------------------------------------------------
+// Inferred Assessment TypeScript Types
+// ---------------------------------------------------------------------------
+
+export type AssessmentConcept = z.infer<typeof assessmentConceptSchema>;
+export type AssessmentStage1Data = z.infer<typeof assessmentStage1Schema>;
+export type MCQQuestion = z.infer<typeof mcqQuestionSchema>;
+export type AssessmentStage2Data = z.infer<typeof assessmentStage2Schema>;
+
+export type Resource = z.infer<typeof resourceSchema>;
+export type StudyMilestone = z.infer<typeof studyMilestoneSchema>;
+export type StudyRoadmapData = z.infer<typeof studyRoadmapSchema>;
+
+export type AssessmentSelfReportStatus = "mastered" | "review" | "gap" | "skipped";
+
+// ---------------------------------------------------------------------------
+// Assessment Validation Helpers
+// ---------------------------------------------------------------------------
+
+export function validateAssessmentStage1(data: unknown): AssessmentStage1Data {
+  const result = assessmentStage1Schema.safeParse(data);
+  if (!result.success) {
+    const errors = result.error.issues
+      .map((e) => `${e.path.join(".")}: ${e.message}`)
+      .join("; ");
+    throw new Error(`Invalid Assessment Stage 1 data: ${errors}`);
+  }
+  return result.data;
+}
+
+export function validateAssessmentStage2(data: unknown): AssessmentStage2Data {
+  const result = assessmentStage2Schema.safeParse(data);
+  if (!result.success) {
+    const errors = result.error.issues
+      .map((e) => `${e.path.join(".")}: ${e.message}`)
+      .join("; ");
+    throw new Error(`Invalid Assessment Stage 2 data: ${errors}`);
+  }
+  return result.data;
+}
+
+export function validateStudyRoadmap(data: unknown): StudyRoadmapData {
+  const result = studyRoadmapSchema.safeParse(data);
+  if (!result.success) {
+    const errors = result.error.issues
+      .map((e) => `${e.path.join(".")}: ${e.message}`)
+      .join("; ");
+    throw new Error(`Invalid Study Roadmap data: ${errors}`);
+  }
+  return result.data;
+}
+
+// ---------------------------------------------------------------------------
+// Assessment GenAI Schemas
+// ---------------------------------------------------------------------------
+
+const _assessmentConceptSchemaGenAI = {
+  type: Type.OBJECT,
+  properties: {
+    id: { type: Type.STRING },
+    label: { type: Type.STRING },
+    description: { type: Type.STRING },
+    category: { type: Type.STRING },
+    question: { type: Type.STRING },
+    parentId: { type: Type.STRING },
+    level: { type: Type.INTEGER },
+  },
+  required: ["id", "label", "description", "category", "question", "level"],
+};
+
+export const assessmentStage1SchemaGenAI = {
+  type: Type.OBJECT,
+  properties: {
+    version: { type: Type.STRING, enum: ["1.0.0"] },
+    topic: { type: Type.STRING },
+    overview: { type: Type.STRING },
+    concepts: {
+      type: Type.ARRAY,
+      items: _assessmentConceptSchemaGenAI,
+      minItems: 5,
+      maxItems: 16,
+    },
+  },
+  required: ["topic", "overview", "concepts"],
+};
+
+const _mcqQuestionSchemaGenAI = {
+  type: Type.OBJECT,
+  properties: {
+    id: { type: Type.STRING },
+    conceptId: { type: Type.STRING },
+    conceptLabel: { type: Type.STRING },
+    question: { type: Type.STRING },
+    options: {
+      type: Type.ARRAY,
+      items: { type: Type.STRING },
+    },
+    correctIndex: { type: Type.INTEGER },
+    explanation: { type: Type.STRING },
+  },
+  required: ["id", "conceptId", "conceptLabel", "question", "options", "correctIndex", "explanation"],
+};
+
+export const assessmentStage2SchemaGenAI = {
+  type: Type.OBJECT,
+  properties: {
+    version: { type: Type.STRING, enum: ["1.0.0"] },
+    topic: { type: Type.STRING },
+    mcqs: {
+      type: Type.ARRAY,
+      items: _mcqQuestionSchemaGenAI,
+      minItems: 1,
+      maxItems: 5,
+    },
+  },
+  required: ["topic", "mcqs"],
+};
+
+const _resourceSchemaGenAI = {
+  type: Type.OBJECT,
+  properties: {
+    title: { type: Type.STRING },
+    type: {
+      type: Type.STRING,
+      enum: ["article", "documentation", "video", "book", "hands-on"],
+    },
+    description: { type: Type.STRING },
+  },
+  required: ["title", "type", "description"],
+};
+
+const _studyMilestoneSchemaGenAI = {
+  type: Type.OBJECT,
+  properties: {
+    id: { type: Type.STRING },
+    title: { type: Type.STRING },
+    description: { type: Type.STRING },
+    estimatedHours: { type: Type.NUMBER },
+    targetConcepts: { type: Type.ARRAY, items: { type: Type.STRING } },
+    keyTakeaways: { type: Type.ARRAY, items: { type: Type.STRING } },
+    recommendedResources: { type: Type.ARRAY, items: _resourceSchemaGenAI },
+    practiceTask: { type: Type.STRING },
+  },
+  required: [
+    "id",
+    "title",
+    "description",
+    "estimatedHours",
+    "targetConcepts",
+    "keyTakeaways",
+    "recommendedResources",
+    "practiceTask",
+  ],
+};
+
+export const studyRoadmapSchemaGenAI = {
+  type: Type.OBJECT,
+  properties: {
+    version: { type: Type.STRING, enum: ["1.0.0"] },
+    topic: { type: Type.STRING },
+    overview: { type: Type.STRING },
+    totalEstimatedHours: { type: Type.NUMBER },
+    milestones: {
+      type: Type.ARRAY,
+      items: _studyMilestoneSchemaGenAI,
+      minItems: 2,
+      maxItems: 6,
+    },
+  },
+  required: ["topic", "overview", "totalEstimatedHours", "milestones"],
+};
+
+export const flashcardSchema = z.object({
+  id: z.string().describe("Unique identifier for this flashcard."),
+  conceptId: z.string().describe("ID of the concept this flashcard teaches."),
+  title: z.string().describe("Concise concept title."),
+  category: z.string().describe("Pillar or category name."),
+  question: z.string().describe("Front side: Clear diagnostic study prompt or question."),
+  explanation: z.string().describe("Back side: Clear 1-2 sentence core explanation."),
+  keyTakeaways: z.array(z.string()).describe("Back side: 2-3 key takeaways."),
+  realWorldExample: z.string().describe("Back side: Concrete real-world scenario or use case."),
+});
+
+export const flashcardDeckSchema = z.object({
+  version: z.literal(SCHEMA_VERSION).optional(),
+  topic: z.string(),
+  cards: z.array(flashcardSchema).min(1).max(20),
+});
+
+export type Flashcard = z.infer<typeof flashcardSchema>;
+export type FlashcardDeckData = z.infer<typeof flashcardDeckSchema>;
+
+export function validateFlashcardDeck(data: unknown): FlashcardDeckData {
+  const result = flashcardDeckSchema.safeParse(data);
+  if (!result.success) {
+    const errors = result.error.issues
+      .map((e) => `${e.path.join(".")}: ${e.message}`)
+      .join("; ");
+    throw new Error(`Invalid Flashcard Deck data: ${errors}`);
+  }
+  return result.data;
+}
+
+const _flashcardSchemaGenAI = {
+  type: Type.OBJECT,
+  properties: {
+    id: { type: Type.STRING },
+    conceptId: { type: Type.STRING },
+    title: { type: Type.STRING },
+    category: { type: Type.STRING },
+    question: { type: Type.STRING },
+    explanation: { type: Type.STRING },
+    keyTakeaways: { type: Type.ARRAY, items: { type: Type.STRING } },
+    realWorldExample: { type: Type.STRING },
+  },
+  required: [
+    "id",
+    "conceptId",
+    "title",
+    "category",
+    "question",
+    "explanation",
+    "keyTakeaways",
+    "realWorldExample",
+  ],
+};
+
+export const flashcardDeckSchemaGenAI = {
+  type: Type.OBJECT,
+  properties: {
+    version: { type: Type.STRING, enum: ["1.0.0"] },
+    topic: { type: Type.STRING },
+    cards: {
+      type: Type.ARRAY,
+      items: _flashcardSchemaGenAI,
+      minItems: 1,
+      maxItems: 20,
+    },
+  },
+  required: ["topic", "cards"],
+};
+
+

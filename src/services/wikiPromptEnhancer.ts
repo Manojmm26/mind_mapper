@@ -14,6 +14,7 @@
 
 import { WikiIndexEntry } from "./wikiService";
 import { ConceptIndex, ConceptEntry, normalizeConceptName } from "./wikiIndex";
+import { WikiPage } from "../config/wikiSchema";
 
 // ---------------------------------------------------------------------------
 // Context Data Structures
@@ -39,7 +40,8 @@ export interface WikiContext {
 export function buildWikiContext(
   query: string,
   indexEntries: WikiIndexEntry[],
-  conceptIndex: ConceptIndex
+  conceptIndex: ConceptIndex,
+  fullPages?: WikiPage[]
 ): WikiContext {
   const normalizedQuery = normalizeConceptName(query);
   const queryTerms = normalizedQuery.split("-").filter(Boolean);
@@ -68,8 +70,16 @@ export function buildWikiContext(
     }
   ).slice(0, 10);
 
+  // Map related page IDs to full pages if provided
+  const pageDetailsMap = new Map<string, WikiPage>();
+  if (fullPages) {
+    for (const page of fullPages) {
+      pageDetailsMap.set(page.id, page);
+    }
+  }
+
   // 3. Build the context string
-  const contextString = formatContextForPrompt(query, relatedPages, sharedConcepts);
+  const contextString = formatContextForPrompt(query, relatedPages, sharedConcepts, pageDetailsMap);
 
   return { relatedPages, sharedConcepts, contextString };
 }
@@ -85,7 +95,8 @@ export function buildWikiContext(
 function formatContextForPrompt(
   query: string,
   relatedPages: WikiIndexEntry[],
-  sharedConcepts: ConceptEntry[]
+  sharedConcepts: ConceptEntry[],
+  pageDetailsMap?: Map<string, WikiPage>
 ): string {
   if (relatedPages.length === 0 && sharedConcepts.length === 0) {
     return "";
@@ -96,10 +107,15 @@ function formatContextForPrompt(
   context += `Your goal is to EXPAND and CROSS-REFERENCE, not duplicate.\n\n`;
 
   if (relatedPages.length > 0) {
-    context += `## Existing Related Pages\n`;
+    context += `## Existing Related Pages & Key Concepts\n`;
     context += `The following pages already exist in the wiki. Reference them using [[Page Title]] syntax where appropriate.\n`;
     for (const page of relatedPages) {
+      const fullPage = pageDetailsMap?.get(page.id);
       context += `- [[${page.title}]] (${page.sourceType}): ${page.summary || "No summary available."}\n`;
+      if (fullPage && fullPage.nodes.length > 0) {
+        const topNodes = fullPage.nodes.slice(0, 5);
+        context += `  - Key Nodes: ${topNodes.map(n => `"${n.label}"${n.description ? `: ${n.description.substring(0, 60)}...` : ""}`).join("; ")}\n`;
+      }
     }
     context += `\n`;
   }

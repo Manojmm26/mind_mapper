@@ -9,6 +9,7 @@
  * across all generated mind maps.
  */
 
+import type { ComparisonWorkspaceData } from "../services/llmSchemas";
 import type { LintRule, LintIssue } from "../services/wikiLintRules";
 import { LINT_RULES } from "../services/wikiLintRules";
 
@@ -178,6 +179,7 @@ export interface WikiPage {
     label?: string;
     metadata?: WikiEdgeMetadata;
   }>;
+  comparisonData?: ComparisonWorkspaceData;
   metadata: {
     tags: string[];
     relatedPages: string[]; // Wiki page IDs

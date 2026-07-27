@@ -8,13 +8,25 @@ import {
   type SetStateAction,
 } from "react";
 import { Edge, Node } from "@xyflow/react";
-import { ComparisonWorkspaceData, MindMapData } from "../services/llmService";
+import {
+  ComparisonWorkspaceData,
+  MindMapData,
+  AssessmentStage1Data,
+  AssessmentStage2Data,
+  StudyRoadmapData,
+  AssessmentSelfReportStatus,
+  FlashcardDeckData,
+} from "../services/llmService";
 import { convertTreeToGraph, findRootNode, toFlowGraph } from "../utils/mapData";
 import { useMediaQuery } from "./useMediaQuery";
 import { useElementFullscreen } from "./useElementFullscreen";
 
 type AppExperience = "classic" | "pretext" | "gallery";
 export type { AppExperience };
+
+export type WorkflowMode = "learn" | "compare" | "assess";
+export type WorkspaceActiveView = "map" | "outline" | "compare" | "report" | "roadmap" | "flashcards";
+export type AssessmentStage = "idle" | "self_report" | "mcq" | "report" | "roadmap" | "reassess" | "flashcards";
 
 function getInitialExperience(): AppExperience {
   if (typeof window === "undefined") {
@@ -63,10 +75,10 @@ export interface AppState {
   setExperience: Dispatch<SetStateAction<AppExperience>>;
 
   // Workflow
-  workflowMode: "learn" | "compare";
-  setWorkflowMode: Dispatch<SetStateAction<"learn" | "compare">>;
-  activeView: "map" | "outline" | "compare";
-  setActiveView: Dispatch<SetStateAction<"map" | "outline" | "compare">>;
+  workflowMode: WorkflowMode;
+  setWorkflowMode: Dispatch<SetStateAction<WorkflowMode>>;
+  activeView: WorkspaceActiveView;
+  setActiveView: Dispatch<SetStateAction<WorkspaceActiveView>>;
 
   // Loading
   isLoading: boolean;
@@ -85,6 +97,26 @@ export interface AppState {
   // Comparison data
   comparisonData: ComparisonWorkspaceData | null;
   setComparisonData: Dispatch<SetStateAction<ComparisonWorkspaceData | null>>;
+
+  // Assessment data
+  assessmentStage1Data: AssessmentStage1Data | null;
+  setAssessmentStage1Data: Dispatch<SetStateAction<AssessmentStage1Data | null>>;
+  assessmentStage2Data: AssessmentStage2Data | null;
+  setAssessmentStage2Data: Dispatch<SetStateAction<AssessmentStage2Data | null>>;
+  reassessmentStage2Data: AssessmentStage2Data | null;
+  setReassessmentStage2Data: Dispatch<SetStateAction<AssessmentStage2Data | null>>;
+  assessmentStage: AssessmentStage;
+  setAssessmentStage: Dispatch<SetStateAction<AssessmentStage>>;
+  selfReportAnswers: Record<string, AssessmentSelfReportStatus>;
+  setSelfReportAnswers: Dispatch<SetStateAction<Record<string, AssessmentSelfReportStatus>>>;
+  mcqAnswers: Record<string, number>;
+  setMcqAnswers: Dispatch<SetStateAction<Record<string, number>>>;
+  studyRoadmap: StudyRoadmapData | null;
+  setStudyRoadmap: Dispatch<SetStateAction<StudyRoadmapData | null>>;
+  flashcardDeck: FlashcardDeckData | null;
+  setFlashcardDeck: Dispatch<SetStateAction<FlashcardDeckData | null>>;
+  nodeAssessmentStatus: Record<string, "mastered" | "review" | "gap">;
+  setNodeAssessmentStatus: Dispatch<SetStateAction<Record<string, "mastered" | "review" | "gap">>>;
 
   // Saved/loaded map data
   savedNodes: Node[] | null;
@@ -118,13 +150,25 @@ export function useAppState(): AppState {
   const outlineFullscreen = useElementFullscreen<HTMLDivElement>();
 
   const [experience, setExperience] = useState<AppExperience>(getInitialExperience);
-  const [workflowMode, setWorkflowMode] = useState<"learn" | "compare">("learn");
-  const [activeView, setActiveView] = useState<"map" | "outline" | "compare">("map");
+  const [workflowMode, setWorkflowMode] = useState<WorkflowMode>("learn");
+  const [activeView, setActiveView] = useState<WorkspaceActiveView>("map");
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
   const [error, setError] = useState("");
   const [mapData, setMapData] = useState<MindMapData | null>(null);
   const [comparisonData, setComparisonData] = useState<ComparisonWorkspaceData | null>(null);
+
+  // Assessment state
+  const [assessmentStage1Data, setAssessmentStage1Data] = useState<AssessmentStage1Data | null>(null);
+  const [assessmentStage2Data, setAssessmentStage2Data] = useState<AssessmentStage2Data | null>(null);
+  const [reassessmentStage2Data, setReassessmentStage2Data] = useState<AssessmentStage2Data | null>(null);
+  const [assessmentStage, setAssessmentStage] = useState<AssessmentStage>("idle");
+  const [selfReportAnswers, setSelfReportAnswers] = useState<Record<string, AssessmentSelfReportStatus>>({});
+  const [mcqAnswers, setMcqAnswers] = useState<Record<string, number>>({});
+  const [studyRoadmap, setStudyRoadmap] = useState<StudyRoadmapData | null>(null);
+  const [flashcardDeck, setFlashcardDeck] = useState<FlashcardDeckData | null>(null);
+  const [nodeAssessmentStatus, setNodeAssessmentStatus] = useState<Record<string, "mastered" | "review" | "gap">>({});
+
   const [savedNodes, setSavedNodes] = useState<Node[] | null>(null);
   const [savedEdges, setSavedEdges] = useState<Edge[] | null>(null);
   const [topicInput, setTopicInput] = useState("");
@@ -163,6 +207,13 @@ export function useAppState(): AppState {
   const resetWorkspaceState = () => {
     setMapData(null);
     setComparisonData(null);
+    setAssessmentStage1Data(null);
+    setAssessmentStage2Data(null);
+    setAssessmentStage("idle");
+    setSelfReportAnswers({});
+    setMcqAnswers({});
+    setStudyRoadmap(null);
+    setNodeAssessmentStatus({});
     setSavedNodes(null);
     setSavedEdges(null);
     setSelectedNodeId(null);
@@ -223,6 +274,24 @@ export function useAppState(): AppState {
     setMapData,
     comparisonData,
     setComparisonData,
+    assessmentStage1Data,
+    setAssessmentStage1Data,
+    assessmentStage2Data,
+    setAssessmentStage2Data,
+    reassessmentStage2Data,
+    setReassessmentStage2Data,
+    assessmentStage,
+    setAssessmentStage,
+    selfReportAnswers,
+    setSelfReportAnswers,
+    mcqAnswers,
+    setMcqAnswers,
+    studyRoadmap,
+    setStudyRoadmap,
+    flashcardDeck,
+    setFlashcardDeck,
+    nodeAssessmentStatus,
+    setNodeAssessmentStatus,
     savedNodes,
     setSavedNodes,
     savedEdges,
@@ -241,3 +310,4 @@ export function useAppState(): AppState {
     handleSelectNode,
   };
 }
+

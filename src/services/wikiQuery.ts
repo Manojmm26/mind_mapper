@@ -193,9 +193,16 @@ async function fetchRelevantPages(
         0,
       );
 
+      // Graph neighborhood boost: boost pages connected via crossReferences
+      let graphBoost = 0;
+      if (conceptIndex?.crossReferences[entry.id]) {
+        const connectedPageIds = conceptIndex.crossReferences[entry.id];
+        graphBoost = connectedPageIds.length * 1.5;
+      }
+
       return {
         page,
-        score: score + nodeScore,
+        score: score + nodeScore + graphBoost,
       };
     }),
   );

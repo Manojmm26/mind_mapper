@@ -78,6 +78,7 @@ function OutlineNodeItem({
   const hasChildren = item.children.length > 0;
   const isSelected = item.id === selectedNodeId;
   const typeLabel = item.node.data?.type as string | undefined;
+  const assessmentStatus = item.node.data?.assessmentStatus as "mastered" | "review" | "gap" | undefined;
 
   useEffect(() => {
     if (branchHasSelection) {
@@ -115,10 +116,25 @@ function OutlineNodeItem({
           onClick={() => onSelectNode?.(item.id)}
           className="min-w-0 flex-1 text-left"
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <p className={cn('truncate font-semibold text-slate-900', compact ? 'text-xs' : 'text-sm')}>
               {String(item.node.data?.label || 'Untitled node')}
             </p>
+            {assessmentStatus === "mastered" && (
+              <span className="rounded-full bg-emerald-100 border border-emerald-300 px-2 py-0.5 text-[9px] font-black uppercase text-emerald-800">
+                🟢 Mastered
+              </span>
+            )}
+            {assessmentStatus === "review" && (
+              <span className="rounded-full bg-amber-100 border border-amber-300 px-2 py-0.5 text-[9px] font-black uppercase text-amber-800">
+                🟡 Needs Review
+              </span>
+            )}
+            {assessmentStatus === "gap" && (
+              <span className="rounded-full bg-rose-100 border border-rose-300 px-2 py-0.5 text-[9px] font-black uppercase text-rose-800">
+                🔴 Knowledge Gap
+              </span>
+            )}
             {typeLabel && (
               <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                 {typeLabel}

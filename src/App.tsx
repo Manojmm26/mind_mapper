@@ -63,11 +63,19 @@ export default function App() {
         label: e.label,
       }));
 
+      if (page.comparisonData) {
+        state.setComparisonData(page.comparisonData);
+        state.setWorkflowMode("compare");
+        state.setActiveView("compare");
+      } else {
+        state.setComparisonData(null);
+        state.setWorkflowMode("learn");
+        state.setActiveView("map");
+      }
+
       state.setSavedNodes(nodes);
       state.setSavedEdges(edges);
       state.setMapData({ nodes: [], edges: [] });
-      state.setWorkflowMode("learn");
-      state.setActiveView("map");
       state.setError("");
       state.setSearchQuery("");
       state.setSelectedNodeId(null);
@@ -89,9 +97,26 @@ export default function App() {
     setSelectedNodeId: state.setSelectedNodeId,
     setSearchQuery: state.setSearchQuery,
     setTopicInput: state.setTopicInput,
+    setAssessmentStage1Data: state.setAssessmentStage1Data,
+    setAssessmentStage2Data: state.setAssessmentStage2Data,
+    setReassessmentStage2Data: state.setReassessmentStage2Data,
+    setAssessmentStage: state.setAssessmentStage,
+    setSelfReportAnswers: state.setSelfReportAnswers,
+    setMcqAnswers: state.setMcqAnswers,
+    setStudyRoadmap: state.setStudyRoadmap,
+    setFlashcardDeck: state.setFlashcardDeck,
+    setNodeAssessmentStatus: state.setNodeAssessmentStatus,
     workflowMode: state.workflowMode,
     comparisonData: state.comparisonData,
+    assessmentStage1Data: state.assessmentStage1Data,
+    assessmentStage2Data: state.assessmentStage2Data,
+    reassessmentStage2Data: state.reassessmentStage2Data,
+    selfReportAnswers: state.selfReportAnswers,
+    mcqAnswers: state.mcqAnswers,
+    flashcardDeck: state.flashcardDeck,
     topicInput: state.topicInput,
+    savedNodes: state.savedNodes,
+    savedEdges: state.savedEdges,
     fileInputRef: state.fileInputRef,
     jsonInputRef: state.jsonInputRef,
     wiki,
@@ -126,8 +151,8 @@ export default function App() {
     );
   }
 
-  // Workspace view (when a map is loaded)
-  if (state.workspaceGraph.nodes.length > 0) {
+  // Workspace view (when a map or assessment is loaded)
+  if (state.workspaceGraph.nodes.length > 0 || state.assessmentStage1Data) {
     return (
       <Suspense
         fallback={<FullScreenLoadingMessage message="Loading workspace…" />}
@@ -141,6 +166,25 @@ export default function App() {
           activeView={state.activeView}
           setActiveView={state.setActiveView}
           comparisonData={state.comparisonData}
+          assessmentStage={state.assessmentStage}
+          assessmentStage1Data={state.assessmentStage1Data}
+          assessmentStage2Data={state.assessmentStage2Data}
+          reassessmentStage2Data={state.reassessmentStage2Data}
+          selfReportAnswers={state.selfReportAnswers}
+          mcqAnswers={state.mcqAnswers}
+          studyRoadmap={state.studyRoadmap}
+          flashcardDeck={state.flashcardDeck}
+          isLoading={state.isLoading}
+          onSelfReportSubmit={handlers.handleSelfReportSubmit}
+          onMcqSubmit={handlers.handleMcqSubmit}
+          onReassessmentChecklistSubmit={handlers.handleReassessmentChecklistSubmit}
+          onReassessmentMcqSubmit={handlers.handleReassessmentMcqSubmit}
+          onRateFlashcard={handlers.handleRateFlashcard}
+          onGenerateStudyRoadmap={handlers.handleGenerateStudyRoadmap}
+          onStartAssessmentFromMap={handlers.handleStartAssessmentFromMap}
+          onStartReassessment={handlers.handleStartReassessment}
+          onStartFlashcards={handlers.handleStartFlashcards}
+          onExportReport={handlers.handleExportDiagnosticReport}
           selectedNodeId={state.selectedNodeId}
           searchQuery={state.searchQuery}
           setSearchQuery={state.setSearchQuery}

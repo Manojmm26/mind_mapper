@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Edge, Node } from '@xyflow/react';
 import { ArrowRight, BookmarkPlus, Check, CircleDashed, Compass, Flag, Layers3, Tag } from 'lucide-react';
-import { ComparisonWorkspaceData } from '../services/llmService';
+import { ComparisonWorkspaceData, MindMapData } from '../services/llmService';
 import { buildGraphMaps } from '../utils/mapData';
 import { cn } from '../utils/cn';
-import { saveWikiPage, generateId } from '../services/wikiService';
 import { NodeType } from '../config/wikiSchema';
+import { useWiki } from '../hooks/useWiki';
 
 interface WorkspaceInspectorProps {
   nodes: Node[];
@@ -13,6 +13,7 @@ interface WorkspaceInspectorProps {
   selectedNodeId?: string | null;
   comparisonData: ComparisonWorkspaceData | null;
   onSelectNode: (id: string) => void;
+  onStartFlashcards?: (targetConceptIds?: string[]) => void;
 }
 
 function formatValue(value?: string) {
@@ -29,8 +30,10 @@ export function WorkspaceInspector({
   selectedNodeId,
   comparisonData,
   onSelectNode,
+  onStartFlashcards,
 }: WorkspaceInspectorProps) {
   const [savedToWiki, setSavedToWiki] = useState(false);
+  const wiki = useWiki();
   const { nodeMap, parentMap, childrenMap, depthMap, root } = buildGraphMaps(nodes, edges);
   const selectedNode = selectedNodeId ? nodeMap.get(selectedNodeId) : root || null;
   const parentNode = selectedNode ? nodeMap.get(parentMap[selectedNode.id] || '') : null;
@@ -40,49 +43,47 @@ export function WorkspaceInspector({
   const handleSaveBranchToWiki = async () => {
     if (!selectedNode) return;
 
-    const pageId = generateId();
-    const title = String(selectedNode.data?.label || 'Untitled Concept');
-    const summary = String(selectedNode.data?.description || 'Extracted concept from workspace mind map.');
+    // Collect selected node + all descendant node IDs recursively
+    const descendantIds = new Set<string>();
+    const collectDescendants = (nodeId: string) => {
+      descendantIds.add(nodeId);
+      const children = childrenMap[nodeId] || [];
+      for (const childId of children) {
+        if (!descendantIds.has(childId)) {
+          collectDescendants(childId);
+        }
+      }
+    };
+    collectDescendants(selectedNode.id);
 
-    const wikiNodes = [selectedNode, ...childNodes].map((n) => ({
-      id: n.id,
-      label: String(n.data?.label || ''),
-      description: String(n.data?.description || ''),
-      metadata: {
-        type: (n.data?.type as NodeType) || 'concept',
+    const subNodes = nodes
+      .filter((n) => descendantIds.has(n.id))
+      .map((n) => ({
+        id: n.id,
+        label: String(n.data?.label || ''),
+        description: String(n.data?.description || ''),
+        type: ((n.data?.type as string) || 'concept') as MindMapData['nodes'][number]['type'],
         importance: (n.data?.importance as "high" | "medium" | "low") || 'medium',
         tags: Array.isArray(n.data?.tags) ? (n.data?.tags as string[]) : [],
         nextStep: n.data?.nextStep as string | undefined,
-      },
-    }));
+      }));
 
-    const wikiEdges = edges
-      .filter((e) => e.source === selectedNode.id || e.target === selectedNode.id)
+    const subEdges = edges
+      .filter((e) => descendantIds.has(e.source) && descendantIds.has(e.target))
       .map((e) => ({
         source: e.source,
         target: e.target,
         label: e.label as string | undefined,
       }));
 
-    const now = new Date().toISOString();
+    const title = String(selectedNode.data?.label || 'Untitled Concept');
 
-    await saveWikiPage({
-      id: pageId,
-      title,
-      sourceType: 'topic',
-      sourceName: 'Workspace Mind Map',
-      createdAt: now,
-      updatedAt: now,
-      nodes: wikiNodes,
-      edges: wikiEdges,
-      metadata: {
-        summary,
-        tags: tags.length > 0 ? tags : ['mind-map'],
-        nodeCount: wikiNodes.length,
-        version: 1,
-        relatedPages: [],
-      },
-    });
+    const mapData: MindMapData = {
+      nodes: subNodes,
+      edges: subEdges,
+    };
+
+    await wiki.ingestMindMap(mapData, 'topic', title);
 
     setSavedToWiki(true);
     setTimeout(() => setSavedToWiki(false), 2500);
@@ -154,6 +155,71 @@ export function WorkspaceInspector({
           </span>
         )}
       </div>
+
+      {selectedNode?.data?.assessmentStatus && (
+        <section
+          className={cn(
+            "rounded-[28px] border p-5 transition-all shadow-sm",
+            selectedNode.data.assessmentStatus === "mastered"
+              ? "border-emerald-200 bg-emerald-50/70"
+              : selectedNode.data.assessmentStatus === "review"
+              ? "border-amber-200 bg-amber-50/70"
+              : "border-rose-200 bg-rose-50/70",
+          )}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+              💡 AI Concept Explainer
+            </span>
+            <span
+              className={cn(
+                "rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white",
+                selectedNode.data.assessmentStatus === "mastered"
+                  ? "bg-emerald-600"
+                  : selectedNode.data.assessmentStatus === "review"
+                  ? "bg-amber-600"
+                  : "bg-rose-600",
+              )}
+            >
+              {selectedNode.data.assessmentStatus === "mastered"
+                ? "🟢 Mastered"
+                : selectedNode.data.assessmentStatus === "review"
+                ? "🟡 Needs Review"
+                : "🔴 Knowledge Gap"}
+            </span>
+          </div>
+
+          {selectedNode.data.question && (
+            <div className="mt-3 rounded-xl bg-white/80 p-3 shadow-xs">
+              <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                Diagnostic Question Tested
+              </p>
+              <p className="mt-1 text-xs font-semibold text-slate-800">
+                "{String(selectedNode.data.question)}"
+              </p>
+            </div>
+          )}
+
+          <div className="mt-3">
+            <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+              Key Concept Takeaway
+            </p>
+            <p className="mt-1 text-xs font-medium leading-5 text-slate-700">
+              {String(selectedNode.data.description || "Core principle for this topic.")}
+            </p>
+          </div>
+
+          {onStartFlashcards && (
+            <button
+              type="button"
+              onClick={() => onStartFlashcards([selectedNode.id])}
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-purple-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-purple-700 active:scale-95"
+            >
+              <span>🃏 Study Flashcards for this Node</span>
+            </button>
+          )}
+        </section>
+      )}
 
       {tags.length > 0 && (
         <section className="space-y-4 rounded-[28px] bg-slate-50/50 p-5 ring-1 ring-slate-100">

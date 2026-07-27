@@ -15,10 +15,12 @@ import {
   Layers,
   Network,
   Shield,
+  Target,
 } from "lucide-react";
 import { ModelSelector } from "./ModelSelector";
 import { EXAMPLE_MAP } from "../exampleData";
 import { MindMapData, ComparisonWorkspaceData } from "../services/llmService";
+import { WorkflowMode } from "../hooks/useAppState";
 
 const WikiExplorer = lazy(() =>
   import("./WikiExplorer").then((module) => ({
@@ -27,12 +29,12 @@ const WikiExplorer = lazy(() =>
 );
 
 export interface HomePageProps {
-  workflowMode: "learn" | "compare";
+  workflowMode: WorkflowMode;
   isLoading: boolean;
   loadingMessage: string;
   error: string;
   topicInput: string;
-  onWorkflowModeChange: (mode: "learn" | "compare") => void;
+  onWorkflowModeChange: (mode: WorkflowMode) => void;
   onTopicInputChange: (value: string) => void;
   onTopicSubmit: (e?: React.FormEvent) => void;
   onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -144,13 +146,13 @@ export function HomePage({
             </div>
           )}
 
-          {/* Learn / Compare Toggle */}
-          <div className="grid grid-cols-2 gap-3 rounded-2xl bg-slate-100 p-1">
+          {/* Learn / Compare / Assess Toggle */}
+          <div className="grid grid-cols-3 gap-2 rounded-2xl bg-slate-100 p-1">
             <button
               type="button"
               onClick={() => onWorkflowModeChange("learn")}
               disabled={isLoading}
-              className={`flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+              className={`flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-bold transition-all ${
                 workflowMode === "learn"
                   ? "bg-white text-slate-900 shadow-sm"
                   : "text-slate-500 hover:text-slate-700"
@@ -163,7 +165,7 @@ export function HomePage({
               type="button"
               onClick={() => onWorkflowModeChange("compare")}
               disabled={isLoading}
-              className={`flex flex-1 sm:flex-none items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+              className={`flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-bold transition-all ${
                 workflowMode === "compare"
                   ? "bg-white text-slate-900 shadow-sm"
                   : "text-slate-500 hover:text-slate-700"
@@ -171,6 +173,19 @@ export function HomePage({
             >
               <Scale size={16} />
               Compare
+            </button>
+            <button
+              type="button"
+              onClick={() => onWorkflowModeChange("assess")}
+              disabled={isLoading}
+              className={`flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-bold transition-all ${
+                workflowMode === "assess"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              <Target size={16} />
+              Assess
             </button>
           </div>
 
@@ -192,6 +207,8 @@ export function HomePage({
                   placeholder={
                     workflowMode === "compare"
                       ? "Compare any product, tool, or topic..."
+                      : workflowMode === "assess"
+                      ? "Test how much you know about any topic..."
                       : "Visualize any concept..."
                   }
                   disabled={isLoading}
@@ -220,6 +237,8 @@ export function HomePage({
             <p className="text-center text-xs leading-5 text-slate-500">
               {workflowMode === "compare"
                 ? "Comparison mode builds a decision board, matched options, next steps, and a linked knowledge map."
+                : workflowMode === "assess"
+                ? "Assessment mode runs adaptive self-reporting and targeted MCQs to pinpoint knowledge gaps and build a study roadmap."
                 : "Learning mode builds a layered workspace with map, outline, and node inspection."}
             </p>
           </form>

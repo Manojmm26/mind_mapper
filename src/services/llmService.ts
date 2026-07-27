@@ -4,8 +4,16 @@ import { getActiveGeminiModel } from "../config/aiConfig";
 import {
   mindMapSchemaGenAI,
   comparisonWorkspaceSchemaGenAI,
+  assessmentStage1SchemaGenAI,
+  assessmentStage2SchemaGenAI,
+  studyRoadmapSchemaGenAI,
+  flashcardDeckSchemaGenAI,
   validateMindMap,
   validateComparisonWorkspace,
+  validateAssessmentStage1,
+  validateAssessmentStage2,
+  validateStudyRoadmap,
+  validateFlashcardDeck,
   normalizeComparisonData,
   type NodeData,
   type EdgeData,
@@ -17,6 +25,16 @@ import {
   type ComparisonDomain,
   type ComparisonWorkspaceData,
   type ComparisonWorkspaceDataRaw,
+  type AssessmentConcept,
+  type AssessmentStage1Data,
+  type MCQQuestion,
+  type AssessmentStage2Data,
+  type StudyRoadmapData,
+  type StudyMilestone,
+  type Resource,
+  type AssessmentSelfReportStatus,
+  type Flashcard,
+  type FlashcardDeckData,
 } from "./llmSchemas";
 
 // Re-export types and helpers so existing imports from other modules continue to work
@@ -31,6 +49,16 @@ export type {
   ComparisonDomain,
   ComparisonWorkspaceData,
   ComparisonWorkspaceDataRaw,
+  AssessmentConcept,
+  AssessmentStage1Data,
+  MCQQuestion,
+  AssessmentStage2Data,
+  StudyRoadmapData,
+  StudyMilestone,
+  Resource,
+  AssessmentSelfReportStatus,
+  Flashcard,
+  FlashcardDeckData,
 };
 export { normalizeComparisonData };
 
@@ -478,3 +506,167 @@ Your task is to create a comprehensive, well-organized mind map that serves as a
   // Final parsing and validation to guarantee full structured output
   return validateMindMap(JSON.parse(fullText));
 }
+
+// ---------------------------------------------------------------------------
+// Assessment Workspace Generators
+// ---------------------------------------------------------------------------
+
+export async function generateAssessmentStage1(
+  topic: string,
+  wikiContext?: WikiContext,
+): Promise<AssessmentStage1Data> {
+  const ai = getAI();
+  const basePrompt = `You are an expert diagnostic evaluator and knowledge architect. A user wants to test their knowledge on: "${topic}"
+
+Your task is to create a structured diagnostic assessment hierarchy of 8 to 15 key concepts.
+
+## Requirements:
+1. Break down the topic into 3-5 main categories (level 1) and 2-4 sub-concepts per category (level 2-3).
+2. For each concept, formulate a direct, diagnostic self-report question prompt that tests whether the user truly understands the mechanism, nuance, or principle (e.g. "Can you explain how attention weights are computed across sequence dimensions?").
+3. Ensure every concept has a parentId if it is a child of a level 1 category node.
+4. Descriptions should be specific and educational (1-2 sentences).
+5. Labels should be concise (max 6 words).
+
+Return valid structured JSON matching the assessmentStage1Schema.`;
+
+  const prompt = wikiContext?.contextString
+    ? `${basePrompt}${wikiContext.contextString}${WIKI_INSTRUCTIONS}`
+    : basePrompt;
+
+  const response = await ai.models.generateContent({
+    model: getActiveGeminiModel(),
+    contents: prompt,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: assessmentStage1SchemaGenAI,
+    },
+  });
+
+  return parseAndValidate(response, validateAssessmentStage1);
+}
+
+export async function generateAssessmentStage2(
+  topic: string,
+  selfReportResults: Array<{ conceptId: string; conceptLabel: string; status: string; question: string }>,
+  wikiContext?: WikiContext,
+): Promise<AssessmentStage2Data> {
+  const ai = getAI();
+  const flaggedList = selfReportResults
+    .map(
+      (r) => `- [${r.status.toUpperCase()}] Concept: "${r.conceptLabel}" (Question: "${r.question}")`,
+    )
+    .join("\n");
+
+  const basePrompt = `You are an expert examiner. A user recently completed a self-assessment on "${topic}" with these self-reported answers:
+
+${flaggedList}
+
+Create a set of 3 to 5 targeted, high-value multiple-choice questions (MCQs) specifically focusing on concepts marked as "REVIEW" or "MASTERED" to verify their actual understanding.
+
+## Requirements:
+1. Provide 3 to 5 MCQs in total.
+2. Each MCQ must have exactly 4 plausible option choices, 1 correct index (0-3), and a clear educational explanation of why the answer is correct.
+3. Test conceptual depth and application, not trivial recall.
+
+Return valid structured JSON matching the assessmentStage2Schema.`;
+
+  const prompt = wikiContext?.contextString
+    ? `${basePrompt}${wikiContext.contextString}${WIKI_INSTRUCTIONS}`
+    : basePrompt;
+
+  const response = await ai.models.generateContent({
+    model: getActiveGeminiModel(),
+    contents: prompt,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: assessmentStage2SchemaGenAI,
+    },
+  });
+
+  return parseAndValidate(response, validateAssessmentStage2);
+}
+
+export async function generateStudyRoadmap(
+  topic: string,
+  gapConcepts: string[],
+  wikiContext?: WikiContext,
+): Promise<StudyRoadmapData> {
+  const ai = getAI();
+  const gapList = gapConcepts.map((g) => `- ${g}`).join("\n");
+
+  const basePrompt = `You are a world-class mentor and curriculum developer. A student just finished a diagnostic evaluation on "${topic}" and was found to have knowledge gaps in these key areas:
+
+${gapList.length > 0 ? gapList : "- All core concepts (full foundational review required)"}
+
+Create a personalized, step-by-step Study Roadmap (Action Plan) designed to take them from their current gaps to full mastery.
+
+## Requirements:
+1. Break the learning journey into 3 to 5 sequential milestones.
+2. For each milestone, provide:
+   - Clear title and description.
+   - Estimated study hours.
+   - Target concepts covered.
+   - Key takeaways & skills gained.
+   - 2-3 curated recommended learning resources (documentation, videos, articles, or hands-on guides).
+   - A concrete, actionable practice task or mini-project exercise.
+3. Estimate total study hours across all milestones.
+
+Return valid structured JSON matching the studyRoadmapSchema.`;
+
+  const prompt = wikiContext?.contextString
+    ? `${basePrompt}${wikiContext.contextString}${WIKI_INSTRUCTIONS}`
+    : basePrompt;
+
+  const response = await ai.models.generateContent({
+    model: getActiveGeminiModel(),
+    contents: prompt,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: studyRoadmapSchemaGenAI,
+    },
+  });
+
+  return parseAndValidate(response, validateStudyRoadmap);
+}
+
+export async function generateFlashcardDeck(
+  topic: string,
+  targetConcepts: Array<{ label: string; description?: string; question?: string; category?: string }>,
+  wikiContext?: WikiContext,
+): Promise<FlashcardDeckData> {
+  const ai = getAI();
+  const conceptList = targetConcepts
+    .map((c) => `- [${c.category || "General"}] ${c.label}: ${c.description || ""}`)
+    .join("\n");
+
+  const basePrompt = `You are a master educator designing interactive practice flashcards for the topic: "${topic}".
+
+Create a flashcard deck for these concepts:
+${conceptList}
+
+## Requirements:
+For each concept, provide:
+1. question: Front side diagnostic question (e.g. "How does the self-attention calculation differ from standard attention?").
+2. explanation: Back side clear 1-2 sentence core explanation.
+3. keyTakeaways: 2-3 concise bullet points highlighting key skills or facts to remember.
+4. realWorldExample: A practical, concrete real-world use case or code/system scenario.
+
+Return valid structured JSON matching flashcardDeckSchemaGenAI.`;
+
+  const prompt = wikiContext?.contextString
+    ? `${basePrompt}${wikiContext.contextString}${WIKI_INSTRUCTIONS}`
+    : basePrompt;
+
+  const response = await ai.models.generateContent({
+    model: getActiveGeminiModel(),
+    contents: prompt,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: flashcardDeckSchemaGenAI,
+    },
+  });
+
+  return parseAndValidate(response, validateFlashcardDeck);
+}
+
+

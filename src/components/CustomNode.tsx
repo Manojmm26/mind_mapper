@@ -90,13 +90,22 @@ export const CustomNode = memo(({ id, data, isConnectable, selected }: NodeProps
   const themeFamily = (data.themeFamily as string) || 'slate';
   const themeLevel = Math.min(Math.max((data.themeLevel as number) || 0, 0), 4);
   
-  const familyThemes = themes[themeFamily] || themes.slate;
-  const theme = familyThemes[themeLevel];
+  const assessmentStatus = data.assessmentStatus as "mastered" | "review" | "gap" | undefined;
+
+  let assessmentBorder = "";
+  if (assessmentStatus === "mastered") {
+    assessmentBorder = "border-2 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)]";
+  } else if (assessmentStatus === "review") {
+    assessmentBorder = "border-2 border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.3)]";
+  } else if (assessmentStatus === "gap") {
+    assessmentBorder = "border-2 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.3)]";
+  }
 
   return (
     <div className={cn(
       "w-[300px] min-h-[120px] rounded-[22px] border shadow-sm",
-      theme.bg, theme.border,
+      assessmentBorder || theme.bg,
+      theme.border,
       "relative flex flex-col overflow-visible transition-shadow hover:shadow-xl",
       selected && 'ring-2 ring-cyan-300 ring-offset-4 ring-offset-slate-50 shadow-[0_20px_50px_rgba(14,165,233,0.18)]'
     )}>
@@ -110,11 +119,28 @@ export const CustomNode = memo(({ id, data, isConnectable, selected }: NodeProps
       <div className={cn('border-b px-4 py-3 rounded-t-[22px]', theme.header, theme.border)}>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className={cn('truncate text-sm font-bold', theme.text)} title={data.label as string}>
-              {data.label as string}
-            </h3>
-            {(typeLabel || importanceLabel) && (
+            <div className="flex items-center gap-2">
+              <h3 className={cn('truncate text-sm font-bold', theme.text)} title={data.label as string}>
+                {data.label as string}
+              </h3>
+            </div>
+            {(typeLabel || importanceLabel || assessmentStatus) && (
               <div className="mt-2 flex flex-wrap gap-1.5">
+                {assessmentStatus === "mastered" && (
+                  <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-sm">
+                    🟢 Mastered
+                  </span>
+                )}
+                {assessmentStatus === "review" && (
+                  <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-sm">
+                    🟡 Needs Review
+                  </span>
+                )}
+                {assessmentStatus === "gap" && (
+                  <span className="rounded-full bg-rose-600 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-sm">
+                    🔴 Knowledge Gap
+                  </span>
+                )}
                 {typeLabel && (
                   <span className="rounded-full bg-white/75 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 shadow-sm">
                     {typeLabel}

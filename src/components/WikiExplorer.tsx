@@ -186,10 +186,10 @@ export function WikiExplorer({
         )}
 
         {activeTab === "graph" && (
-          <div className="h-full min-h-[400px] rounded-[20px] border border-white/60 bg-white/80 shadow-sm overflow-hidden">
+          <div className="h-[550px] min-h-[500px] w-full rounded-[20px] border border-slate-200/80 bg-slate-950 shadow-md overflow-hidden">
             <Suspense
               fallback={
-                <div className="flex h-full items-center justify-center text-sm font-semibold text-slate-500">
+                <div className="flex h-full items-center justify-center text-sm font-semibold text-slate-400">
                   Loading knowledge graph…
                 </div>
               }

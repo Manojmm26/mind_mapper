@@ -8,6 +8,9 @@ import {
   Minimize2,
   Scale,
   Sparkles,
+  Target,
+  Rocket,
+  Award,
 } from "lucide-react";
 import { ComparisonWorkspace } from "./ComparisonWorkspace";
 import { Map } from "./Map";
@@ -15,7 +18,23 @@ import { MobileMapView } from "./MobileMapView";
 import { WorkspaceInspector } from "./WorkspaceInspector";
 import { WorkspaceSidebar, WorkspaceView } from "./WorkspaceSidebar";
 import { ModelSelector } from "./ModelSelector";
-import { ComparisonWorkspaceData, MindMapData } from "../services/llmService";
+import {
+  ComparisonWorkspaceData,
+  MindMapData,
+  AssessmentStage1Data,
+  AssessmentStage2Data,
+  StudyRoadmapData,
+  AssessmentSelfReportStatus,
+  FlashcardDeckData,
+  Flashcard,
+} from "../services/llmService";
+import { AssessmentWorkspace } from "./Assessment/AssessmentWorkspace";
+import { StudyRoadmapView } from "./Assessment/StudyRoadmapView";
+import {
+  WorkflowMode,
+  WorkspaceActiveView,
+  AssessmentStage,
+} from "../hooks/useAppState";
 
 export interface WorkspaceViewComponentProps {
   isMobile: boolean;
@@ -27,10 +46,29 @@ export interface WorkspaceViewComponentProps {
   };
   workspaceGraph: { nodes: Node[]; edges: Edge[] };
   workspaceRoot: Node | null;
-  workflowMode: "learn" | "compare";
-  activeView: WorkspaceView;
-  setActiveView: (view: WorkspaceView) => void;
+  workflowMode: WorkflowMode;
+  activeView: WorkspaceActiveView;
+  setActiveView: (view: WorkspaceActiveView) => void;
   comparisonData: ComparisonWorkspaceData | null;
+  assessmentStage: AssessmentStage;
+  assessmentStage1Data: AssessmentStage1Data | null;
+  assessmentStage2Data: AssessmentStage2Data | null;
+  reassessmentStage2Data?: AssessmentStage2Data | null;
+  selfReportAnswers: Record<string, AssessmentSelfReportStatus>;
+  mcqAnswers: Record<string, number>;
+  studyRoadmap: StudyRoadmapData | null;
+  flashcardDeck?: FlashcardDeckData | null;
+  isLoading?: boolean;
+  onSelfReportSubmit: (answers: Record<string, AssessmentSelfReportStatus>) => void;
+  onMcqSubmit: (answers: Record<string, number>) => void;
+  onReassessmentChecklistSubmit?: (selectedConceptIds: string[]) => void;
+  onReassessmentMcqSubmit?: (answers: Record<string, number>) => void;
+  onRateFlashcard?: (card: Flashcard, rating: "easy" | "good" | "hard") => void;
+  onGenerateStudyRoadmap: () => void;
+  onStartAssessmentFromMap: () => void;
+  onStartReassessment?: () => void;
+  onStartFlashcards?: (targetConceptIds?: string[]) => void;
+  onExportReport?: () => void;
   selectedNodeId: string | null;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
@@ -52,6 +90,25 @@ export function WorkspaceViewComponent({
   activeView,
   setActiveView,
   comparisonData,
+  assessmentStage,
+  assessmentStage1Data,
+  assessmentStage2Data,
+  reassessmentStage2Data = null,
+  selfReportAnswers,
+  mcqAnswers,
+  studyRoadmap,
+  flashcardDeck = null,
+  isLoading = false,
+  onSelfReportSubmit,
+  onMcqSubmit,
+  onReassessmentChecklistSubmit = () => {},
+  onReassessmentMcqSubmit = () => {},
+  onRateFlashcard = () => {},
+  onGenerateStudyRoadmap,
+  onStartAssessmentFromMap,
+  onStartReassessment = () => {},
+  onStartFlashcards = () => {},
+  onExportReport = () => {},
   selectedNodeId,
   searchQuery,
   setSearchQuery,
@@ -66,6 +123,42 @@ export function WorkspaceViewComponent({
   const renderContent = () => {
     if (activeView === "compare" && comparisonData) {
       return <ComparisonWorkspace data={comparisonData} />;
+    }
+
+    if (activeView === "roadmap" && studyRoadmap) {
+      return <StudyRoadmapView roadmap={studyRoadmap} />;
+    }
+
+    if (
+      activeView === "report" ||
+      (workflowMode === "assess" &&
+        activeView !== "map" &&
+        activeView !== "outline" &&
+        activeView !== "roadmap")
+    ) {
+      return (
+        <AssessmentWorkspace
+          stage={assessmentStage}
+          stage1Data={assessmentStage1Data}
+          stage2Data={assessmentStage2Data}
+          reassessmentStage2Data={reassessmentStage2Data}
+          selfReportAnswers={selfReportAnswers}
+          mcqAnswers={mcqAnswers}
+          studyRoadmap={studyRoadmap}
+          flashcardDeck={flashcardDeck}
+          isLoading={isLoading}
+          onSelfReportSubmit={onSelfReportSubmit}
+          onMcqSubmit={onMcqSubmit}
+          onReassessmentChecklistSubmit={onReassessmentChecklistSubmit}
+          onReassessmentMcqSubmit={onReassessmentMcqSubmit}
+          onRateFlashcard={onRateFlashcard}
+          onViewMap={() => setActiveView("map")}
+          onGenerateRoadmap={onGenerateStudyRoadmap}
+          onStartReassessment={onStartReassessment}
+          onStartFlashcards={onStartFlashcards}
+          onExportReport={onExportReport}
+        />
+      );
     }
 
     if (activeView === "outline") {
@@ -162,25 +255,33 @@ export function WorkspaceViewComponent({
               </button>
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
-                  {workflowMode === "compare" ? (
+                  {workflowMode === "assess" ? (
+                    <Target size={12} />
+                  ) : workflowMode === "compare" ? (
                     <Scale size={12} />
                   ) : (
                     <GraduationCap size={12} />
                   )}
-                  {workflowMode === "compare"
+                  {workflowMode === "assess"
+                    ? "Diagnostic assessment workspace"
+                    : workflowMode === "compare"
                     ? "Decision workspace"
                     : "Learning workspace"}
                 </div>
                 <h1 className="mt-3 text-2xl font-black tracking-tight text-slate-950 md:text-3xl">
                   {String(
-                    workspaceRoot?.data?.label ||
-                      (workflowMode === "compare"
+                    assessmentStage1Data?.topic ||
+                      workspaceRoot?.data?.label ||
+                      (workflowMode === "assess"
+                        ? "Diagnostic assessment"
+                        : workflowMode === "compare"
                         ? "Comparison workspace"
                         : "Mind map"),
                   )}
                 </h1>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                  {comparisonData?.overview ||
+                  {assessmentStage1Data?.overview ||
+                    comparisonData?.overview ||
                     String(
                       workspaceRoot?.data?.description ||
                         "Explore the map, inspect deeper branches, and move between canvas, outline, and decision layers.",
@@ -191,6 +292,19 @@ export function WorkspaceViewComponent({
 
             <div className="flex flex-wrap items-center gap-2">
               <ModelSelector />
+
+              {/* Test Knowledge CTA when in Learn Mode */}
+              {workflowMode === "learn" && workspaceGraph.nodes.length > 0 && (
+                <button
+                  type="button"
+                  onClick={onStartAssessmentFromMap}
+                  className="inline-flex items-center gap-2 rounded-2xl bg-amber-500 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-amber-600 hover:scale-105"
+                >
+                  <Target size={16} />
+                  Test My Knowledge
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={() => setExperience("pretext")}
@@ -199,6 +313,37 @@ export function WorkspaceViewComponent({
                 <Sparkles size={16} />
                 Pretext demo
               </button>
+
+              {assessmentStage1Data && (
+                <button
+                  type="button"
+                  onClick={() => setActiveView("report")}
+                  className={`inline-flex items-center gap-1.5 rounded-2xl px-4 py-2.5 text-sm font-semibold transition-colors ${
+                    activeView === "report"
+                      ? "bg-slate-950 text-white"
+                      : "bg-white text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  <Award size={16} />
+                  Report
+                </button>
+              )}
+
+              {studyRoadmap && (
+                <button
+                  type="button"
+                  onClick={() => setActiveView("roadmap")}
+                  className={`inline-flex items-center gap-1.5 rounded-2xl px-4 py-2.5 text-sm font-semibold transition-colors ${
+                    activeView === "roadmap"
+                      ? "bg-slate-950 text-white"
+                      : "bg-white text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  <Rocket size={16} />
+                  Action Plan
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={() => setActiveView("map")}
@@ -210,6 +355,7 @@ export function WorkspaceViewComponent({
               >
                 Map
               </button>
+
               <button
                 type="button"
                 onClick={() => setActiveView("outline")}
@@ -221,6 +367,7 @@ export function WorkspaceViewComponent({
               >
                 Outline
               </button>
+
               {comparisonData && (
                 <button
                   type="button"
@@ -234,6 +381,7 @@ export function WorkspaceViewComponent({
                   Compare
                 </button>
               )}
+
               <button
                 type="button"
                 onClick={() =>
@@ -258,8 +406,8 @@ export function WorkspaceViewComponent({
               selectedNodeId={selectedNodeId}
               searchQuery={searchQuery}
               onSearchQueryChange={setSearchQuery}
-              activeView={activeView}
-              onChangeView={setActiveView}
+              activeView={activeView as WorkspaceView}
+              onChangeView={(v) => setActiveView(v as WorkspaceActiveView)}
               onSelectNode={handleSelectNode}
               compact={isMobile}
             />
@@ -276,6 +424,7 @@ export function WorkspaceViewComponent({
               selectedNodeId={selectedNodeId}
               comparisonData={comparisonData}
               onSelectNode={handleSelectNode}
+              onStartFlashcards={onStartFlashcards}
             />
           </div>
         </div>
@@ -283,3 +432,4 @@ export function WorkspaceViewComponent({
     </div>
   );
 }
+

@@ -14,39 +14,89 @@ import {
   useNodesState,
   useEdgesState,
 } from "@xyflow/react";
-import { Maximize, Minimize } from "lucide-react";
+import "@xyflow/react/dist/style.css";
+import { Maximize, Minimize, Sparkles, BookOpen, Layers, Tag, Network } from "lucide-react";
 import dagre from "dagre";
 import { WikiIndexEntry } from "../services/wikiService";
 import { ConceptIndex } from "../services/wikiIndex";
 
 // ---------------------------------------------------------------------------
-// Custom Node: Wiki Page Card
+// Custom Nodes
 // ---------------------------------------------------------------------------
 
 function WikiPageNode({ data }: NodeProps) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-md min-w-[200px] max-w-[240px] transition-shadow hover:shadow-lg">
+    <div className="group relative rounded-2xl border border-indigo-200/80 bg-white/95 p-4 shadow-[0_8px_30px_rgb(15,23,42,0.08)] backdrop-blur-md min-w-[240px] max-w-[270px] transition-all hover:scale-[1.02] hover:shadow-[0_12px_40px_rgb(99,102,241,0.2)] hover:border-indigo-400 ring-1 ring-slate-100">
       <Handle
         type="target"
         position={Position.Top}
-        className="!bg-indigo-500 !w-3 !h-3"
+        className="!bg-indigo-600 !w-3.5 !h-3.5 !border-2 !border-white !-top-2"
       />
-      <div className="font-semibold text-sm text-gray-900 truncate">
-        {data.label}
-      </div>
-      {data.summary && (
-        <div className="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">
-          {data.summary}
+      <div className="flex items-center gap-2.5 mb-2">
+        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 text-white shadow-sm shrink-0">
+          <BookOpen size={15} />
         </div>
-      )}
-      <div className="flex items-center justify-between mt-2 text-[10px] text-gray-400 uppercase tracking-wider font-medium">
-        <span className="capitalize">{data.sourceType}</span>
-        <span>{data.nodeCount} nodes</span>
+        <div className="overflow-hidden">
+          <span className="font-black text-xs text-slate-950 truncate block group-hover:text-indigo-600 transition-colors">
+            {String(data.label || "")}
+          </span>
+          <span className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block">
+            {String(data.sourceType || "topic")}
+          </span>
+        </div>
       </div>
+
+      {data.summary && (
+        <p className="text-[11px] font-medium text-slate-600 line-clamp-2 leading-relaxed mb-3">
+          {String(data.summary)}
+        </p>
+      )}
+
+      <div className="flex items-center justify-between pt-2 border-t border-slate-100/80 text-[10px] font-black tracking-wider text-slate-500">
+        <span className="inline-flex items-center gap-1 text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
+          <Layers size={10} /> {Number(data.nodeCount || 0)} concepts
+        </span>
+        <span className="text-slate-400 font-bold">Wiki Note</span>
+      </div>
+
       <Handle
         type="source"
         position={Position.Bottom}
-        className="!bg-indigo-500 !w-3 !h-3"
+        className="!bg-indigo-600 !w-3.5 !h-3.5 !border-2 !border-white !-bottom-2"
+      />
+    </div>
+  );
+}
+
+function ConceptNode({ data }: NodeProps) {
+  const isMulti = Number(data.occurrences) > 1;
+
+  return (
+    <div className={`group relative rounded-full border px-4 py-2 shadow-sm min-w-[130px] max-w-[210px] flex items-center justify-between gap-2 transition-all hover:scale-105 ${
+      isMulti
+        ? "border-emerald-300 bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-emerald-500/20"
+        : "border-cyan-200 bg-white text-slate-800 ring-1 ring-slate-100 hover:border-cyan-400"
+    }`}>
+      <Handle
+        type="target"
+        position={Position.Top}
+        className="!bg-emerald-500 !w-2.5 !h-2.5 !border-2 !border-white !-top-1.5"
+      />
+      <div className="flex items-center gap-1.5 truncate">
+        <Sparkles size={12} className={isMulti ? "text-emerald-200 shrink-0 animate-pulse" : "text-cyan-600 shrink-0"} />
+        <span className={`text-xs font-black truncate ${isMulti ? "text-white" : "text-slate-900"}`}>
+          {String(data.label || "")}
+        </span>
+      </div>
+      {isMulti && (
+        <span className="shrink-0 rounded-full bg-white/20 px-2 py-0.5 text-[9px] font-black text-white backdrop-blur-sm">
+          {data.occurrences}x
+        </span>
+      )}
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="!bg-emerald-500 !w-2.5 !h-2.5 !border-2 !border-white !-bottom-1.5"
       />
     </div>
   );
@@ -54,10 +104,11 @@ function WikiPageNode({ data }: NodeProps) {
 
 const nodeTypes = {
   wikiPage: WikiPageNode,
+  conceptNode: ConceptNode,
 };
 
 // ---------------------------------------------------------------------------
-// Layout Engine (Dagre)
+// Dagre Layout Engine
 // ---------------------------------------------------------------------------
 
 function getLayoutedElements(
@@ -65,20 +116,23 @@ function getLayoutedElements(
   edges: Edge[],
   direction: "TB" | "LR" = "TB",
 ) {
+  if (nodes.length === 0) return { nodes: [], edges: [] };
+
   const g = new dagre.graphlib.Graph();
   g.setDefaultEdgeLabel(() => ({}));
   g.setGraph({
     rankdir: direction,
-    nodesep: 140,
-    ranksep: 200,
+    nodesep: 90,
+    ranksep: 140,
     marginx: 40,
     marginy: 40,
   });
 
   nodes.forEach((node) => {
+    const isPage = node.type === "wikiPage";
     g.setNode(node.id, {
-      width: node.width || 220,
-      height: node.height || 100,
+      width: isPage ? 260 : 160,
+      height: isPage ? 130 : 50,
     });
   });
 
@@ -89,12 +143,16 @@ function getLayoutedElements(
   dagre.layout(g);
 
   const layoutedNodes = nodes.map((node) => {
-    const nodeWithPosition = g.node(node.id);
+    const nodeWithPos = g.node(node.id);
+    const isPage = node.type === "wikiPage";
+    const width = isPage ? 260 : 160;
+    const height = isPage ? 130 : 50;
+
     return {
       ...node,
       position: {
-        x: nodeWithPosition.x - (node.width || 220) / 2,
-        y: nodeWithPosition.y - (node.height || 100) / 2,
+        x: (nodeWithPos?.x || 0) - width / 2,
+        y: (nodeWithPos?.y || 0) - height / 2,
       },
     };
   });
@@ -103,7 +161,7 @@ function getLayoutedElements(
 }
 
 // ---------------------------------------------------------------------------
-// Main Component
+// Main KnowledgeGraph Component
 // ---------------------------------------------------------------------------
 
 export interface KnowledgeGraphProps {
@@ -118,76 +176,81 @@ export function KnowledgeGraph({
   onNodeClick,
 }: KnowledgeGraphProps) {
   const { nodes: layoutedNodes, edges: layoutedEdges } = useMemo(() => {
-    if (!conceptIndex || wikiIndex.length < 2) {
+    if (!wikiIndex || wikiIndex.length === 0) {
       return { nodes: [], edges: [] };
     }
 
-    const pageMap = new Map(wikiIndex.map((p) => [p.id, p]));
-    const edgeMap = new Map<
-      string,
-      { source: string; target: string; concepts: string[] }
-    >();
+    const nodes: Node[] = [];
+    const edges: Edge[] = [];
+    const addedNodeIds = new Set<string>();
 
-    // Build edges from shared concepts
-    for (const concept of Object.values(conceptIndex.concepts)) {
-      if (concept.pageIds.length > 1) {
-        for (let i = 0; i < concept.pageIds.length; i++) {
-          for (let j = i + 1; j < concept.pageIds.length; j++) {
-            const p1 = concept.pageIds[i];
-            const p2 = concept.pageIds[j];
-            if (!pageMap.has(p1) || !pageMap.has(p2)) continue;
+    // 1. Add Wiki Page Nodes
+    for (const page of wikiIndex) {
+      const pageNodeId = `page_${page.id}`;
+      nodes.push({
+        id: pageNodeId,
+        type: "wikiPage",
+        position: { x: 0, y: 0 },
+        data: {
+          label: page.title,
+          summary: page.summary,
+          nodeCount: page.nodeCount,
+          sourceType: page.sourceType,
+          pageId: page.id,
+        },
+        sourcePosition: Position.Bottom,
+        targetPosition: Position.Top,
+      });
+      addedNodeIds.add(pageNodeId);
+    }
 
-            const key = [p1, p2].sort().join("--");
-            if (!edgeMap.has(key)) {
-              edgeMap.set(key, { source: p1, target: p2, concepts: [] });
+    // 2. Add Top Shared / Key Concept Nodes
+    if (conceptIndex && conceptIndex.concepts) {
+      // Prioritize concepts present in multiple pages or top unique concepts (limit to max 15 to prevent clutter)
+      const conceptsList = Object.values(conceptIndex.concepts)
+        .sort((a, b) => b.occurrences - a.occurrences)
+        .slice(0, 15);
+
+      for (const concept of conceptsList) {
+        const conceptNodeId = `concept_${concept.id}`;
+
+        if (concept.pageIds.length > 0 && !addedNodeIds.has(conceptNodeId)) {
+          nodes.push({
+            id: conceptNodeId,
+            type: "conceptNode",
+            position: { x: 0, y: 0 },
+            data: {
+              label: concept.label,
+              occurrences: concept.occurrences,
+              tags: concept.tags || [],
+            },
+            sourcePosition: Position.Bottom,
+            targetPosition: Position.Top,
+          });
+          addedNodeIds.add(conceptNodeId);
+
+          // Connect pages to concepts
+          for (const pageId of concept.pageIds) {
+            const pageNodeId = `page_${pageId}`;
+            if (addedNodeIds.has(pageNodeId)) {
+              edges.push({
+                id: `edge_${pageId}_${concept.id}`,
+                source: pageNodeId,
+                target: conceptNodeId,
+                style: { stroke: concept.occurrences > 1 ? "#10b981" : "#06b6d4", strokeWidth: concept.occurrences > 1 ? 2.5 : 1.5 },
+                animated: true,
+                markerEnd: {
+                  type: MarkerType.ArrowClosed,
+                  width: 10,
+                  height: 10,
+                  color: concept.occurrences > 1 ? "#10b981" : "#06b6d4",
+                },
+              });
             }
-            edgeMap.get(key)!.concepts.push(concept.label);
           }
         }
       }
     }
-
-    // Create React Flow Nodes
-    const nodes: Node[] = wikiIndex.map((page) => ({
-      id: page.id,
-      type: "wikiPage",
-      position: { x: 0, y: 0 },
-      data: {
-        label: page.title,
-        summary: page.summary,
-        nodeCount: page.nodeCount,
-        sourceType: page.sourceType,
-      },
-      width: 220,
-      height: 100,
-      sourcePosition: Position.Bottom,
-      targetPosition: Position.Top,
-    }));
-
-    // Create React Flow Edges
-    const edges: Edge[] = Array.from(edgeMap.values()).map((e, i) => ({
-      id: `edge-${i}`,
-      source: e.source,
-      target: e.target,
-      label:
-        e.concepts.slice(0, 2).join(", ") +
-        (e.concepts.length > 2 ? ` +${e.concepts.length - 2}` : ""),
-      style: { stroke: "#cbd5e1", strokeWidth: 2 },
-      labelStyle: {
-        fill: "#64748b",
-        fontSize: 10,
-        fontWeight: 500,
-        background: "#f8fafc",
-        padding: "2px 4px",
-        borderRadius: "4px",
-      },
-      markerEnd: {
-        type: MarkerType.ArrowClosed,
-        width: 12,
-        height: 12,
-        color: "#cbd5e1",
-      },
-    }));
 
     return getLayoutedElements(nodes, edges, "TB");
   }, [wikiIndex, conceptIndex]);
@@ -195,7 +258,6 @@ export function KnowledgeGraph({
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  // Sync layouted data whenever the computed layout changes, even if counts stay the same.
   useEffect(() => {
     setNodes(layoutedNodes);
     setEdges(layoutedEdges);
@@ -203,35 +265,12 @@ export function KnowledgeGraph({
 
   const onNodeClickHandler = useCallback(
     (_: React.MouseEvent, node: Node) => {
-      onNodeClick?.(node.id);
+      if (node.data?.pageId) {
+        onNodeClick?.(String(node.data.pageId));
+      }
     },
     [onNodeClick],
   );
-
-  if (wikiIndex.length === 0) {
-    return (
-      <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-gray-500 p-6">
-        <svg
-          className="w-12 h-12 opacity-30"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={1.5}
-            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-          />
-        </svg>
-        <p className="text-sm font-medium">Knowledge graph is empty.</p>
-        <p className="text-xs text-center max-w-xs">
-          Generate or upload at least two mind maps to see cross-map
-          connections.
-        </p>
-      </div>
-    );
-  }
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -257,8 +296,20 @@ export function KnowledgeGraph({
     }
   };
 
+  if (!wikiIndex || wikiIndex.length === 0) {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-slate-500 p-6 bg-slate-900/5 backdrop-blur-xl rounded-2xl border border-slate-200">
+        <Network size={36} className="text-slate-300 animate-pulse" />
+        <p className="text-sm font-black text-slate-800">Knowledge graph is empty.</p>
+        <p className="text-xs text-center text-slate-500 max-w-xs">
+          Generate or upload mind maps to visualize interlinked wiki concepts.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div ref={containerRef} className="h-full w-full rounded-xl border border-gray-200 bg-gray-50 overflow-hidden">
+    <div ref={containerRef} className="h-[550px] min-h-[500px] w-full rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950 overflow-hidden shadow-inner relative">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -267,31 +318,32 @@ export function KnowledgeGraph({
         onNodeClick={onNodeClickHandler}
         nodeTypes={nodeTypes}
         fitView
-        fitViewOptions={{ padding: 0.15 }}
-        minZoom={0.2}
-        maxZoom={2}
+        fitViewOptions={{ padding: 0.25 }}
+        minZoom={0.1}
+        maxZoom={2.5}
         defaultEdgeOptions={{
           type: "smoothstep",
           animated: true,
         }}
       >
-        <Controls className="!bg-white !border-gray-200 !shadow-sm">
+        <Controls className="!bg-slate-900/90 !border-slate-800 !text-slate-200 !shadow-xl !rounded-xl overflow-hidden">
           <ControlButton
             onClick={toggleFullscreen}
             title={isFullscreen ? "Exit Fullscreen" : "Fullscreen mode"}
             aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen mode"}
+            className="!border-slate-800 hover:!bg-slate-800"
           >
             {isFullscreen ? <Minimize size={14} /> : <Maximize size={14} />}
           </ControlButton>
         </Controls>
         <MiniMap
-          className="!bg-white !border-gray-200 !shadow-sm"
+          className="!bg-slate-900/90 !border-slate-800 !shadow-2xl !rounded-xl"
           nodeStrokeWidth={3}
           zoomable
           pannable
-          maskColor="rgba(0, 0, 0, 0.05)"
+          maskColor="rgba(15, 23, 42, 0.6)"
         />
-        <Background variant="dots" gap={16} size={1} color="#cbd5e1" />
+        <Background variant="dots" gap={20} size={1.2} color="rgba(255, 255, 255, 0.15)" />
       </ReactFlow>
     </div>
   );

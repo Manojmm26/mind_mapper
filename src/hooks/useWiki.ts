@@ -126,98 +126,18 @@ function useProvideWiki(): UseWikiReturn {
       sourceType: IngestionSource,
       sourceName?: string,
     ): Promise<string> => {
-      // Delegate to the ingestion service
       const pageId = await ingestMindMapService(
         mapData,
         sourceType,
         sourceName,
       );
 
-      // Update local state for responsive UI
-      const rootNode = mapData.nodes.find(
-        (n) => !mapData.edges.some((e) => e.target === n.id),
-      );
-      const summary =
-        rootNode?.description ||
-        `Mind map generated from ${sourceName || sourceType}`;
-      const extractedTags = Array.from(
-        new Set(mapData.nodes.flatMap((n) => n.tags || []).filter(Boolean)),
-      ) as string[];
-      const now = new Date().toISOString();
-
-      const newPage: WikiPage = {
-        id: pageId,
-        title: sourceName || `Map ${new Date().toLocaleDateString()}`,
-        createdAt: now,
-        updatedAt: now,
-        sourceType,
-        sourceName,
-        nodes: mapData.nodes.map((n) => ({
-          id: n.id,
-          label: n.label,
-          description: n.description,
-          metadata: {
-            type: n.type,
-            tags: n.tags,
-            importance: n.importance,
-            confidence: n.confidence,
-            sourceHint: n.sourceHint,
-            nextStep: n.nextStep,
-          },
-        })),
-        edges: mapData.edges.map((e) => ({
-          source: e.source,
-          target: e.target,
-          label: e.label,
-        })),
-        metadata: {
-          tags: extractedTags,
-          relatedPages: [],
-          nodeCount: mapData.nodes.length,
-          version: 1,
-          summary,
-        },
-      };
-
-      setPages((prev) => [...prev, newPage]);
-      setWikiIndex((prev) => [
-        ...prev,
-        {
-          id: pageId,
-          title: newPage.title,
-          summary,
-          sourceType,
-          sourceName,
-          createdAt: now,
-          updatedAt: now,
-          nodeCount: mapData.nodes.length,
-          tags: extractedTags,
-          relatedPageIds: [],
-        },
-      ]);
-
-      // Incrementally update concept index
-      if (conceptIndex) {
-        const newIndex = updateConceptIndex(conceptIndex, newPage);
-        setConceptIndex(newIndex);
-
-        // Auto-lint after ingestion if wiki has enough pages
-        if (pages.length >= 2) {
-          const report = runLintChecks([...pages, newPage], newIndex);
-          setLintReport(report);
-          await addLogEntry({
-            id: generateId(),
-            timestamp: new Date().toISOString(),
-            type: "lint",
-            topic: "Auto-Lint (Post-Ingest)",
-            details: `Health score: ${report.summary.healthScore}% | ${report.summary.errors} errors, ${report.summary.warnings} warnings`,
-          });
-        }
-      }
+      // Re-fetch all stores to keep all tabs (Browse, Graph, Logs, Stats, Health Check) synchronized
+      await initializeWiki();
 
       return pageId;
     },
-    [conceptIndex, pages],
+    [initializeWiki],
   );
 
   const ingestComparison = useCallback(
@@ -226,9 +146,15 @@ function useProvideWiki(): UseWikiReturn {
       sourceType: IngestionSource,
       sourceName?: string,
     ): Promise<string> => {
-      return ingestComparisonService(comparisonData, sourceType, sourceName);
+      const pageId = await ingestComparisonService(
+        comparisonData,
+        sourceType,
+        sourceName,
+      );
+      await initializeWiki();
+      return pageId;
     },
-    [],
+    [initializeWiki],
   );
 
   const loadWikiPage = useCallback(

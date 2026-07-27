@@ -29,7 +29,8 @@ import { MindMapData, ComparisonWorkspaceData } from "./llmService";
 export async function ingestMindMap(
   mapData: MindMapData,
   sourceType: IngestionSource,
-  sourceName?: string
+  sourceName?: string,
+  comparisonData?: ComparisonWorkspaceData
 ): Promise<string> {
   const now = new Date().toISOString();
   const pageId = generateId();
@@ -54,6 +55,7 @@ export async function ingestMindMap(
     updatedAt: now,
     sourceType,
     sourceName,
+    comparisonData,
     nodes: mapData.nodes.map((n) => ({
       id: n.id,
       label: n.label,
@@ -96,7 +98,7 @@ export async function ingestMindMap(
 
 /**
  * Transforms a ComparisonWorkspaceData object into a WikiPage and persists it.
- * Delegates to ingestMindMap using the embedded mind map data.
+ * Delegates to ingestMindMap using the embedded mind map data and full comparison workspace data.
  *
  * @param comparisonData - The comparison workspace data to ingest.
  * @param sourceType - The type of source.
@@ -111,5 +113,5 @@ export async function ingestComparison(
   if (!comparisonData.map) {
     throw new Error("Comparison data must include a mind map to ingest.");
   }
-  return ingestMindMap(comparisonData.map, sourceType, sourceName);
+  return ingestMindMap(comparisonData.map, sourceType, sourceName, comparisonData);
 }

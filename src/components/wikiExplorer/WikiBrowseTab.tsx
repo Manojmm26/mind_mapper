@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from "react";
-import { Search, FileText, ChevronRight, Tag } from "lucide-react";
+import { Search, FileText, ChevronRight, Tag, FolderSync, CheckCircle2 } from "lucide-react";
 import { WikiIndexEntry } from "../../services/wikiService";
+import { connectLocalVault, syncAllPagesToVault, isFileSystemAccessSupported } from "../../services/vaultSyncService";
+import { useWiki } from "../../hooks/useWiki";
 
 export interface WikiBrowseTabProps {
   wikiIndex: WikiIndexEntry[];
@@ -14,6 +16,21 @@ export function WikiBrowseTab({
   onLoadPage,
 }: WikiBrowseTabProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [syncStatus, setSyncStatus] = useState<string | null>(null);
+  const wiki = useWiki();
+
+  const handleSyncToVault = async () => {
+    const status = await connectLocalVault();
+    if (status.isConnected) {
+      setSyncStatus("Syncing...");
+      const count = await syncAllPagesToVault(wiki.pages);
+      setSyncStatus(`Synced ${count} note(s) to ${status.directoryName}`);
+      setTimeout(() => setSyncStatus(null), 3500);
+    } else if (status.error) {
+      setSyncStatus(status.error);
+      setTimeout(() => setSyncStatus(null), 3500);
+    }
+  };
 
   const filteredPages = useMemo(() => {
     if (!searchQuery.trim()) return wikiIndex;
@@ -41,19 +58,39 @@ export function WikiBrowseTab({
 
   return (
     <div className="space-y-4">
-      {/* Search Input */}
-      <div className="relative">
-        <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-          <Search size={16} />
+      {/* Search & Vault Sync Bar */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative flex-1">
+          <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+            <Search size={16} />
+          </div>
+          <input
+            type="text"
+            placeholder="Search topics, tags, summaries..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full rounded-2xl border border-slate-200/80 bg-white/80 py-3 pl-11 pr-4 text-sm font-medium text-slate-800 placeholder-slate-400 shadow-sm ring-1 ring-slate-100 transition-all focus:border-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-100"
+          />
         </div>
-        <input
-          type="text"
-          placeholder="Search topics, tags, summaries..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full rounded-2xl border border-slate-200/80 bg-white/80 py-3 pl-11 pr-4 text-sm font-medium text-slate-800 placeholder-slate-400 shadow-sm ring-1 ring-slate-100 transition-all focus:border-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-100"
-        />
+
+        {isFileSystemAccessSupported() && (
+          <button
+            onClick={handleSyncToVault}
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-indigo-50 px-4 py-3 text-xs font-black uppercase tracking-[0.16em] text-indigo-700 hover:bg-indigo-100 ring-1 ring-indigo-200 transition-all shadow-sm"
+            title="Sync wiki pages to a local folder or Obsidian vault"
+          >
+            <FolderSync size={15} />
+            Sync to Local Vault
+          </button>
+        )}
       </div>
+
+      {syncStatus && (
+        <div className="flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-800 ring-1 ring-emerald-200">
+          <CheckCircle2 size={14} />
+          {syncStatus}
+        </div>
+      )}
 
       {/* Loading State */}
       {isLoading ? (
