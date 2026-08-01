@@ -1,5 +1,6 @@
 import React, { Suspense, lazy, useCallback } from "react";
 import { HomePage } from "./components/HomePage";
+import { ThemeToggle } from "./components/ThemeToggle";
 import { useAppState } from "./hooks/useAppState";
 import { useAppHandlers } from "./hooks/useAppHandlers";
 import { useWiki } from "./hooks/useWiki";
@@ -23,12 +24,10 @@ const WorkspaceViewComponent = lazy(() =>
   })),
 );
 
+import { AppLoader } from "./components/common/AppLoader";
+
 function FullScreenLoadingMessage({ message }: { message: string }) {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950/95 px-6 text-center text-sm font-semibold text-slate-100">
-      {message}
-    </div>
-  );
+  return <AppLoader variant="fullscreen" message={message} />;
 }
 
 export default function App() {
@@ -126,104 +125,116 @@ export default function App() {
   // Pretext showcase experience
   if (state.experience === "pretext") {
     return (
-      <Suspense fallback={<FullScreenLoadingMessage message="Loading showcase…" />}>
-        <PretextShowcase onExit={() => state.setExperience("classic")} />
-      </Suspense>
+      <>
+        <Suspense fallback={<FullScreenLoadingMessage message="Loading showcase…" />}>
+          <PretextShowcase onExit={() => state.setExperience("classic")} />
+        </Suspense>
+        <ThemeToggle />
+      </>
     );
   }
 
   // Gallery page experience
   if (state.experience === "gallery") {
     return (
-      <Suspense fallback={<FullScreenLoadingMessage message="Loading gallery…" />}>
-        <GalleryPageComponent
-          onBack={() => state.setExperience("classic")}
-          onSelectMapExample={(name, data) => {
-            state.setExperience("classic");
-            handlers.handleSelectMapExample(name, data);
-          }}
-          onSelectCompareExample={(data) => {
-            state.setExperience("classic");
-            handlers.handleSelectCompareExample(data);
-          }}
-        />
-      </Suspense>
+      <>
+        <Suspense fallback={<FullScreenLoadingMessage message="Loading gallery…" />}>
+          <GalleryPageComponent
+            onBack={() => state.setExperience("classic")}
+            onSelectMapExample={(name, data) => {
+              state.setExperience("classic");
+              handlers.handleSelectMapExample(name, data);
+            }}
+            onSelectCompareExample={(data) => {
+              state.setExperience("classic");
+              handlers.handleSelectCompareExample(data);
+            }}
+          />
+        </Suspense>
+        <ThemeToggle />
+      </>
     );
   }
 
-  // Workspace view (when a map or assessment is loaded)
-  if (state.workspaceGraph.nodes.length > 0 || state.assessmentStage1Data) {
+  // Workspace view (when a map, assessment, or comparison is loaded)
+  if (state.workspaceGraph.nodes.length > 0 || state.assessmentStage1Data || state.comparisonData) {
     return (
-      <Suspense
-        fallback={<FullScreenLoadingMessage message="Loading workspace…" />}
-      >
-        <WorkspaceViewComponent
-          isMobile={state.isMobile}
-          outlineFullscreen={state.outlineFullscreen}
-          workspaceGraph={state.workspaceGraph}
-          workspaceRoot={state.workspaceRoot}
-          workflowMode={state.workflowMode}
-          activeView={state.activeView}
-          setActiveView={state.setActiveView}
-          comparisonData={state.comparisonData}
-          assessmentStage={state.assessmentStage}
-          assessmentStage1Data={state.assessmentStage1Data}
-          assessmentStage2Data={state.assessmentStage2Data}
-          reassessmentStage2Data={state.reassessmentStage2Data}
-          selfReportAnswers={state.selfReportAnswers}
-          mcqAnswers={state.mcqAnswers}
-          studyRoadmap={state.studyRoadmap}
-          flashcardDeck={state.flashcardDeck}
-          isLoading={state.isLoading}
-          onSelfReportSubmit={handlers.handleSelfReportSubmit}
-          onMcqSubmit={handlers.handleMcqSubmit}
-          onReassessmentChecklistSubmit={handlers.handleReassessmentChecklistSubmit}
-          onReassessmentMcqSubmit={handlers.handleReassessmentMcqSubmit}
-          onRateFlashcard={handlers.handleRateFlashcard}
-          onGenerateStudyRoadmap={handlers.handleGenerateStudyRoadmap}
-          onStartAssessmentFromMap={handlers.handleStartAssessmentFromMap}
-          onStartReassessment={handlers.handleStartReassessment}
-          onStartFlashcards={handlers.handleStartFlashcards}
-          onExportReport={handlers.handleExportDiagnosticReport}
-          selectedNodeId={state.selectedNodeId}
-          searchQuery={state.searchQuery}
-          setSearchQuery={state.setSearchQuery}
-          handleSelectNode={state.handleSelectNode}
-          handleSaveMap={handlers.handleSaveMap}
-          resetWorkspaceState={state.resetWorkspaceState}
-          setExperience={state.setExperience}
-          mapData={state.mapData}
-          savedNodes={state.savedNodes}
-          savedEdges={state.savedEdges}
-        />
-      </Suspense>
+      <>
+        <Suspense
+          fallback={<FullScreenLoadingMessage message="Loading workspace…" />}
+        >
+          <WorkspaceViewComponent
+            isMobile={state.isMobile}
+            outlineFullscreen={state.outlineFullscreen}
+            workspaceGraph={state.workspaceGraph}
+            workspaceRoot={state.workspaceRoot}
+            workflowMode={state.workflowMode}
+            activeView={state.activeView}
+            setActiveView={state.setActiveView}
+            comparisonData={state.comparisonData}
+            assessmentStage={state.assessmentStage}
+            assessmentStage1Data={state.assessmentStage1Data}
+            assessmentStage2Data={state.assessmentStage2Data}
+            reassessmentStage2Data={state.reassessmentStage2Data}
+            selfReportAnswers={state.selfReportAnswers}
+            mcqAnswers={state.mcqAnswers}
+            studyRoadmap={state.studyRoadmap}
+            flashcardDeck={state.flashcardDeck}
+            isLoading={state.isLoading}
+            onSelfReportSubmit={handlers.handleSelfReportSubmit}
+            onMcqSubmit={handlers.handleMcqSubmit}
+            onReassessmentChecklistSubmit={handlers.handleReassessmentChecklistSubmit}
+            onReassessmentMcqSubmit={handlers.handleReassessmentMcqSubmit}
+            onRateFlashcard={handlers.handleRateFlashcard}
+            onGenerateStudyRoadmap={handlers.handleGenerateStudyRoadmap}
+            onStartAssessmentFromMap={handlers.handleStartAssessmentFromMap}
+            onStartReassessment={handlers.handleStartReassessment}
+            onStartFlashcards={handlers.handleStartFlashcards}
+            onExportReport={handlers.handleExportDiagnosticReport}
+            selectedNodeId={state.selectedNodeId}
+            searchQuery={state.searchQuery}
+            setSearchQuery={state.setSearchQuery}
+            handleSelectNode={state.handleSelectNode}
+            handleSaveMap={handlers.handleSaveMap}
+            resetWorkspaceState={state.resetWorkspaceState}
+            setExperience={state.setExperience}
+            mapData={state.mapData}
+            savedNodes={state.savedNodes}
+            savedEdges={state.savedEdges}
+          />
+        </Suspense>
+        <ThemeToggle />
+      </>
     );
   }
 
   // Home page (landing / input screen)
   return (
-    <HomePage
-      workflowMode={state.workflowMode}
-      isLoading={state.isLoading}
-      loadingMessage={state.loadingMessage}
-      error={state.error}
-      topicInput={state.topicInput}
-      onWorkflowModeChange={state.setWorkflowMode}
-      onTopicInputChange={state.setTopicInput}
-      onTopicSubmit={handlers.handleTopicSubmit}
-      onFileUpload={handlers.handleFileUpload}
-      onJsonUpload={handlers.handleJsonUpload}
-      onLoadExample={handlers.handleLoadExample}
-      onSelectMapExample={handlers.handleSelectMapExample}
-      onSelectCompareExample={handlers.handleSelectCompareExample}
-      onOpenShowcase={() => state.setExperience("pretext")}
-      onOpenGallery={() => state.setExperience("gallery")}
-      onOpenWikiExplorer={() => state.setShowWikiExplorer(true)}
-      showWikiExplorer={state.showWikiExplorer}
-      onCloseWikiExplorer={() => state.setShowWikiExplorer(false)}
-      onLoadWikiPage={handleLoadWikiPage}
-      fileInputRef={state.fileInputRef}
-      jsonInputRef={state.jsonInputRef}
-    />
+    <>
+      <HomePage
+        workflowMode={state.workflowMode}
+        isLoading={state.isLoading}
+        loadingMessage={state.loadingMessage}
+        error={state.error}
+        topicInput={state.topicInput}
+        onWorkflowModeChange={state.setWorkflowMode}
+        onTopicInputChange={state.setTopicInput}
+        onTopicSubmit={handlers.handleTopicSubmit}
+        onFileUpload={handlers.handleFileUpload}
+        onJsonUpload={handlers.handleJsonUpload}
+        onLoadExample={handlers.handleLoadExample}
+        onSelectMapExample={handlers.handleSelectMapExample}
+        onSelectCompareExample={handlers.handleSelectCompareExample}
+        onOpenShowcase={() => state.setExperience("pretext")}
+        onOpenGallery={() => state.setExperience("gallery")}
+        onOpenWikiExplorer={() => state.setShowWikiExplorer(true)}
+        showWikiExplorer={state.showWikiExplorer}
+        onCloseWikiExplorer={() => state.setShowWikiExplorer(false)}
+        onLoadWikiPage={handleLoadWikiPage}
+        fileInputRef={state.fileInputRef}
+        jsonInputRef={state.jsonInputRef}
+      />
+      <ThemeToggle />
+    </>
   );
 }

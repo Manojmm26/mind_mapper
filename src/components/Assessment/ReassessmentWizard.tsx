@@ -54,14 +54,14 @@ export function ReassessmentWizard({
     <div className="flex h-full w-full flex-col justify-between overflow-y-auto p-4 md:p-6 space-y-6">
       <div className="mx-auto w-full max-w-2xl space-y-6">
         {/* Header */}
-        <div className="rounded-[28px] border border-cyan-100 bg-cyan-50/70 p-6 backdrop-blur-xl">
-          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-cyan-800">
+        <div className="rounded-[28px] border border-cyan-100 dark:border-white/10 bg-cyan-50/70 dark:bg-slate-900/80 p-6 backdrop-blur-xl">
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-cyan-800 dark:text-cyan-300">
             <RefreshCw size={14} className="animate-spin-slow" /> Knowledge Re-Assessment
           </div>
-          <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950 dark:text-white">
             What have you learned about {stage1Data.topic}?
           </h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
+          <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
             Select the knowledge gaps and review concepts you have studied since your last evaluation. AI will generate targeted verification questions for your selected concepts.
           </p>
         </div>
@@ -69,7 +69,7 @@ export function ReassessmentWizard({
         {/* Concept Multi-Select Checklist */}
         <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
               Select studied concepts ({selectedIds.length} of {revisitableConcepts.length})
             </span>
             <button
@@ -81,7 +81,7 @@ export function ReassessmentWizard({
                     : revisitableConcepts.map((c) => c.id)
                 )
               }
-              className="text-xs font-semibold text-cyan-600 hover:underline"
+              className="text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:underline"
             >
               {selectedIds.length === revisitableConcepts.length ? "Deselect All" : "Select All"}
             </button>
@@ -98,38 +98,38 @@ export function ReassessmentWizard({
                   onClick={() => toggleSelect(concept.id)}
                   className={`flex cursor-pointer items-start gap-4 rounded-2xl border p-4 transition-all ${
                     isChecked
-                      ? "border-cyan-500 bg-cyan-50/60 shadow-sm"
-                      : "border-slate-200 bg-white hover:border-slate-300"
+                      ? "border-cyan-500 bg-cyan-50/60 dark:border-cyan-500/80 dark:bg-cyan-950/60 shadow-sm"
+                      : "border-slate-200 bg-white dark:border-white/10 dark:bg-slate-900/80 hover:border-slate-300 dark:hover:bg-slate-800"
                   }`}
                 >
-                  <div className="mt-0.5 shrink-0 text-cyan-600">
+                  <div className="mt-0.5 shrink-0 text-cyan-600 dark:text-cyan-400">
                     {isChecked ? (
-                      <CheckSquare size={20} className="text-cyan-600" />
+                      <CheckSquare size={20} className="text-cyan-600 dark:text-cyan-400" />
                     ) : (
-                      <Square size={20} className="text-slate-300" />
+                      <Square size={20} className="text-slate-300 dark:text-slate-600" />
                     )}
                   </div>
 
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm font-bold text-slate-900">
+                      <p className="text-sm font-bold text-slate-900 dark:text-white">
                         {concept.label}
                       </p>
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500 uppercase">
+                      <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">
                         {concept.category}
                       </span>
                       {prevStatus === "gap" && (
-                        <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[9px] font-black uppercase text-rose-700">
+                        <span className="rounded-full bg-rose-100 dark:bg-rose-950/60 px-2 py-0.5 text-[9px] font-black uppercase text-rose-700 dark:text-rose-300">
                           🔴 Knowledge Gap
                         </span>
                       )}
                       {prevStatus === "review" && (
-                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-black uppercase text-amber-700">
+                        <span className="rounded-full bg-amber-100 dark:bg-amber-950/60 px-2 py-0.5 text-[9px] font-black uppercase text-amber-700 dark:text-amber-300">
                           🟡 Needs Review
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-600 leading-5">
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-5">
                       {concept.description}
                     </p>
                   </div>

@@ -49,48 +49,48 @@ export function WorkspaceSidebar({
   return (
     <aside
       className={cn(
-        'flex h-full flex-col gap-4 rounded-[28px] border border-white/60 bg-white/78 p-4 shadow-[0_12px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl',
+        'flex h-full flex-col gap-4 rounded-[28px] border border-white/60 bg-white/78 dark:border-white/10 dark:bg-slate-900/80 p-4 shadow-[0_12px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl',
         compact ? 'p-3' : 'p-4'
       )}
     >
-      <div className="space-y-3 rounded-[24px] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(241,245,249,0.9))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
-        <div className="inline-flex items-center gap-2 rounded-full bg-cyan-50 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-700">
+      <div className="space-y-3 rounded-[24px] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(241,245,249,0.9))] dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.98),rgba(11,15,25,0.9))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-none border border-transparent dark:border-white/10">
+        <div className="inline-flex items-center gap-2 rounded-full bg-cyan-50 dark:bg-cyan-950/50 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-700 dark:text-cyan-300">
           <Sparkles size={12} />
           {workflowMode === 'compare' ? 'Decision Workspace' : 'Learning Workspace'}
         </div>
         <div>
-          <h2 className="text-lg font-black tracking-tight text-slate-950">
+          <h2 className="text-lg font-black tracking-tight text-slate-950 dark:text-white">
             {String(root?.data?.label || (workflowMode === 'compare' ? 'Comparison map' : 'Mind map'))}
           </h2>
-          <p className="mt-1 text-sm leading-6 text-slate-600">
+          <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-400">
             {workflowMode === 'compare'
               ? comparisonData?.overview || 'Compare options, inspect the map, and keep the decision trail visible.'
               : String(root?.data?.description || 'Browse the map through branches, search, and node details.')}
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center">
-          <div className="rounded-2xl bg-slate-50 px-2 py-3">
+          <div className="rounded-2xl bg-slate-50 dark:bg-slate-800/80 px-2 py-3">
             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Nodes</p>
-            <p className="mt-1 text-lg font-black text-slate-900">{nodes.length}</p>
+            <p className="mt-1 text-lg font-black text-slate-900 dark:text-white">{nodes.length}</p>
           </div>
-          <div className="rounded-2xl bg-slate-50 px-2 py-3">
+          <div className="rounded-2xl bg-slate-50 dark:bg-slate-800/80 px-2 py-3">
             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Branches</p>
-            <p className="mt-1 text-lg font-black text-slate-900">{edges.length}</p>
+            <p className="mt-1 text-lg font-black text-slate-900 dark:text-white">{edges.length}</p>
           </div>
-          <div className="rounded-2xl bg-slate-50 px-2 py-3">
+          <div className="rounded-2xl bg-slate-50 dark:bg-slate-800/80 px-2 py-3">
             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Depth</p>
-            <p className="mt-1 text-lg font-black text-slate-900">{maxDepth + 1}</p>
+            <p className="mt-1 text-lg font-black text-slate-900 dark:text-white">{maxDepth + 1}</p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1 text-sm font-bold text-slate-500">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-2xl bg-slate-100 dark:bg-slate-800/80 p-1 text-sm font-bold text-slate-500 dark:text-slate-400">
         <button
           type="button"
           onClick={() => onChangeView('map')}
           className={cn(
             'inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 transition-colors',
-            activeView === 'map' ? 'bg-white text-slate-950 shadow-sm' : 'hover:text-slate-700'
+            activeView === 'map' ? 'bg-white text-slate-950 dark:bg-slate-900 dark:text-white shadow-sm' : 'hover:text-slate-700 dark:hover:text-slate-200'
           )}
         >
           <LayoutGrid size={16} />
@@ -101,7 +101,7 @@ export function WorkspaceSidebar({
           onClick={() => onChangeView('outline')}
           className={cn(
             'inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 transition-colors',
-            activeView === 'outline' ? 'bg-white text-slate-950 shadow-sm' : 'hover:text-slate-700'
+            activeView === 'outline' ? 'bg-white text-slate-950 dark:bg-slate-900 dark:text-white shadow-sm' : 'hover:text-slate-700 dark:hover:text-slate-200'
           )}
         >
           <ListTree size={16} />
@@ -113,7 +113,7 @@ export function WorkspaceSidebar({
             onClick={() => onChangeView('compare')}
             className={cn(
               'sm:col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 transition-colors',
-              activeView === 'compare' ? 'bg-white text-slate-950 shadow-sm' : 'hover:text-slate-700'
+              activeView === 'compare' ? 'bg-white text-slate-950 dark:bg-slate-900 dark:text-white shadow-sm' : 'hover:text-slate-700 dark:hover:text-slate-200'
             )}
           >
             <Scale size={16} />

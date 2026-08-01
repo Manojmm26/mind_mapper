@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { CheckCircle2, AlertTriangle, XCircle, ArrowLeft, ArrowRight, Sparkles, HelpCircle, Layers } from "lucide-react";
 import { AssessmentStage1Data, AssessmentSelfReportStatus, AssessmentConcept } from "../../services/llmService";
+import { cn } from "../../utils/cn";
 
 interface SelfReportWizardProps {
   data: AssessmentStage1Data;
@@ -35,6 +36,7 @@ export function SelfReportWizard({ data, onSubmit }: SelfReportWizardProps) {
   }, [data.concepts, answers]);
 
   const currentConcept = visibleConcepts[currentIndex] || visibleConcepts[visibleConcepts.length - 1];
+  const currentStatus = currentConcept ? answers[currentConcept.id] : undefined;
 
   const handleSelectAnswer = (status: AssessmentSelfReportStatus) => {
     if (!currentConcept) return;
@@ -80,30 +82,30 @@ export function SelfReportWizard({ data, onSubmit }: SelfReportWizardProps) {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       {/* Header & Progress */}
-      <div className="rounded-[28px] border border-white/70 bg-white/80 p-6 shadow-sm backdrop-blur-xl">
+      <div className="rounded-[28px] border border-white/70 bg-white/80 dark:border-white/10 dark:bg-slate-900/80 p-6 shadow-sm backdrop-blur-xl">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-cyan-50 px-3 py-1 text-[11px] font-black uppercase tracking-widest text-cyan-700">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-cyan-50 dark:bg-cyan-950/60 px-3 py-1 text-[11px] font-black uppercase tracking-widest text-cyan-700 dark:text-cyan-300">
               <Sparkles size={12} />
               Phase 1 of 2: Rapid Self-Evaluation
             </div>
-            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-900">
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-900 dark:text-white">
               {data.topic}
             </h2>
-            <p className="mt-1 text-sm text-slate-500">{data.overview}</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{data.overview}</p>
           </div>
           <div className="shrink-0 text-right">
-            <span className="text-2xl font-black text-cyan-600">
+            <span className="text-2xl font-black text-cyan-600 dark:text-cyan-400">
               {currentIndex + 1}
             </span>
-            <span className="text-sm font-bold text-slate-400">
+            <span className="text-sm font-bold text-slate-400 dark:text-slate-500">
               /{visibleConcepts.length}
             </span>
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="mt-5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+        <div className="mt-5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
           <div
             className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 transition-all duration-300"
             style={{ width: `${progressPercent}%` }}
@@ -111,36 +113,36 @@ export function SelfReportWizard({ data, onSubmit }: SelfReportWizardProps) {
         </div>
       </div>
 
-      {/* Main Question Card */}
-      <div className="relative overflow-hidden rounded-[32px] border border-white/90 bg-white p-6 shadow-xl sm:p-8">
-        <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-4">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-600">
-            <Layers size={12} />
-            {currentConcept.category}
-          </span>
-          {currentConcept.level > 1 && (
-            <span className="text-xs font-semibold text-slate-400">
-              Sub-concept (Level {currentConcept.level})
+      {/* Active Concept Card */}
+      <div className="rounded-[32px] border border-white/80 bg-white/90 dark:border-white/10 dark:bg-slate-900/90 p-5 sm:p-8 shadow-xl backdrop-blur-xl transition-all">
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-cyan-50 dark:bg-cyan-950/60 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-cyan-700 dark:text-cyan-300 border border-cyan-200/60 dark:border-cyan-800/40">
+              <Layers size={12} />
+              {currentConcept.category || "Core Concept"}
             </span>
-          )}
-        </div>
+            <span className="text-xs font-bold text-slate-400 dark:text-slate-500">
+              Concept Level {currentConcept.level}
+            </span>
+          </div>
 
-        <div className="mt-6 space-y-4">
-          <h3 className="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">
+          <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
             {currentConcept.label}
           </h3>
-          <p className="text-sm leading-6 text-slate-600">
+
+          <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">
             {currentConcept.description}
           </p>
 
-          <div className="rounded-2xl border border-cyan-100 bg-gradient-to-r from-cyan-50/60 to-blue-50/40 p-4">
+          {/* Diagnostic Question Box */}
+          <div className="rounded-2xl border border-cyan-100 dark:border-cyan-800/30 bg-gradient-to-r from-cyan-50/60 to-blue-50/40 dark:from-cyan-950/40 dark:to-blue-950/30 p-4">
             <div className="flex items-start gap-3">
-              <HelpCircle size={20} className="mt-0.5 shrink-0 text-cyan-600" />
+              <HelpCircle className="mt-0.5 shrink-0 text-cyan-600 dark:text-cyan-400" size={20} />
               <div>
-                <p className="text-[11px] font-black uppercase tracking-wider text-cyan-800">
+                <p className="text-[11px] font-black uppercase tracking-wider text-cyan-800 dark:text-cyan-300">
                   Diagnostic Question
                 </p>
-                <p className="mt-1 text-sm font-semibold text-slate-800">
+                <p className="mt-1 text-sm font-semibold text-slate-800 dark:text-slate-100">
                   "{currentConcept.question}"
                 </p>
               </div>
@@ -148,55 +150,58 @@ export function SelfReportWizard({ data, onSubmit }: SelfReportWizardProps) {
           </div>
         </div>
 
-        {/* Response Buttons */}
-        <div className="mt-8 grid gap-3 sm:grid-cols-3">
+        {/* Self-Rating Action Buttons */}
+        <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3">
           <button
             type="button"
             onClick={() => handleSelectAnswer("mastered")}
-            className={`group flex items-center justify-center gap-2 rounded-2xl border p-4 text-sm font-bold transition-all ${
-              answers[currentConcept.id] === "mastered"
-                ? "border-emerald-500 bg-emerald-50 text-emerald-800 ring-2 ring-emerald-500/20"
-                : "border-slate-200 bg-white text-slate-700 hover:border-emerald-300 hover:bg-emerald-50/50"
-            }`}
+            className={cn(
+              "group flex items-center justify-center gap-2 rounded-2xl border p-4 text-sm font-bold transition-all",
+              currentStatus === "mastered"
+                ? "border-emerald-500 bg-emerald-50 text-emerald-900 dark:border-emerald-500/80 dark:bg-emerald-950/60 dark:text-emerald-200 ring-2 ring-emerald-500/20"
+                : "border-slate-200 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-800 dark:text-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/40"
+            )}
           >
-            <CheckCircle2 size={18} className="text-emerald-600 transition-transform group-hover:scale-110" />
+            <CheckCircle2 className="text-emerald-600 dark:text-emerald-400 transition-transform group-hover:scale-110" size={18} />
             <span>I Mastered This</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleSelectAnswer("review")}
-            className={`group flex items-center justify-center gap-2 rounded-2xl border p-4 text-sm font-bold transition-all ${
-              answers[currentConcept.id] === "review"
-                ? "border-amber-500 bg-amber-50 text-amber-800 ring-2 ring-amber-500/20"
-                : "border-slate-200 bg-white text-slate-700 hover:border-amber-300 hover:bg-amber-50/50"
-            }`}
+            className={cn(
+              "group flex items-center justify-center gap-2 rounded-2xl border p-4 text-sm font-bold transition-all",
+              currentStatus === "review"
+                ? "border-amber-500 bg-amber-50 text-amber-900 dark:border-amber-500/80 dark:bg-amber-950/60 dark:text-amber-200 ring-2 ring-amber-500/20"
+                : "border-slate-200 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-800 dark:text-slate-200 hover:border-amber-300 hover:bg-amber-50/50 dark:hover:bg-amber-950/40"
+            )}
           >
-            <AlertTriangle size={18} className="text-amber-600 transition-transform group-hover:scale-110" />
+            <AlertTriangle className="text-amber-600 dark:text-amber-400 transition-transform group-hover:scale-110" size={18} />
             <span>Needs Review</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleSelectAnswer("gap")}
-            className={`group flex items-center justify-center gap-2 rounded-2xl border p-4 text-sm font-bold transition-all ${
-              answers[currentConcept.id] === "gap"
-                ? "border-rose-500 bg-rose-50 text-rose-800 ring-2 ring-rose-500/20"
-                : "border-slate-200 bg-white text-slate-700 hover:border-rose-300 hover:bg-rose-50/50"
-            }`}
+            className={cn(
+              "group flex items-center justify-center gap-2 rounded-2xl border p-4 text-sm font-bold transition-all",
+              currentStatus === "gap"
+                ? "border-rose-500 bg-rose-50 text-rose-900 dark:border-rose-500/80 dark:bg-rose-950/60 dark:text-rose-200 ring-2 ring-rose-500/20"
+                : "border-slate-200 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-800 dark:text-slate-200 hover:border-rose-300 hover:bg-rose-50/50 dark:hover:bg-rose-950/40"
+            )}
           >
-            <XCircle size={18} className="text-rose-600 transition-transform group-hover:scale-110" />
+            <XCircle className="text-rose-600 dark:text-rose-400 transition-transform group-hover:scale-110" size={18} />
             <span>I Don't Know</span>
           </button>
         </div>
 
         {/* Navigation Controls */}
-        <div className="mt-8 flex items-center justify-between border-t border-slate-100 pt-6">
+        <div className="mt-8 flex items-center justify-between border-t border-slate-100 dark:border-white/10 pt-6">
           <button
             type="button"
             disabled={currentIndex === 0}
             onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition-colors hover:text-slate-900 disabled:opacity-30"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400 transition-colors hover:text-slate-900 dark:hover:text-white disabled:opacity-30"
           >
             <ArrowLeft size={16} />
             Previous
@@ -215,7 +220,7 @@ export function SelfReportWizard({ data, onSubmit }: SelfReportWizardProps) {
             <button
               type="button"
               onClick={() => setCurrentIndex((prev) => prev + 1)}
-              className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-600 transition-colors hover:text-cyan-700"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-600 dark:text-cyan-400 transition-colors hover:text-cyan-700 dark:hover:text-cyan-300"
             >
               Skip / Next
               <ArrowRight size={16} />

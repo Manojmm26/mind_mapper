@@ -90,10 +90,10 @@ export function WorkspaceInspector({
   };
 
   return (
-    <aside className="flex h-full flex-col gap-5 overflow-y-auto rounded-[32px] border border-white/60 bg-white/75 p-5 shadow-[0_12px_60px_rgba(15,23,42,0.1)] backdrop-blur-2xl scrollbar-hide">
-      <div className="rounded-[28px] bg-white p-6 shadow-[0_2px_8px_rgba(15,23,42,0.04)] ring-1 ring-slate-100">
+    <aside className="flex h-full flex-col gap-5 overflow-y-auto rounded-[32px] border border-white/60 bg-white/75 dark:border-white/10 dark:bg-slate-900/80 p-5 shadow-[0_12px_60px_rgba(15,23,42,0.1)] backdrop-blur-2xl scrollbar-hide">
+      <div className="rounded-[28px] bg-white dark:bg-slate-900 p-6 shadow-[0_2px_8px_rgba(15,23,42,0.04)] ring-1 ring-slate-100 dark:ring-white/10">
         <div className="flex items-center justify-between gap-4">
-          <div className="inline-flex items-center gap-2 rounded-full bg-slate-100/80 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+          <div className="inline-flex items-center gap-2 rounded-full bg-slate-100/80 dark:bg-slate-800/80 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
             <Compass size={12} />
             Inspector
           </div>
@@ -104,8 +104,8 @@ export function WorkspaceInspector({
               className={cn(
                 "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] transition-all",
                 savedToWiki
-                  ? "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200"
-                  : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100 ring-1 ring-indigo-100"
+                  ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 ring-1 ring-emerald-200 dark:ring-emerald-800/40"
+                  : "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 ring-1 ring-indigo-100 dark:ring-indigo-800/40"
               )}
               title="Save selected concept branch to Knowledge Wiki"
             >
@@ -119,16 +119,16 @@ export function WorkspaceInspector({
                 </>
               )}
             </button>
-            <div className="flex items-center gap-1.5 rounded-full bg-cyan-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-cyan-700">
+            <div className="flex items-center gap-1.5 rounded-full bg-cyan-50 dark:bg-cyan-950/60 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-cyan-700 dark:text-cyan-300">
               <Layers3 size={11} />
               Depth {depthMap[selectedNode?.id || ''] ?? 0}
             </div>
           </div>
         </div>
-        <h3 className="mt-5 text-2xl font-black leading-tight tracking-tight text-slate-950">
+        <h3 className="mt-5 text-2xl font-black leading-tight tracking-tight text-slate-950 dark:text-white">
           {String(selectedNode?.data?.label || 'Workspace overview')}
         </h3>
-        <p className="mt-3 text-sm font-medium leading-7 text-slate-600 opacity-90">
+        <p className="mt-3 text-sm font-medium leading-7 text-slate-600 dark:text-slate-400 opacity-90">
           {String(
             selectedNode?.data?.description ||
               comparisonData?.overview ||
@@ -222,14 +222,14 @@ export function WorkspaceInspector({
       )}
 
       {tags.length > 0 && (
-        <section className="space-y-4 rounded-[28px] bg-slate-50/50 p-5 ring-1 ring-slate-100">
+        <section className="space-y-4 rounded-[28px] bg-slate-50/50 dark:bg-slate-800/50 p-5 ring-1 ring-slate-100 dark:ring-white/10">
           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
             <Tag size={12} />
             Context Tags
           </div>
           <div className="flex flex-wrap gap-2">
             {tags.map((tag) => (
-              <span key={tag} className="rounded-xl bg-white px-3 py-1.5 text-[12px] font-bold text-slate-600 shadow-sm ring-1 ring-slate-100/50">
+              <span key={tag} className="rounded-xl bg-white dark:bg-slate-900 px-3 py-1.5 text-[12px] font-bold text-slate-600 dark:text-slate-200 shadow-sm ring-1 ring-slate-100/50 dark:ring-white/10">
                 {tag}
               </span>
             ))}
@@ -238,16 +238,16 @@ export function WorkspaceInspector({
       )}
 
       {selectedNode?.data?.nextStep && (
-        <section className="group rounded-[28px] border border-cyan-100/50 bg-cyan-50/40 p-5 transition-colors hover:bg-cyan-50/60">
-          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-cyan-700">
+        <section className="group rounded-[28px] border border-cyan-100/50 dark:border-cyan-800/40 bg-cyan-50/40 dark:bg-cyan-950/40 p-5 transition-colors hover:bg-cyan-50/60 dark:hover:bg-cyan-950/60">
+          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-cyan-700 dark:text-cyan-300">
             <Flag size={12} className="transition-transform group-hover:scale-110" />
             Strategic Next step
           </div>
-          <p className="mt-4 text-[13px] font-semibold leading-6 text-cyan-950/90">{String(selectedNode.data.nextStep)}</p>
+          <p className="mt-4 text-[13px] font-semibold leading-6 text-cyan-950/90 dark:text-cyan-100">{String(selectedNode.data.nextStep)}</p>
         </section>
       )}
 
-      <section className="space-y-4 rounded-[28px] bg-white p-6 shadow-sm ring-1 ring-slate-100">
+      <section className="space-y-4 rounded-[28px] bg-white dark:bg-slate-900 p-6 shadow-sm ring-1 ring-slate-100 dark:ring-white/10">
         <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
           <Layers3 size={12} />
           Branch context
@@ -260,17 +260,17 @@ export function WorkspaceInspector({
               <button
                 type="button"
                 onClick={() => onSelectNode(parentNode.id)}
-                className="flex w-full items-center justify-between rounded-2xl bg-slate-50 p-4 text-left transition-all hover:bg-slate-100 active:scale-[0.98]"
+                className="flex w-full items-center justify-between rounded-2xl bg-slate-50 dark:bg-slate-800 p-4 text-left transition-all hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-[0.98]"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-[13px] font-black text-slate-900 leading-none">{String(parentNode.data?.label || 'Untitled')}</p>
+                  <p className="truncate text-[13px] font-black text-slate-900 dark:text-white leading-none">{String(parentNode.data?.label || 'Untitled')}</p>
                   <p className="mt-2 text-[9px] font-black uppercase tracking-[0.16em] text-slate-400 leading-none">Parent Node</p>
                 </div>
                 <ArrowRight size={14} className="text-slate-400 -rotate-45" />
               </button>
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 p-4 text-[12px] font-bold text-slate-500 text-center">
+            <div className="rounded-2xl border border-dashed border-slate-200 dark:border-white/15 bg-slate-50/50 dark:bg-slate-800/50 p-4 text-[12px] font-bold text-slate-500 dark:text-slate-400 text-center">
               Root Level Entity
             </div>
           )}
@@ -287,14 +287,14 @@ export function WorkspaceInspector({
                     className={cn(
                       'flex w-full items-center justify-between rounded-2xl p-4 text-left transition-all active:scale-[0.98]',
                       childNode.id === selectedNodeId 
-                        ? 'bg-cyan-50 shadow-[inset_0_0_0_2px_rgba(6,182,212,0.1)]' 
-                        : 'bg-slate-50 hover:bg-slate-100'
+                        ? 'bg-cyan-50 dark:bg-cyan-950/60 shadow-[inset_0_0_0_2px_rgba(6,182,212,0.1)]' 
+                        : 'bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700'
                     )}
                   >
                     <div className="min-w-0">
                       <p className={cn(
                         'truncate text-[13px] font-black transition-colors',
-                        childNode.id === selectedNodeId ? 'text-cyan-900' : 'text-slate-800'
+                        childNode.id === selectedNodeId ? 'text-cyan-900 dark:text-cyan-300' : 'text-slate-800 dark:text-slate-100'
                       )}>
                         {String(childNode.data?.label || 'Untitled')}
                       </p>
@@ -306,15 +306,15 @@ export function WorkspaceInspector({
                     </div>
                     <ArrowRight size={14} className={cn(
                       'shrink-0 transition-colors',
-                      childNode.id === selectedNodeId ? 'text-cyan-500' : 'text-slate-300'
+                      childNode.id === selectedNodeId ? 'text-cyan-500' : 'text-slate-300 dark:text-slate-500'
                     )} />
                   </button>
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
-                <CircleDashed size={20} className="text-slate-300" />
-                <p className="text-[12px] font-bold text-slate-500">Terminal Branch (Leaf)</p>
+              <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-slate-200 dark:border-white/15 bg-slate-50/50 dark:bg-slate-800/50 p-8 text-center">
+                <CircleDashed size={20} className="text-slate-300 dark:text-slate-500" />
+                <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400">Terminal Branch (Leaf)</p>
               </div>
             )}
           </div>

@@ -39,20 +39,35 @@ export interface WikiContext {
  */
 export function buildWikiContext(
   query: string,
-  indexEntries: WikiIndexEntry[],
-  conceptIndex: ConceptIndex,
+  indexEntriesOrWiki?: WikiIndexEntry[] | any,
+  conceptIndex?: ConceptIndex,
   fullPages?: WikiPage[]
 ): WikiContext {
-  const normalizedQuery = normalizeConceptName(query);
+  let indexEntries: WikiIndexEntry[] = [];
+  let conceptsObj: ConceptIndex = { concepts: {} };
+
+  if (Array.isArray(indexEntriesOrWiki)) {
+    indexEntries = indexEntriesOrWiki;
+    if (conceptIndex) conceptsObj = conceptIndex;
+  } else if (indexEntriesOrWiki && typeof indexEntriesOrWiki === "object") {
+    indexEntries = Array.isArray(indexEntriesOrWiki.index) ? indexEntriesOrWiki.index : [];
+    conceptsObj = indexEntriesOrWiki.concepts || conceptIndex || { concepts: {} };
+    if (!fullPages && Array.isArray(indexEntriesOrWiki.pages)) {
+      fullPages = indexEntriesOrWiki.pages;
+    }
+  }
+
+  const normalizedQuery = normalizeConceptName(query || "");
   const queryTerms = normalizedQuery.split("-").filter(Boolean);
 
   // 1. Find related pages by matching query terms against titles, tags, and summaries
   const relatedPages = indexEntries.filter((entry) => {
-    const titleMatch = entry.title.toLowerCase().includes(normalizedQuery);
-    const tagMatch = entry.tags.some((tag) =>
-      queryTerms.some((term) => tag.toLowerCase().includes(term))
+    if (!entry) return false;
+    const titleMatch = (entry.title || "").toLowerCase().includes(normalizedQuery);
+    const tagMatch = Array.isArray(entry.tags) && entry.tags.some((tag) =>
+      queryTerms.some((term) => (tag || "").toLowerCase().includes(term))
     );
-    const summaryMatch = entry.summary
+    const summaryMatch = (entry.summary || "")
       .toLowerCase()
       .includes(normalizedQuery);
 
@@ -60,11 +75,13 @@ export function buildWikiContext(
   }).slice(0, 5); // Limit to top 5 most relevant pages
 
   // 2. Find shared concepts that match the query
-  const sharedConcepts = Object.values(conceptIndex.concepts).filter(
+  const conceptMap = conceptsObj?.concepts || {};
+  const sharedConcepts = Object.values(conceptMap).filter(
     (concept) => {
-      const labelMatch = concept.label.toLowerCase().includes(normalizedQuery);
-      const tagMatch = concept.tags?.some((tag) =>
-        queryTerms.some((term) => tag.toLowerCase().includes(term))
+      if (!concept) return false;
+      const labelMatch = (concept.label || "").toLowerCase().includes(normalizedQuery);
+      const tagMatch = Array.isArray(concept.tags) && concept.tags.some((tag) =>
+        queryTerms.some((term) => (tag || "").toLowerCase().includes(term))
       );
       return labelMatch || tagMatch;
     }
@@ -124,7 +141,8 @@ function formatContextForPrompt(
     context += `## Recurring Concepts\n`;
     context += `These concepts appear across multiple existing pages. Ensure consistency in terminology and link to them.\n`;
     for (const concept of sharedConcepts) {
-      context += `- **${concept.label}**: Appears in ${concept.pageIds.length} page(s). Tags: ${concept.tags?.join(", ") || "none"}\n`;
+      const pageCount = Array.isArray(concept.pageIds) ? concept.pageIds.length : 0;
+      context += `- **${concept.label}**: Appears in ${pageCount} page(s). Tags: ${concept.tags?.join(", ") || "none"}\n`;
     }
     context += `\n`;
   }

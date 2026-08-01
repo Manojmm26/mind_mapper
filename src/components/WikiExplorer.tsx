@@ -91,18 +91,18 @@ export function WikiExplorer({
   ];
 
   return (
-    <div className="flex h-full w-full flex-col rounded-[32px] border border-white/60 bg-white/75 p-5 shadow-[0_12px_60px_rgba(15,23,42,0.1)] backdrop-blur-2xl overflow-hidden">
+    <div className="flex h-full w-full flex-col rounded-[32px] border border-white/60 dark:border-white/10 bg-white/75 dark:bg-slate-900/90 p-5 shadow-[0_12px_60px_rgba(15,23,42,0.1)] dark:shadow-[0_12px_60px_rgba(0,0,0,0.6)] backdrop-blur-2xl overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between rounded-[28px] bg-white p-4 shadow-sm ring-1 ring-slate-100 mb-4">
+      <div className="flex items-center justify-between rounded-[28px] bg-white dark:bg-slate-800/90 p-4 shadow-sm ring-1 ring-slate-100 dark:ring-white/10 mb-4">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-indigo-500 text-white shadow-sm">
             <BookOpen size={20} />
           </div>
           <div>
-            <h2 className="text-lg font-black tracking-tight text-slate-950">
+            <h2 className="text-lg font-black tracking-tight text-slate-950 dark:text-white">
               Knowledge Base
             </h2>
-            <div className="inline-flex items-center gap-2 rounded-full bg-slate-100/80 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">
+            <div className="inline-flex items-center gap-2 rounded-full bg-slate-100/80 dark:bg-slate-700/80 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-300">
               {wiki.isLoading ? (
                 <>
                   <RefreshCw size={10} className="animate-spin" /> Syncing
@@ -120,7 +120,7 @@ export function WikiExplorer({
         <div className="flex items-center gap-1.5">
           <button
             onClick={handleExportVaultZip}
-            className="flex items-center gap-1.5 rounded-xl bg-indigo-50 px-3 py-2 text-xs font-bold text-indigo-700 transition-colors hover:bg-indigo-100"
+            className="flex items-center gap-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 px-3 py-2 text-xs font-bold text-indigo-700 dark:text-indigo-300 transition-colors hover:bg-indigo-100 dark:hover:bg-indigo-900"
             title="Export Obsidian Vault (.zip)"
           >
             <Archive size={15} />
@@ -128,28 +128,28 @@ export function WikiExplorer({
           </button>
           <button
             onClick={handleExportMarkdown}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 dark:text-slate-400 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-white"
             title="Export Markdown Index"
           >
             <FileText size={16} />
           </button>
           <button
             onClick={handleExportJSON}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 dark:text-slate-400 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-white"
             title="Export Wiki JSON"
           >
             <Download size={16} />
           </button>
           <button
             onClick={() => wiki.refreshWiki()}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 dark:text-slate-400 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-white"
             title="Refresh"
           >
             <RefreshCw size={16} />
           </button>
           <button
             onClick={() => setShowClearConfirm(true)}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-red-400 transition-colors hover:bg-red-50 hover:text-red-600"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-red-400 dark:text-red-400 transition-colors hover:bg-red-50 dark:hover:bg-red-950/60 hover:text-red-600 dark:hover:text-red-300"
             title="Clear All Data"
           >
             <Trash2 size={16} />
@@ -158,15 +158,15 @@ export function WikiExplorer({
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 rounded-2xl bg-slate-100 p-1 mb-4">
+      <div className="flex flex-wrap gap-2 rounded-2xl bg-slate-100 dark:bg-slate-800 p-1 mb-4">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex-1 flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold transition-all ${
               activeTab === tab.id
-                ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-500 hover:text-slate-700"
+                ? "bg-white text-slate-900 dark:bg-slate-900 dark:text-white shadow-sm"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
             }`}
           >
             <tab.icon size={14} />
@@ -176,7 +176,7 @@ export function WikiExplorer({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto rounded-[28px] bg-slate-50/50 p-5 ring-1 ring-slate-100">
+      <div className="flex-1 overflow-y-auto rounded-[28px] bg-slate-50/50 dark:bg-slate-900/60 p-5 ring-1 ring-slate-100 dark:ring-white/10">
         {activeTab === "browse" && (
           <WikiBrowseTab
             wikiIndex={wiki.wikiIndex}

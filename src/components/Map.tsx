@@ -21,6 +21,7 @@ import { getLayoutedElements } from '../services/layoutService';
 import { MindMapData } from '../services/llmService';
 import { MapContext } from './MapContext';
 import { createFlowEdge, createFlowNode } from '../utils/mapData';
+import { useTheme } from '../context/ThemeContext';
 
 const nodeTypes = {
   custom: CustomNode,
@@ -464,9 +465,11 @@ export function Map({ data, onSave, initialNodes, initialEdges, selectedNodeId, 
     onSave(nodes, edges);
   };
 
+  const { theme } = useTheme();
+
   return (
     <MapContext.Provider value={{ onToggle: handleToggle }}>
-      <div ref={containerRef} className="h-full w-full relative bg-slate-950">
+      <div ref={containerRef} className="h-full w-full relative bg-slate-100 dark:bg-slate-950 transition-colors">
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -481,7 +484,7 @@ export function Map({ data, onSave, initialNodes, initialEdges, selectedNodeId, 
           fitView
           className="workspace-map-canvas"
         >
-          <Controls className="workspace-map-controls !m-4 !border !border-white/80 !bg-white/90 !p-1.5 !shadow-xl !backdrop-blur-xl !rounded-2xl">
+          <Controls className="workspace-map-controls !m-4 !border !border-slate-200 dark:!border-white/10 !bg-white/90 dark:!bg-slate-800/90 !p-1.5 !shadow-xl !backdrop-blur-xl !rounded-2xl !text-slate-700 dark:!text-slate-200">
             <ControlButton
               onClick={toggleFullscreen}
               title={isFullscreen ? "Exit Fullscreen" : "Fullscreen mode"}
@@ -493,23 +496,24 @@ export function Map({ data, onSave, initialNodes, initialEdges, selectedNodeId, 
           <MiniMap
             zoomable
             pannable
-            className="!m-4 !rounded-2xl !border !border-white/80 !bg-white/90 !shadow-xl !backdrop-blur-xl"
-            nodeColor={(node) => String(node.style?.borderColor || '#94a3b8')}
+            className="!m-4 !rounded-2xl !border !border-slate-200 dark:!border-white/10 !bg-white/90 dark:!bg-slate-800/90 !shadow-xl !backdrop-blur-xl"
+            nodeColor={(node) => String(node.style?.borderColor || (theme === "dark" ? '#334155' : '#94a3b8'))}
+            maskColor={theme === "dark" ? "rgba(15, 23, 42, 0.7)" : "rgba(240, 242, 245, 0.7)"}
           />
-          <Background variant={BackgroundVariant.Dots} gap={18} size={1.4} color="#cbd5e1" />
-          <Panel position="top-left" className="flex items-center gap-1.5 rounded-2xl border border-white/80 bg-white/90 p-1.5 shadow-xl backdrop-blur-xl">
+          <Background variant={BackgroundVariant.Dots} gap={18} size={1.4} color={theme === "dark" ? "#334155" : "#cbd5e1"} />
+          <Panel position="top-left" className="flex items-center gap-1.5 rounded-2xl border border-slate-200 dark:border-white/10 bg-white/90 dark:bg-slate-800/90 p-1.5 shadow-xl backdrop-blur-xl text-slate-700 dark:text-slate-200">
             <button
               type="button"
               onClick={handleExpandAll}
-              className="rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-100"
+              className="rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
             >
               Expand all
             </button>
-            <div className="h-4 w-px bg-slate-200" />
+            <div className="h-4 w-px bg-slate-200 dark:bg-white/10" />
             <button
               type="button"
               onClick={() => handleCollapseToLevel(1)}
-              className="rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100"
+              className="rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
               title="Collapse to primary branches (Depth 1)"
             >
               Depth 1
@@ -517,25 +521,25 @@ export function Map({ data, onSave, initialNodes, initialEdges, selectedNodeId, 
             <button
               type="button"
               onClick={() => handleCollapseToLevel(2)}
-              className="rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100"
+              className="rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
               title="Collapse to sub-branches (Depth 2)"
             >
               Depth 2
             </button>
-            <div className="h-4 w-px bg-slate-200" />
+            <div className="h-4 w-px bg-slate-200 dark:bg-white/10" />
             <button
               type="button"
               onClick={handleCollapseAll}
-              className="rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-100"
+              className="rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
             >
               Collapse layers
             </button>
           </Panel>
-          <Panel position="top-right" className="rounded-2xl border border-white/80 bg-white/90 p-1.5 shadow-xl backdrop-blur-xl">
+          <Panel position="top-right" className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white/90 dark:bg-slate-800/90 p-1.5 shadow-xl backdrop-blur-xl">
             <button
               type="button"
               onClick={handleSave}
-              className="rounded-xl bg-slate-950 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-slate-800 shadow-sm"
+              className="rounded-xl bg-slate-950 dark:bg-white px-4 py-2 text-xs font-bold text-white dark:text-slate-900 transition-colors hover:bg-slate-800 dark:hover:bg-slate-100 shadow-sm"
             >
               Save map
             </button>

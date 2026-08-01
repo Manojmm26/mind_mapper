@@ -147,39 +147,48 @@ export function OptionCard({
   const highlights = getDomainHighlights(option.metadata, domainType);
   const tags = option.tags ?? [];
   const actions = option.actions ?? [];
+  const metadata = option.metadata;
 
   return (
-    <article className="group relative flex min-w-[320px] md:min-w-[380px] shrink-0 snap-start flex-col rounded-[28px] border border-slate-200/80 bg-white p-7 shadow-[0_12px_40px_rgba(15,23,42,0.06)] transition-all hover:border-cyan-200 hover:shadow-[0_20px_60px_rgba(15,23,42,0.1)]">
+    <article
+      className={`group relative flex w-full min-w-[300px] max-w-[380px] shrink-0 snap-center flex-col justify-between rounded-[28px] border p-6 transition-all duration-300 ${
+        isRecommended
+          ? "border-amber-200 dark:border-amber-500/40 bg-gradient-to-b from-amber-50/50 via-white to-white dark:from-amber-950/30 dark:via-slate-900 dark:to-slate-900 shadow-[0_16px_50px_rgba(245,158,11,0.12)] ring-1 ring-amber-200/60 dark:ring-amber-500/30"
+          : "border-slate-200/80 dark:border-white/10 bg-white dark:bg-slate-900 shadow-[0_14px_40px_rgba(15,23,42,0.04)] hover:border-slate-300 dark:hover:border-white/20 hover:shadow-lg"
+      }`}
+    >
+      {/* Recommended Pill */}
       {isRecommended && (
-        <div className="mb-4 flex justify-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-lg shadow-emerald-500/20">
-            <BadgeCheck size={12} />
-            Recommended
-          </span>
+        <div className="absolute -top-3.5 left-6 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-3.5 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white shadow-md shadow-amber-500/25">
+          <BadgeCheck size={13} />
+          Top Pick
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex flex-col gap-6">
-        <div className="flex items-start justify-between">
-          <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-            Option {index + 1}
-          </div>
-          {domainType === "products" && option.metadata?.priceBand && (
-            <div className="shrink-0 rounded-xl bg-cyan-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-cyan-700">
-              {option.metadata.priceBand}
+      <div>
+        {/* Header */}
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
+                Option #{index + 1}
+              </span>
+              {metadata?.priceBand && (
+                <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[9px] font-bold text-slate-500 dark:text-slate-400">
+                  {metadata.priceBand}
+                </span>
+              )}
             </div>
-          )}
+            <h4 className="mt-1 text-xl font-black tracking-tight text-slate-950 dark:text-white">
+              {option.name}
+            </h4>
+          </div>
         </div>
 
-        <div className="space-y-4">
-          <h4 className="text-2xl font-black tracking-tight text-slate-950 leading-[1.15]">
-            {option.name}
-          </h4>
-          <p className="text-sm leading-relaxed text-slate-600">
-            {option.summary}
-          </p>
-        </div>
+        {/* Summary */}
+        <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
+          {option.summary}
+        </p>
       </div>
 
       {/* Tags */}
@@ -188,7 +197,7 @@ export function OptionCard({
           {tags.map((tag) => (
             <span
               key={tag}
-              className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-semibold text-slate-600"
+              className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-[10px] font-semibold text-slate-600 dark:text-slate-300"
             >
               <Tag size={10} />
               {tag}
@@ -201,20 +210,20 @@ export function OptionCard({
       {topScores.length > 0 && (
         <div className="mt-6">
           <div className="mb-3 flex items-center gap-2">
-            <div className="h-px flex-1 bg-slate-100" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+            <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
               {domainScoreLabels[domainType]}
             </span>
-            <div className="h-px flex-1 bg-slate-100" />
+            <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
           </div>
           <div className="grid gap-3">
             {topScores.map(({ criterion, score }) => (
               <div
                 key={criterion.id}
-                className="flex flex-col rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-100/50"
+                className="flex flex-col rounded-2xl bg-slate-50 dark:bg-slate-800/80 p-4 ring-1 ring-slate-100/50 dark:ring-white/10"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                     {criterion.label}
                   </span>
                   <span
@@ -231,11 +240,11 @@ export function OptionCard({
                     })()}
                   </span>
                 </div>
-                <p className="mt-1.5 text-sm font-semibold text-slate-800">
+                <p className="mt-1.5 text-sm font-semibold text-slate-800 dark:text-slate-100">
                   {score.displayValue}
                 </p>
                 {score.note && (
-                  <p className="mt-1 text-[11px] leading-snug text-slate-500">
+                  <p className="mt-1 text-[11px] leading-snug text-slate-500 dark:text-slate-400">
                     {score.note}
                   </p>
                 )}
@@ -253,19 +262,19 @@ export function OptionCard({
               key={h.label}
               className={`flex flex-col rounded-2xl p-4 ring-1 ${
                 h.variant === "positive"
-                  ? "bg-emerald-50/60 ring-emerald-100/50"
+                  ? "bg-emerald-50/60 dark:bg-emerald-950/40 ring-emerald-100/50 dark:ring-emerald-800/40"
                   : h.variant === "caution"
-                    ? "bg-amber-50/60 ring-amber-100/50"
-                    : "bg-slate-50/60 ring-slate-100/50"
+                    ? "bg-amber-50/60 dark:bg-amber-950/40 ring-amber-100/50 dark:ring-amber-800/40"
+                    : "bg-slate-50/60 dark:bg-slate-800/60 ring-slate-100/50 dark:ring-white/10"
               }`}
             >
               <div
                 className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] ${
                   h.variant === "positive"
-                    ? "text-emerald-700"
+                    ? "text-emerald-700 dark:text-emerald-300"
                     : h.variant === "caution"
-                      ? "text-amber-700"
-                      : "text-slate-500"
+                      ? "text-amber-700 dark:text-amber-300"
+                      : "text-slate-500 dark:text-slate-400"
                 }`}
               >
                 {h.variant === "positive" ? <BadgeCheck size={14} /> : null}
@@ -274,10 +283,10 @@ export function OptionCard({
               <p
                 className={`mt-1.5 text-sm font-semibold leading-snug ${
                   h.variant === "positive"
-                    ? "text-emerald-900"
+                    ? "text-emerald-900 dark:text-emerald-200"
                     : h.variant === "caution"
-                      ? "text-amber-900"
-                      : "text-slate-700"
+                      ? "text-amber-900 dark:text-amber-200"
+                      : "text-slate-700 dark:text-slate-200"
                 }`}
               >
                 {h.value}
@@ -289,7 +298,7 @@ export function OptionCard({
 
       {/* Actions */}
       {actions.length > 0 && (
-        <div className="mt-6 flex flex-wrap gap-2 pt-5 border-t border-slate-100">
+        <div className="mt-6 flex flex-wrap gap-2 pt-5 border-t border-slate-100 dark:border-white/10">
           {actions.map((action) => (
             <a
               key={action.label}

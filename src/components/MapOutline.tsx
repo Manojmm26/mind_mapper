@@ -93,8 +93,8 @@ function OutlineNodeItem({
           'group flex items-start gap-2 rounded-2xl border transition-colors',
           compact ? 'px-2.5 py-2' : 'px-3 py-2.5',
           isSelected
-            ? 'border-cyan-200 bg-cyan-50/80 shadow-sm'
-            : 'border-transparent bg-white/55 hover:border-slate-200 hover:bg-white'
+            ? 'border-cyan-200 bg-cyan-50/80 dark:border-cyan-800/60 dark:bg-cyan-950/60 shadow-sm'
+            : 'border-transparent bg-white/55 dark:bg-slate-900/60 hover:border-slate-200 dark:hover:border-white/10 hover:bg-white dark:hover:bg-slate-800'
         )}
       >
         <button
@@ -103,8 +103,8 @@ function OutlineNodeItem({
           className={cn(
             'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors',
             hasChildren
-              ? 'border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:text-cyan-700'
-              : 'border-transparent bg-slate-100 text-slate-300'
+              ? 'border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-300 hover:border-cyan-200 dark:hover:border-cyan-700 hover:text-cyan-700 dark:hover:text-cyan-300'
+              : 'border-transparent bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600'
           )}
           aria-label={hasChildren ? 'Toggle branch' : 'Leaf node'}
         >
@@ -114,35 +114,40 @@ function OutlineNodeItem({
         <button
           type="button"
           onClick={() => onSelectNode?.(item.id)}
-          className="min-w-0 flex-1 text-left"
+          className={cn(
+            'w-full rounded-2xl p-3 text-left transition-all',
+            isSelected
+              ? 'border border-cyan-200 bg-cyan-50/80 dark:border-cyan-800/60 dark:bg-cyan-950/60 shadow-sm'
+              : 'border border-transparent hover:border-slate-200 dark:hover:border-white/10 hover:bg-slate-50/80 dark:hover:bg-slate-800/50'
+          )}
         >
-          <div className="flex items-center gap-2 flex-wrap">
-            <p className={cn('truncate font-semibold text-slate-900', compact ? 'text-xs' : 'text-sm')}>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <p className={cn('truncate font-semibold text-slate-900 dark:text-white', compact ? 'text-xs' : 'text-sm')}>
               {String(item.node.data?.label || 'Untitled node')}
             </p>
             {assessmentStatus === "mastered" && (
-              <span className="rounded-full bg-emerald-100 border border-emerald-300 px-2 py-0.5 text-[9px] font-black uppercase text-emerald-800">
+              <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-800/60 px-2 py-0.5 text-[9px] font-black uppercase text-emerald-800 dark:text-emerald-300">
                 🟢 Mastered
               </span>
             )}
             {assessmentStatus === "review" && (
-              <span className="rounded-full bg-amber-100 border border-amber-300 px-2 py-0.5 text-[9px] font-black uppercase text-amber-800">
+              <span className="rounded-full bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-800/60 px-2 py-0.5 text-[9px] font-black uppercase text-amber-800 dark:text-amber-300">
                 🟡 Needs Review
               </span>
             )}
             {assessmentStatus === "gap" && (
-              <span className="rounded-full bg-rose-100 border border-rose-300 px-2 py-0.5 text-[9px] font-black uppercase text-rose-800">
+              <span className="rounded-full bg-rose-100 dark:bg-rose-950/80 border border-rose-300 dark:border-rose-800/60 px-2 py-0.5 text-[9px] font-black uppercase text-rose-800 dark:text-rose-300">
                 🔴 Knowledge Gap
               </span>
             )}
             {typeLabel && (
-              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+              <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
                 {typeLabel}
               </span>
             )}
           </div>
           {!compact && item.node.data?.description && (
-            <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">
+            <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500 dark:text-slate-400">
               {String(item.node.data.description)}
             </p>
           )}
@@ -150,7 +155,7 @@ function OutlineNodeItem({
       </div>
 
       {hasChildren && isExpanded && (
-        <div className={cn('space-y-1 border-l border-slate-200/80', compact ? 'ml-2 pl-1' : 'ml-4 pl-3')}>
+        <div className={cn('space-y-1 border-l border-slate-200/80 dark:border-white/10', compact ? 'ml-2 pl-1' : 'ml-4 pl-3')}>
           {item.children.map((child) => (
             <OutlineNodeItem
               key={child.id}

@@ -4,59 +4,44 @@ import { DiagnosticReportView } from "./DiagnosticReportView";
 import { StudyRoadmapView } from "./StudyRoadmapView";
 import { ReassessmentWizard } from "./ReassessmentWizard";
 import { FlashcardPracticeView } from "./FlashcardPracticeView";
-import {
-  AssessmentStage1Data,
-  AssessmentStage2Data,
-  StudyRoadmapData,
-  AssessmentSelfReportStatus,
-  FlashcardDeckData,
-  Flashcard,
-} from "../../services/llmService";
-import { AssessmentStage } from "../../hooks/useAppState";
+import { useAssessmentContext } from "../../context/AssessmentContext";
+import { AppLoader } from "../common/AppLoader";
 
-interface AssessmentWorkspaceProps {
-  stage: AssessmentStage;
-  stage1Data: AssessmentStage1Data | null;
-  stage2Data: AssessmentStage2Data | null;
-  reassessmentStage2Data: AssessmentStage2Data | null;
-  selfReportAnswers: Record<string, AssessmentSelfReportStatus>;
-  mcqAnswers: Record<string, number>;
-  studyRoadmap: StudyRoadmapData | null;
-  flashcardDeck: FlashcardDeckData | null;
-  isLoading: boolean;
-  onSelfReportSubmit: (answers: Record<string, AssessmentSelfReportStatus>) => void;
-  onMcqSubmit: (answers: Record<string, number>) => void;
-  onReassessmentChecklistSubmit: (selectedConceptIds: string[]) => void;
-  onReassessmentMcqSubmit: (answers: Record<string, number>) => void;
-  onRateFlashcard: (card: Flashcard, rating: "easy" | "good" | "hard") => void;
-  onViewMap: () => void;
-  onGenerateRoadmap: () => void;
-  onStartReassessment: () => void;
-  onStartFlashcards: () => void;
-  onExportReport: () => void;
-}
+export function AssessmentWorkspace() {
+  const context = useAssessmentContext();
 
-export function AssessmentWorkspace({
-  stage,
-  stage1Data,
-  stage2Data,
-  reassessmentStage2Data,
-  selfReportAnswers,
-  mcqAnswers,
-  studyRoadmap,
-  flashcardDeck,
-  isLoading,
-  onSelfReportSubmit,
-  onMcqSubmit,
-  onReassessmentChecklistSubmit,
-  onReassessmentMcqSubmit,
-  onRateFlashcard,
-  onViewMap,
-  onGenerateRoadmap,
-  onStartReassessment,
-  onStartFlashcards,
-  onExportReport,
-}: AssessmentWorkspaceProps) {
+  const {
+    stage,
+    stage1Data,
+    stage2Data,
+    reassessmentStage2Data,
+    selfReportAnswers,
+    mcqAnswers,
+    studyRoadmap,
+    flashcardDeck,
+    isLoading,
+    onSelfReportSubmit,
+    onMcqSubmit,
+    onReassessmentChecklistSubmit,
+    onReassessmentMcqSubmit,
+    onRateFlashcard,
+    onViewMap,
+    onGenerateRoadmap,
+    onStartReassessment,
+    onStartFlashcards,
+    onExportReport,
+  } = context;
+
+  if (isLoading) {
+    return (
+      <AppLoader
+        variant="card"
+        message="Generating Assessment Data..."
+        subtitle="AI is analyzing concepts, generating diagnostic questions, and building your study plan..."
+      />
+    );
+  }
+
   if (stage === "self_report" && stage1Data) {
     return <SelfReportWizard data={stage1Data} onSubmit={onSelfReportSubmit} />;
   }

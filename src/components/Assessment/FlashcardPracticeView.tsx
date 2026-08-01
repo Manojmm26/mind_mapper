@@ -69,39 +69,39 @@ export function FlashcardPracticeView({
   if (isFinished || deck.length === 0 || !currentCard) {
     return (
       <div className="flex h-full w-full items-center justify-center p-6">
-        <div className="w-full max-w-xl rounded-[32px] border border-white/80 bg-white/95 p-8 text-center shadow-xl backdrop-blur-xl space-y-6">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-emerald-100 text-emerald-600 shadow-inner">
+        <div className="w-full max-w-xl rounded-[32px] border border-white/80 dark:border-white/10 bg-white/95 dark:bg-slate-900/95 p-8 text-center shadow-xl backdrop-blur-xl space-y-6">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 shadow-inner">
             <Award size={40} />
           </div>
 
           <div>
-            <h2 className="text-2xl font-black text-slate-900">
+            <h2 className="text-2xl font-black text-slate-900 dark:text-white">
               Practice Session Completed!
             </h2>
-            <p className="mt-2 text-sm text-slate-600">
-              Great effort reviewing <span className="font-semibold text-cyan-600">{topic}</span>. Your mind map and scores have been updated in real time.
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+              Great effort reviewing <span className="font-semibold text-cyan-600 dark:text-cyan-400">{topic}</span>. Your mind map and scores have been updated in real time.
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 rounded-2xl bg-slate-50 p-4 border border-slate-100">
+          <div className="grid grid-cols-3 gap-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 p-4 border border-slate-100 dark:border-white/10">
             <div className="text-center">
-              <span className="block text-2xl font-black text-emerald-600">{sessionStats.easy}</span>
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Mastered</span>
+              <span className="block text-2xl font-black text-emerald-600 dark:text-emerald-400">{sessionStats.easy}</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Mastered</span>
             </div>
-            <div className="text-center border-x border-slate-200">
-              <span className="block text-2xl font-black text-amber-600">{sessionStats.good}</span>
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Review</span>
+            <div className="text-center border-x border-slate-200 dark:border-white/10">
+              <span className="block text-2xl font-black text-amber-600 dark:text-amber-400">{sessionStats.good}</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Review</span>
             </div>
             <div className="text-center">
-              <span className="block text-2xl font-black text-rose-600">{sessionStats.hard}</span>
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Retried</span>
+              <span className="block text-2xl font-black text-rose-600 dark:text-rose-400">{sessionStats.hard}</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Retried</span>
             </div>
           </div>
 
           <button
             type="button"
             onClick={onFinish}
-            className="w-full flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-6 py-4 text-sm font-bold text-white shadow-md transition-all hover:bg-slate-800 hover:scale-[1.02]"
+            className="w-full flex items-center justify-center gap-2 rounded-2xl bg-slate-950 dark:bg-white px-6 py-4 text-sm font-bold text-white dark:text-slate-950 shadow-md transition-all hover:bg-slate-800 dark:hover:bg-slate-100 hover:scale-[1.02]"
           >
             <span>Return to Workspace Report & Map</span>
             <ArrowRight size={18} />
@@ -116,24 +116,24 @@ export function FlashcardPracticeView({
       {/* Top Header & Progress */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full bg-cyan-50 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-700 border border-cyan-100">
+          <div className="inline-flex items-center gap-2 rounded-full bg-cyan-50 dark:bg-cyan-950/60 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-700 dark:text-cyan-300 border border-cyan-100 dark:border-cyan-800/40">
             <Zap size={12} /> Flashcard Practice Mode
           </div>
-          <h2 className="mt-2 text-xl font-black text-slate-900 sm:text-2xl">
+          <h2 className="mt-2 text-xl font-black text-slate-900 dark:text-white sm:text-2xl">
             {topic}
           </h2>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <span className="block text-xs font-bold uppercase tracking-wider text-slate-400">Progress</span>
-            <span className="text-sm font-black text-slate-800">
+            <span className="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Progress</span>
+            <span className="text-sm font-black text-slate-800 dark:text-slate-100">
               Card {currentIndex + 1} of {deck.length}
             </span>
           </div>
-          <div className="h-2 w-28 overflow-hidden rounded-full bg-slate-100">
+          <div className="h-2 w-28 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
             <div
-              className="h-full bg-cyan-600 transition-all duration-300"
+              className="h-full bg-cyan-600 dark:bg-cyan-500 transition-all duration-300"
               style={{ width: `${Math.min(100, Math.max(5, progressPercent))}%` }}
             />
           </div>
@@ -144,44 +144,44 @@ export function FlashcardPracticeView({
       <div className="mx-auto w-full max-w-2xl flex-1 flex flex-col justify-center min-h-[380px]">
         <div
           onClick={handleFlip}
-          className="group relative cursor-pointer min-h-[360px] w-full rounded-[32px] border border-white/90 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)] transition-all duration-500 hover:shadow-2xl"
+          className="group relative cursor-pointer min-h-[360px] w-full rounded-[32px] border border-white/90 dark:border-white/10 bg-white dark:bg-slate-900 shadow-[0_20px_60px_rgba(15,23,42,0.08)] transition-all duration-500 hover:shadow-2xl"
           style={{ perspective: "1000px" }}
         >
           {!isFlipped ? (
             /* FRONT SIDE */
-            <div className="flex h-full flex-col justify-between p-8">
+            <div className="flex h-full flex-col justify-between p-5 sm:p-8">
               <div>
                 <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     {currentCard.category || "General Concept"}
                   </span>
-                  <span className="text-xs font-semibold text-cyan-600 group-hover:underline flex items-center gap-1">
+                  <span className="text-xs font-semibold text-cyan-600 dark:text-cyan-400 group-hover:underline flex items-center gap-1">
                     <RotateCw size={14} className="animate-spin-slow" /> Tap to reveal answer
                   </span>
                 </div>
 
-                <h3 className="mt-6 text-xl font-black tracking-tight text-slate-900 md:text-2xl">
+                <h3 className="mt-6 text-xl font-black tracking-tight text-slate-900 dark:text-white md:text-2xl">
                   {currentCard.title}
                 </h3>
 
-                <p className="mt-4 text-base font-medium leading-7 text-slate-700">
+                <p className="mt-4 text-base font-medium leading-7 text-slate-700 dark:text-slate-200">
                   {currentCard.question}
                 </p>
               </div>
 
-              <div className="mt-8 flex items-center justify-between rounded-2xl bg-cyan-50/70 p-4 border border-cyan-100/80">
-                <div className="flex items-center gap-2 text-xs font-semibold text-cyan-800">
+              <div className="mt-8 flex items-center justify-between rounded-2xl bg-cyan-50/70 dark:bg-cyan-950/40 p-4 border border-cyan-100/80 dark:border-cyan-800/40">
+                <div className="flex items-center gap-2 text-xs font-semibold text-cyan-800 dark:text-cyan-300">
                   <BookOpen size={16} />
                   <span>Think about the core mechanics before flipping.</span>
                 </div>
-                <span className="rounded-xl bg-cyan-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm">
+                <span className="rounded-xl bg-cyan-600 dark:bg-cyan-500 px-3 py-1.5 text-xs font-bold text-white shadow-sm">
                   Flip Card
                 </span>
               </div>
             </div>
           ) : (
             /* BACK SIDE */
-            <div className="flex h-full flex-col justify-between p-8 bg-slate-950 text-white rounded-[32px] shadow-2xl">
+            <div className="flex h-full flex-col justify-between p-5 sm:p-8 bg-slate-950 text-white rounded-[32px] shadow-2xl">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="rounded-full bg-cyan-950 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-cyan-400 border border-cyan-800/50">
@@ -224,7 +224,7 @@ export function FlashcardPracticeView({
                 <p className="text-center text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
                   How well did you know this?
                 </p>
-                <div className="grid grid-cols-3 gap-2" onClick={(e) => e.stopPropagation()}>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3" onClick={(e) => e.stopPropagation()}>
                   <button
                     type="button"
                     onClick={() => handleRating("hard")}

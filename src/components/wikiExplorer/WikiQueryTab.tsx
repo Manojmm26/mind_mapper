@@ -18,17 +18,17 @@ function renderMarkdown(text: string): string {
       // Code blocks
       .replace(
         /```(\w*)\n([\s\S]*?)```/g,
-        '<pre class="bg-slate-100 rounded-lg p-3 my-2 text-xs font-mono overflow-x-auto"><code>$2</code></pre>',
+        '<pre class="bg-slate-100 dark:bg-slate-800 rounded-lg p-3 my-2 text-xs font-mono overflow-x-auto text-slate-800 dark:text-slate-200"><code>$2</code></pre>',
       )
       // Inline code
       .replace(
         /`([^`]+)`/g,
-        '<code class="bg-slate-100 rounded px-1.5 py-0.5 text-xs font-mono text-cyan-700">$1</code>',
+        '<code class="bg-slate-100 dark:bg-slate-800 rounded px-1.5 py-0.5 text-xs font-mono text-cyan-700 dark:text-cyan-400">$1</code>',
       )
       // Bold
       .replace(
         /\*\*([^*]+)\*\*/g,
-        '<strong class="font-bold text-slate-900">$1</strong>',
+        '<strong class="font-bold text-slate-900 dark:text-white">$1</strong>',
       )
       // Italic
       .replace(/\*([^*]+)\*/g, "<em>$1</em>")
@@ -89,7 +89,7 @@ export function WikiQueryTab({
     <div className="space-y-4">
       {/* Query Input */}
       <div className="relative">
-        <div className="pointer-events-none absolute left-4 top-4 text-slate-400">
+        <div className="pointer-events-none absolute left-4 top-4 text-slate-400 dark:text-slate-500">
           <Sparkles size={18} />
         </div>
         <textarea
@@ -98,12 +98,12 @@ export function WikiQueryTab({
           onKeyDown={handleKeyDown}
           placeholder="Ask a question about your knowledge base..."
           rows={3}
-          className="w-full rounded-2xl border border-slate-200/80 bg-white/80 py-3 pl-12 pr-14 text-sm font-medium text-slate-800 placeholder-slate-400 shadow-sm ring-1 ring-slate-100 transition-all focus:border-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-100 resize-none"
+          className="w-full rounded-2xl border border-slate-200/80 bg-white/80 dark:border-white/10 dark:bg-slate-800/80 py-3 pl-12 pr-14 text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 shadow-sm ring-1 ring-slate-100 dark:ring-white/10 transition-all focus:border-cyan-200 dark:focus:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-100 resize-none"
         />
         <button
           onClick={handleAsk}
           disabled={isQuerying || !query.trim() || wikiIndex.length === 0}
-          className="absolute right-3 bottom-3 flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-600 text-white shadow-sm transition-all hover:bg-cyan-700 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
+          className="absolute right-3 bottom-3 flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-600 dark:bg-cyan-500 text-white shadow-sm transition-all hover:bg-cyan-700 dark:hover:bg-cyan-400 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isQuerying ? (
             <Loader2 size={16} className="animate-spin" />
@@ -115,10 +115,10 @@ export function WikiQueryTab({
 
       {/* Loading State */}
       {isQuerying && (
-        <div className="flex flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-200 bg-slate-50/50 py-12 text-slate-500">
-          <Loader2 size={24} className="mb-3 animate-spin text-cyan-500" />
-          <span className="text-sm font-bold">Synthesizing answer...</span>
-          <span className="mt-1 text-xs text-slate-400">
+        <div className="flex flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-slate-900/40 py-12 text-slate-500 dark:text-slate-400">
+          <Loader2 size={24} className="mb-3 animate-spin text-cyan-500 dark:text-cyan-400" />
+          <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Synthesizing answer...</span>
+          <span className="mt-1 text-xs text-slate-400 dark:text-slate-500">
             Searching across {wikiIndex.length} pages
           </span>
         </div>
@@ -126,8 +126,8 @@ export function WikiQueryTab({
 
       {/* Error State */}
       {error && (
-        <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">
-          <AlertTriangle size={18} className="mt-0.5 shrink-0" />
+        <div className="flex items-start gap-3 rounded-2xl border border-red-200 dark:border-red-800/40 bg-red-50 dark:bg-red-950/60 p-4 text-red-700 dark:text-red-300">
+          <AlertTriangle size={18} className="mt-0.5 shrink-0 text-red-500" />
           <div>
             <p className="text-sm font-bold">Query Failed</p>
             <p className="mt-1 text-xs leading-relaxed">{error}</p>
@@ -139,17 +139,17 @@ export function WikiQueryTab({
       {result && !isQuerying && (
         <div className="space-y-4">
           {/* Answer */}
-          <div className="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-sm ring-1 ring-slate-100">
+          <div className="rounded-[28px] border border-slate-200/80 bg-white dark:border-white/10 dark:bg-slate-800/90 p-5 shadow-sm ring-1 ring-slate-100 dark:ring-white/10">
             <div className="mb-3 flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-100 text-cyan-700">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300">
                 <Sparkles size={14} />
               </div>
-              <h3 className="text-sm font-black tracking-tight text-slate-950">
+              <h3 className="text-sm font-black tracking-tight text-slate-950 dark:text-white">
                 Answer
               </h3>
             </div>
             <div
-              className="text-sm leading-relaxed text-slate-700 prose prose-sm max-w-none"
+              className="text-sm leading-relaxed text-slate-700 dark:text-slate-300 prose prose-sm max-w-none dark:prose-invert"
               dangerouslySetInnerHTML={{
                 __html: `<p class="mt-0">${renderMarkdown(result.answer)}</p>`,
               }}
@@ -158,8 +158,8 @@ export function WikiQueryTab({
 
           {/* Contradiction Warning */}
           {result.hasContradictions && (
-            <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-800">
-              <AlertTriangle size={18} className="mt-0.5 shrink-0" />
+            <div className="flex items-start gap-3 rounded-2xl border border-amber-200 dark:border-amber-800/40 bg-amber-50 dark:bg-amber-950/60 p-4 text-amber-800 dark:text-amber-300">
+              <AlertTriangle size={18} className="mt-0.5 shrink-0 text-amber-500" />
               <div>
                 <p className="text-sm font-bold">Contradiction Detected</p>
                 <p className="mt-1 text-xs leading-relaxed">
@@ -172,10 +172,10 @@ export function WikiQueryTab({
 
           {/* Citations */}
           {result.citations.length > 0 && (
-            <div className="rounded-[28px] border border-slate-200/80 bg-slate-50/50 p-5 ring-1 ring-slate-100">
+            <div className="rounded-[28px] border border-slate-200/80 bg-slate-50/50 dark:border-white/10 dark:bg-slate-900/60 p-5 ring-1 ring-slate-100 dark:ring-white/10">
               <div className="mb-3 flex items-center gap-2">
-                <BookOpen size={14} className="text-slate-500" />
-                <h3 className="text-sm font-black tracking-tight text-slate-950">
+                <BookOpen size={14} className="text-slate-500 dark:text-slate-400" />
+                <h3 className="text-sm font-black tracking-tight text-slate-950 dark:text-white">
                   Sources
                 </h3>
               </div>
@@ -184,17 +184,17 @@ export function WikiQueryTab({
                   <button
                     key={cite.pageId}
                     onClick={() => onLoadPage(cite.pageId)}
-                    className="group w-full rounded-xl border border-slate-200 bg-white p-3 text-left shadow-sm transition-all hover:border-cyan-200 hover:shadow-md"
+                    className="group w-full rounded-xl border border-slate-200 bg-white dark:border-white/10 dark:bg-slate-800 p-3 text-left shadow-sm transition-all hover:border-cyan-200 dark:hover:border-cyan-500/50 hover:shadow-md"
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <h4 className="text-sm font-bold text-slate-900 group-hover:text-cyan-700 transition-colors">
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors">
                         {cite.title}
                       </h4>
-                      <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold text-slate-500 capitalize">
+                      <span className="shrink-0 rounded-full bg-slate-100 dark:bg-slate-700 px-2 py-0.5 text-[9px] font-bold text-slate-500 dark:text-slate-300 capitalize">
                         {cite.sourceType}
                       </span>
                     </div>
-                    <p className="mt-1 text-xs text-slate-500 line-clamp-2">
+                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
                       {cite.summary}
                     </p>
                   </button>
@@ -207,12 +207,12 @@ export function WikiQueryTab({
 
       {/* Empty State */}
       {!result && !isQuerying && !error && (
-        <div className="flex flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-200 bg-slate-50/50 py-16 text-slate-500">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 mb-4">
-            <Search size={24} className="text-slate-400" />
+        <div className="flex flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-slate-900/40 py-16 text-slate-500 dark:text-slate-400">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 mb-4">
+            <Search size={24} className="text-slate-400 dark:text-slate-500" />
           </div>
-          <p className="text-sm font-bold text-slate-700">Ask anything</p>
-          <p className="mt-1 text-xs leading-5 text-slate-500 text-center max-w-xs">
+          <p className="text-sm font-bold text-slate-700 dark:text-slate-200">Ask anything</p>
+          <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400 text-center max-w-xs">
             The AI will search your knowledge base and synthesize an answer with
             citations.
           </p>

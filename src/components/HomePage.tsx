@@ -18,6 +18,9 @@ import {
   Target,
 } from "lucide-react";
 import { ModelSelector } from "./ModelSelector";
+import { ThemeToggle } from "./ThemeToggle";
+
+// ... (rest of imports)
 import { EXAMPLE_MAP } from "../exampleData";
 import { MindMapData, ComparisonWorkspaceData } from "../services/llmService";
 import { WorkflowMode } from "../hooks/useAppState";
@@ -76,20 +79,20 @@ export function HomePage({
   jsonInputRef,
 }: HomePageProps) {
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(125,211,252,0.26),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(253,186,116,0.28),transparent_25%),linear-gradient(180deg,#eef6ff_0%,#f8fafc_45%,#fffdf8_100%)] animate-theme-shift flex flex-col items-center py-16 p-4 sm:p-8 relative">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(125,211,252,0.26),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(253,186,116,0.28),transparent_25%),linear-gradient(180deg,#eef6ff_0%,#f8fafc_45%,#fffdf8_100%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.15),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(249,115,22,0.15),transparent_25%),linear-gradient(180deg,#0b0f19_0%,#060913_45%,#090e1c_100%)] animate-theme-shift flex flex-col items-center py-16 p-4 sm:p-8 relative">
       {/* Fixed viewport decorations — position:fixed keeps them out of document flow so they never cause overflow */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden -z-0">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(148,163,184,0.14)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.14)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_58%_at_50%_0%,#000_60%,transparent_100%)] opacity-60" />
-        <div className="absolute left-[-10%] top-[-18%] h-[42rem] w-[42rem] rounded-full bg-cyan-200/35 blur-[140px]" />
-        <div className="absolute bottom-[-20%] right-[-8%] h-[36rem] w-[36rem] rounded-full bg-amber-200/30 blur-[120px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(148,163,184,0.14)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.14)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_58%_at_50%_0%,#000_60%,transparent_100%)] opacity-60" />
+        <div className="absolute left-[-10%] top-[-18%] h-[42rem] w-[42rem] rounded-full bg-cyan-200/35 dark:bg-cyan-900/20 blur-[140px]" />
+        <div className="absolute bottom-[-20%] right-[-8%] h-[36rem] w-[36rem] rounded-full bg-amber-200/30 dark:bg-amber-900/20 blur-[120px]" />
       </div>
 
-      <div className="absolute top-4 right-4 z-20">
+      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
         <ModelSelector />
       </div>
 
       <div className="relative z-10 w-full max-w-5xl space-y-10">
-        <div className="w-full rounded-[34px] border border-white/80 bg-white/76 p-8 shadow-[0_30px_120px_rgba(15,23,42,0.12)] backdrop-blur-2xl sm:p-10">
+        <div className="w-full rounded-[34px] border border-white/80 bg-white/76 dark:border-white/10 dark:bg-slate-900/80 p-8 shadow-[0_30px_120px_rgba(15,23,42,0.12)] backdrop-blur-2xl sm:p-10">
         <div className="space-y-8">
           {/* Header */}
           <div className="text-center space-y-4">
@@ -100,13 +103,13 @@ export function HomePage({
                 <BrainCircuit size={48} className="relative z-10 text-white" />
               </div>
             </div>
-            <h1 className="text-4xl font-black tracking-tight text-slate-950">
+            <h1 className="text-4xl font-black tracking-tight text-slate-950 dark:text-white">
               AI Mind{" "}
               <span className="theme-accent-text transition-colors duration-1000">
                 Mapper
               </span>
             </h1>
-            <p className="mx-auto max-w-sm text-sm leading-6 text-slate-600">
+            <p className="mx-auto max-w-sm text-sm leading-6 text-slate-600 dark:text-slate-400">
               {workflowMode === "compare"
                 ? "Build a decision board, linked map, and action path in one workspace."
                 : "Generate a layered mind map with outline, inspection, and map views from one prompt or source."}
@@ -114,16 +117,16 @@ export function HomePage({
           </div>
 
           {/* Pretext Showcase Promo */}
-          <div className="rounded-[28px] border border-slate-200/80 bg-[linear-gradient(135deg,rgba(14,165,233,0.08),rgba(251,146,60,0.08))] p-5 shadow-sm">
+          <div className="rounded-[28px] border border-slate-200/80 bg-[linear-gradient(135deg,rgba(14,165,233,0.08),rgba(251,146,60,0.08))] dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(14,165,233,0.15),rgba(251,146,60,0.15))] p-5 shadow-sm">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-cyan-700">
+                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-cyan-700 dark:text-cyan-400">
                   New portfolio demo
                 </p>
-                <h2 className="font-display mt-2 text-2xl font-bold tracking-tight text-slate-950">
+                <h2 className="font-display mt-2 text-2xl font-bold tracking-tight text-slate-950 dark:text-white">
                   Pretext Mind Map Builder
                 </h2>
-                <p className="mt-2 max-w-md text-sm leading-6 text-slate-600">
+                <p className="mt-2 max-w-md text-sm leading-6 text-slate-600 dark:text-slate-300">
                   A canvas-first showcase with DOM-free text layout,
                   variable-size node cards, and AI-generated maps.
                 </p>
@@ -147,15 +150,15 @@ export function HomePage({
           )}
 
           {/* Learn / Compare / Assess Toggle */}
-          <div className="grid grid-cols-3 gap-2 rounded-2xl bg-slate-100 p-1">
+          <div className="grid grid-cols-3 gap-2 rounded-2xl bg-slate-100 dark:bg-slate-800/80 p-1">
             <button
               type="button"
               onClick={() => onWorkflowModeChange("learn")}
               disabled={isLoading}
               className={`flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-bold transition-all ${
                 workflowMode === "learn"
-                  ? "bg-white text-slate-900 shadow-sm"
-                  : "text-slate-500 hover:text-slate-700"
+                  ? "bg-white text-slate-900 dark:bg-slate-900 dark:text-white shadow-sm"
+                  : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
               }`}
             >
               <GraduationCap size={16} />
@@ -167,8 +170,8 @@ export function HomePage({
               disabled={isLoading}
               className={`flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-bold transition-all ${
                 workflowMode === "compare"
-                  ? "bg-white text-slate-900 shadow-sm"
-                  : "text-slate-500 hover:text-slate-700"
+                  ? "bg-white text-slate-900 dark:bg-slate-900 dark:text-white shadow-sm"
+                  : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
               }`}
             >
               <Scale size={16} />
@@ -180,8 +183,8 @@ export function HomePage({
               disabled={isLoading}
               className={`flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-bold transition-all ${
                 workflowMode === "assess"
-                  ? "bg-white text-slate-900 shadow-sm"
-                  : "text-slate-500 hover:text-slate-700"
+                  ? "bg-white text-slate-900 dark:bg-slate-900 dark:text-white shadow-sm"
+                  : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
               }`}
             >
               <Target size={16} />
@@ -193,8 +196,24 @@ export function HomePage({
           <form onSubmit={onTopicSubmit} className="space-y-4">
             <div className="group relative">
               <div className="theme-accent-bg absolute -inset-0.5 rounded-2xl blur opacity-10 transition-all duration-1000 group-hover:opacity-20" />
-              <div className="relative flex items-center overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm transition-all duration-300 focus-within:border-cyan-500 focus-within:ring-4 focus-within:ring-cyan-500/15 focus-within:shadow-md">
-                <div className="pl-5 pr-3 text-cyan-600">
+              <div
+                className={`relative flex items-center overflow-hidden rounded-2xl border border-slate-200/90 bg-white dark:border-white/15 dark:bg-slate-800/90 shadow-sm transition-all duration-300 focus-within:ring-4 focus-within:shadow-md ${
+                  workflowMode === "assess"
+                    ? "focus-within:border-amber-500 focus-within:ring-amber-500/15"
+                    : workflowMode === "compare"
+                    ? "focus-within:border-purple-500 focus-within:ring-purple-500/15"
+                    : "focus-within:border-cyan-500 focus-within:ring-cyan-500/15"
+                }`}
+              >
+                <div
+                  className={`pl-5 pr-3 transition-colors ${
+                    workflowMode === "assess"
+                      ? "text-amber-600 dark:text-amber-400"
+                      : workflowMode === "compare"
+                      ? "text-purple-600 dark:text-purple-400"
+                      : "text-cyan-600 dark:text-cyan-400"
+                  }`}
+                >
                   <Sparkles
                     size={20}
                     className={isLoading ? "animate-pulse" : ""}
@@ -212,7 +231,7 @@ export function HomePage({
                       : "Visualize any concept..."
                   }
                   disabled={isLoading}
-                  className="w-full bg-transparent py-5 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none disabled:opacity-50"
+                  className="w-full bg-transparent py-5 text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none disabled:opacity-50"
                 />
                 <button
                   type="submit"
@@ -234,7 +253,7 @@ export function HomePage({
               </div>
             )}
 
-            <p className="text-center text-xs leading-5 text-slate-500">
+            <p className="text-center text-xs leading-5 text-slate-500 dark:text-slate-400">
               {workflowMode === "compare"
                 ? "Comparison mode builds a decision board, matched options, next steps, and a linked knowledge map."
                 : workflowMode === "assess"
@@ -246,11 +265,11 @@ export function HomePage({
           {/* Divider */}
           <div className="space-y-6">
             <div className="relative flex items-center">
-              <div className="flex-grow border-t border-slate-200" />
-              <span className="mx-4 flex-shrink-0 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+              <div className="flex-grow border-t border-slate-200 dark:border-white/10" />
+              <span className="mx-4 flex-shrink-0 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
                 Or Process Data
               </span>
-              <div className="flex-grow border-t border-slate-200" />
+              <div className="flex-grow border-t border-slate-200 dark:border-white/10" />
             </div>
 
             {/* Upload Buttons Grid */}
@@ -258,17 +277,17 @@ export function HomePage({
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isLoading}
-                className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-6 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:border-cyan-500/30 hover:bg-white hover:text-cyan-600 hover:shadow-md disabled:opacity-50"
+                className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-slate-800/60 px-4 py-6 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition-all hover:border-cyan-500/30 hover:bg-white dark:hover:bg-slate-800 hover:text-cyan-600 dark:hover:text-cyan-400 hover:shadow-md disabled:opacity-50"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 bg-white shadow-sm transition-colors group-hover:bg-cyan-50">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 bg-white dark:border-white/10 dark:bg-slate-900 shadow-sm transition-colors group-hover:bg-cyan-50 dark:group-hover:bg-cyan-950/40">
                   <Upload
                     size={22}
-                    className="text-slate-400 group-hover:text-cyan-600"
+                    className="text-slate-400 dark:text-slate-400 group-hover:text-cyan-600 dark:group-hover:text-cyan-400"
                   />
                 </div>
                 <div className="flex flex-col items-center text-center">
                   <span>Document</span>
-                  <span className="text-[9px] uppercase tracking-tighter text-slate-500">
+                  <span className="text-[9px] uppercase tracking-tighter text-slate-500 dark:text-slate-400">
                     PDF, TXT, MD
                   </span>
                 </div>
@@ -277,17 +296,17 @@ export function HomePage({
               <button
                 onClick={() => jsonInputRef.current?.click()}
                 disabled={isLoading}
-                className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-6 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:border-orange-500/30 hover:bg-white hover:text-orange-600 hover:shadow-md disabled:opacity-50"
+                className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-slate-800/60 px-4 py-6 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition-all hover:border-orange-500/30 hover:bg-white dark:hover:bg-slate-800 hover:text-orange-600 dark:hover:text-orange-400 hover:shadow-md disabled:opacity-50"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 bg-white shadow-sm transition-colors group-hover:bg-orange-50">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 bg-white dark:border-white/10 dark:bg-slate-900 shadow-sm transition-colors group-hover:bg-orange-50 dark:group-hover:bg-orange-950/40">
                   <FileJson
                     size={22}
-                    className="text-slate-400 group-hover:text-orange-600"
+                    className="text-slate-400 dark:text-slate-400 group-hover:text-orange-600 dark:group-hover:text-orange-400"
                   />
                 </div>
                 <div className="flex flex-col items-center text-center">
                   <span>Saved Map</span>
-                  <span className="text-[9px] uppercase tracking-tighter text-slate-500">
+                  <span className="text-[9px] uppercase tracking-tighter text-slate-500 dark:text-slate-400">
                     JSON
                   </span>
                 </div>
@@ -296,17 +315,17 @@ export function HomePage({
               <button
                 onClick={onOpenWikiExplorer}
                 disabled={isLoading}
-                className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-6 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:border-indigo-500/30 hover:bg-white hover:text-indigo-600 hover:shadow-md disabled:opacity-50"
+                className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-slate-800/60 px-4 py-6 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition-all hover:border-indigo-500/30 hover:bg-white dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 hover:shadow-md disabled:opacity-50"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 bg-white shadow-sm transition-colors group-hover:bg-indigo-50">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 bg-white dark:border-white/10 dark:bg-slate-900 shadow-sm transition-colors group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/40">
                   <BookOpen
                     size={22}
-                    className="text-slate-400 group-hover:text-indigo-600"
+                    className="text-slate-400 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
                   />
                 </div>
                 <div className="flex flex-col items-center text-center">
                   <span>Knowledge Base</span>
-                  <span className="text-[9px] uppercase tracking-tighter text-slate-500">
+                  <span className="text-[9px] uppercase tracking-tighter text-slate-500 dark:text-slate-400">
                     Wiki & Logs
                   </span>
                 </div>
@@ -333,32 +352,32 @@ export function HomePage({
       </div>
 
       {/* Knowledge Showcase Entry */}
-      <div className="w-full rounded-[34px] border border-white/80 bg-white/76 shadow-[0_20px_80px_rgba(15,23,42,0.09)] backdrop-blur-2xl overflow-hidden">
+      <div className="w-full rounded-[34px] border border-white/80 bg-white/76 dark:border-white/10 dark:bg-slate-900/80 shadow-[0_20px_80px_rgba(15,23,42,0.09)] backdrop-blur-2xl overflow-hidden">
         {/* Top gradient band */}
         <div className="h-1.5 w-full bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-500" />
         <div className="p-6 sm:p-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             {/* Left: text */}
             <div className="space-y-3">
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-cyan-200 bg-cyan-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-widest text-cyan-700">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-cyan-200 bg-cyan-50 dark:border-cyan-800/40 dark:bg-cyan-950/50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-widest text-cyan-700 dark:text-cyan-300">
                 <Sparkles size={11} />
                 Interactive Portfolio Showcase
               </div>
-              <h2 className="text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
+              <h2 className="text-2xl font-black tracking-tight text-slate-950 dark:text-white sm:text-3xl">
                 27 Curated Knowledge Maps
               </h2>
-              <p className="max-w-md text-sm leading-6 text-slate-500">
+              <p className="max-w-md text-sm leading-6 text-slate-500 dark:text-slate-400">
                 Explore deeply researched mind maps and decision matrices — from 47-node foundations to
-                <strong className="font-semibold text-slate-700"> 792-node masterclasses</strong> across
+                <strong className="font-semibold text-slate-700 dark:text-slate-200"> 792-node masterclasses</strong> across
                 software, system design, science, and business.
               </p>
               {/* Mini stat pills */}
               <div className="flex flex-wrap gap-2 pt-1">
                 {[
-                  { icon: <Layers size={11} />, text: "22 Mind Maps", color: "bg-blue-50 text-blue-700 border-blue-200" },
-                  { icon: <Scale size={11} />, text: "5 Decision Matrices", color: "bg-amber-50 text-amber-700 border-amber-200" },
-                  { icon: <Shield size={11} />, text: "777-node Security Map", color: "bg-red-50 text-red-700 border-red-200" },
-                  { icon: <Network size={11} />, text: "792-node Networks Map", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+                  { icon: <Layers size={11} />, text: "22 Mind Maps", color: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800/40" },
+                  { icon: <Scale size={11} />, text: "5 Decision Matrices", color: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/40" },
+                  { icon: <Shield size={11} />, text: "777-node Security Map", color: "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/60 dark:text-red-300 dark:border-red-800/40" },
+                  { icon: <Network size={11} />, text: "792-node Networks Map", color: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/40" },
                 ].map(({ icon, text, color }) => (
                   <span key={text} className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${color}`}>
                     {icon}{text}
@@ -387,15 +406,15 @@ export function HomePage({
           <div className="relative w-full max-w-4xl max-h-[90vh]">
             <button
               onClick={onCloseWikiExplorer}
-              className="absolute top-2 right-2 sm:-top-3 sm:-right-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-700 shadow-lg ring-1 ring-slate-200 transition-all hover:bg-slate-50 hover:scale-105"
+              className="absolute top-2 right-2 sm:-top-3 sm:-right-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-700 dark:bg-slate-800 dark:text-slate-200 shadow-lg ring-1 ring-slate-200 dark:ring-white/10 transition-all hover:bg-slate-50 dark:hover:bg-slate-700 hover:scale-105"
               aria-label="Close Knowledge Base"
             >
               <X size={20} />
             </button>
-            <div className="rounded-2xl bg-white dark:bg-gray-900 shadow-2xl overflow-hidden">
+            <div className="rounded-2xl bg-white dark:bg-slate-900 shadow-2xl overflow-hidden">
               <Suspense
                 fallback={
-                  <div className="flex min-h-[420px] items-center justify-center bg-white px-6 text-sm font-semibold text-slate-600">
+                  <div className="flex min-h-[420px] items-center justify-center bg-white dark:bg-slate-900 px-6 text-sm font-semibold text-slate-600 dark:text-slate-300">
                     Loading knowledge base…
                   </div>
                 }

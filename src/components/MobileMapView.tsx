@@ -11,8 +11,8 @@ interface MobileMapViewProps {
 
 export function MobileMapView({ nodes, edges, selectedNodeId, onSelectNode }: MobileMapViewProps) {
   return (
-    <div className="w-full h-full overflow-y-auto bg-slate-50 p-4 pt-4 pb-20">
-      <div className="max-w-md mx-auto space-y-4">
+    <div className="w-full h-full overflow-y-auto bg-slate-50 dark:bg-transparent p-4 pt-4 pb-20">
+      <div className="max-w-2xl mx-auto space-y-4">
         <MapOutline
           nodes={nodes}
           edges={edges}

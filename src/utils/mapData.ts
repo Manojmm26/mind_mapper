@@ -39,20 +39,29 @@ export function convertTreeToGraph(tree: any): {
   nodes: Node[];
   edges: Edge[];
 } {
+  if (!tree) return { nodes: [], edges: [] };
+
+  // Case 1: Flat MindMapData graph structure ({ nodes: [...], edges: [...] })
+  if (Array.isArray(tree.nodes) && tree.nodes.length > 0) {
+    return toFlowGraph(tree);
+  }
+
+  // Case 2: Recursive hierarchical tree structure ({ name/label, children: [...] })
   const nodes: Node[] = [];
   const edges: Edge[] = [];
   let idCounter = 0;
 
   function traverse(node: any, parentId: string | null) {
-    const currentId = `node_${idCounter++}`;
+    if (!node) return;
+    const currentId = node.id || `node_${idCounter++}`;
     nodes.push({
       id: currentId,
       type: "custom",
       position: { x: 0, y: 0 },
       data: {
         id: currentId,
-        label: node.name || node.label || "Untitled",
-        description: node.description || "",
+        label: node.name || node.label || node.topic || "Untitled",
+        description: node.description || node.overview || "",
         type: node.type,
         tags: node.tags,
         importance: node.importance,

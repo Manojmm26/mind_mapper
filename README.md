@@ -87,6 +87,13 @@
     - Click the "Save" icon on the map to download a JSON version.
     - Use "Load Saved Map (JSON)" on the home screen to restore a previous session.
 
+## 📚 Documentation
+
+For in-depth technical documentation, refer to the repository docs:
+- 🧠 **[LLM Prompt Templates & Sub-Call Pipelines](docs/llm-prompt-templates.md)**: Full reference for all 10 prompt templates, schemas, system prompts, and multi-stage pipeline calls (`Learn`, `Compare`, `Assess`, `Document`, `Wiki RAG`).
+- 📚 **[Curated Showcase Templates](docs/curated-templates.md)**: Catalog of all 32 curated example mind maps, mega-maps (400–792 nodes), and decision matrices.
+- 🌐 **[The LLM Wiki Pattern](llm-wiki-pattern.md)**: Architecture guide for personal, compounding knowledge bases.
+
 ---
 
 ## 🧩 Architecture Notes

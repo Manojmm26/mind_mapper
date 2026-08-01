@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 @import "@xyflow/react/dist/style.css";
 
 :root {
@@ -52,6 +53,12 @@ body {
     background: linear-gradient(180deg, #eef4ff 0%, #f8fafc 48%, #fffdf9 100%);
     color: #0f172a;
     font-family: var(--font-body);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark body {
+    background: linear-gradient(180deg, #0b0f19 0%, #060913 48%, #090e1c 100%);
+    color: #f8fafc;
 }
 
 #root {
@@ -61,6 +68,11 @@ body {
 .workspace-surface {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.82) 100%);
     backdrop-filter: blur(26px);
+}
+
+html.dark .workspace-surface {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(11, 15, 25, 0.9) 100%);
+    border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 .font-display {
@@ -118,6 +130,36 @@ body {
         linear-gradient(180deg, rgba(248, 250, 252, 0.98) 0%, rgba(241, 245, 249, 0.92) 100%);
 }
 
+html.dark .workspace-map-canvas {
+    background:
+        radial-gradient(circle at top left, rgba(14, 165, 233, 0.14), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(249, 115, 22, 0.14), transparent 24%),
+        linear-gradient(180deg, #0b0f19 0%, #060913 52%, #090e1c 100%) !important;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.3);
+    border-radius: 9999px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.5);
+}
+
 .workspace-map-controls {
     border-radius: 18px !important;
     overflow: hidden;
@@ -128,10 +170,26 @@ body {
     border: none !important;
     background: rgba(255, 255, 255, 0.92) !important;
     color: #0f172a !important;
+    fill: #0f172a !important;
 }
 
 .workspace-map-controls button:hover {
     background: rgba(241, 245, 249, 0.98) !important;
+}
+
+html.dark .workspace-map-controls button {
+    background: rgba(30, 41, 59, 0.92) !important;
+    color: #f8fafc !important;
+    fill: #f8fafc !important;
+}
+
+html.dark .workspace-map-controls button:hover {
+    background: rgba(51, 65, 85, 0.98) !important;
+}
+
+html.dark .workspace-map-controls button svg {
+    fill: #f8fafc !important;
+    stroke: #f8fafc !important;
 }
 
 @keyframes signal-deck-hero-enter {

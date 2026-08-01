@@ -104,11 +104,11 @@ export const CustomNode = memo(({ id, data, isConnectable, selected }: NodeProps
 
   return (
     <div className={cn(
-      "w-[300px] min-h-[120px] rounded-[22px] border shadow-sm",
+      "w-[300px] min-h-[120px] rounded-[22px] border shadow-sm dark:bg-slate-900 dark:border-white/15 dark:text-slate-100",
       assessmentBorder || theme.bg,
       theme.border,
-      "relative flex flex-col overflow-visible transition-shadow hover:shadow-xl",
-      selected && 'ring-2 ring-cyan-300 ring-offset-4 ring-offset-slate-50 shadow-[0_20px_50px_rgba(14,165,233,0.18)]'
+      "relative flex flex-col overflow-visible transition-shadow hover:shadow-xl dark:hover:shadow-slate-900/60",
+      selected && 'ring-2 ring-cyan-400 ring-offset-4 ring-offset-slate-50 dark:ring-offset-slate-900 shadow-[0_20px_50px_rgba(14,165,233,0.18)]'
     )}>
       <Handle
         type="target"
@@ -117,11 +117,11 @@ export const CustomNode = memo(({ id, data, isConnectable, selected }: NodeProps
         className={cn("w-3 h-3", theme.handle)}
       />
       
-      <div className={cn('border-b px-4 py-3 rounded-t-[22px]', theme.header, theme.border)}>
+      <div className={cn('border-b px-4 py-3 rounded-t-[22px] dark:bg-slate-800/90 dark:border-white/10', theme.header, theme.border)}>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h3 className={cn('truncate text-sm font-bold', theme.text)} title={data.label as string}>
+              <h3 className={cn('truncate text-sm font-bold dark:text-white', theme.text)} title={data.label as string}>
                 {data.label as string}
               </h3>
             </div>
@@ -143,12 +143,12 @@ export const CustomNode = memo(({ id, data, isConnectable, selected }: NodeProps
                   </span>
                 )}
                 {typeLabel && (
-                  <span className="rounded-full bg-white/75 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 shadow-sm">
+                  <span className="rounded-full bg-white/75 dark:bg-slate-700/80 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 dark:text-slate-300 shadow-sm">
                     {typeLabel}
                   </span>
                 )}
                 {importanceLabel && (
-                  <span className="rounded-full bg-white/75 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 shadow-sm">
+                  <span className="rounded-full bg-white/75 dark:bg-slate-700/80 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 dark:text-slate-300 shadow-sm">
                     {importanceLabel}
                   </span>
                 )}
@@ -156,7 +156,7 @@ export const CustomNode = memo(({ id, data, isConnectable, selected }: NodeProps
             )}
           </div>
           {data.nextStep && (
-            <div className="rounded-full bg-white/75 p-1 text-slate-500 shadow-sm">
+            <div className="rounded-full bg-white/75 dark:bg-slate-700 p-1 text-slate-500 dark:text-slate-300 shadow-sm">
               <CircleArrowOutUpRight size={12} />
             </div>
           )}
@@ -165,17 +165,17 @@ export const CustomNode = memo(({ id, data, isConnectable, selected }: NodeProps
       
       <div className="flex flex-1 flex-col gap-3 p-4">
         {data.description ? (
-          <p className="text-xs leading-relaxed text-slate-600 line-clamp-4" title={data.description as string}>
+          <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-300 line-clamp-4" title={data.description as string}>
             {data.description as string}
           </p>
         ) : (
-          <p className="text-xs text-slate-400 italic">No description provided.</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 italic">No description provided.</p>
         )}
 
         {tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {tags.slice(0, 3).map((tag) => (
-              <span key={tag} className="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold text-slate-500">
+              <span key={tag} className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-1 text-[10px] font-semibold text-slate-500 dark:text-slate-400">
                 {tag}
               </span>
             ))}
@@ -190,7 +190,7 @@ export const CustomNode = memo(({ id, data, isConnectable, selected }: NodeProps
             onToggle?.(id);
           }}
           className={cn(
-            'absolute -right-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer rounded-full border p-1.5 shadow-md transition-colors',
+            'absolute -right-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer rounded-full border p-1.5 shadow-md transition-colors dark:bg-slate-800 dark:border-white/20 dark:text-slate-200',
             theme.bg, theme.border, theme.text,
             'hover:brightness-95'
           )}

@@ -75,6 +75,7 @@ import {
   GenerationLoadingOverlay,
   ErrorToast,
 } from "./ui/Overlays";
+import { ExpandNodeModal } from "./ui/ExpandNodeModal";
 
 export function KnowledgeExplorer({
   initialData,
@@ -2305,65 +2306,13 @@ export function KnowledgeExplorer({
       </div>
 
       {/* Expand Prompt Modal */}
-      {expandPrompt.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-white">
-                Expand: {nodeMap.get(expandPrompt.nodeId ?? "")?.data.label}
-              </h3>
-              <button
-                onClick={() =>
-                  setExpandPrompt((prev) => ({ ...prev, open: false }))
-                }
-                className="text-slate-400 hover:text-white"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <p className="mb-3 text-xs text-slate-400">
-              Ask AI to expand this branch with more detail, examples, or
-              sub-topics.
-            </p>
-            <textarea
-              value={expandPrompt.input}
-              onChange={(e) =>
-                setExpandPrompt((prev) => ({ ...prev, input: e.target.value }))
-              }
-              placeholder="e.g., Show me practical examples, Add implementation details, What are common pitfalls?"
-              rows={3}
-              className="w-full rounded-xl border border-white/10 bg-slate-800 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none focus:border-cyan-500/50"
-            />
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                onClick={() =>
-                  setExpandPrompt((prev) => ({ ...prev, open: false }))
-                }
-                className="rounded-xl px-4 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-white/5"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() =>
-                  expandPrompt.nodeId &&
-                  handleExpandNode(expandPrompt.nodeId, expandPrompt.input)
-                }
-                disabled={
-                  expandPrompt.isGenerating || !expandPrompt.input.trim()
-                }
-                className="flex items-center gap-2 rounded-xl bg-cyan-500/20 px-4 py-2 text-sm font-medium text-cyan-300 transition-colors hover:bg-cyan-500/30 disabled:opacity-40"
-              >
-                {expandPrompt.isGenerating ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  <Sparkles size={16} />
-                )}
-                Expand
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ExpandNodeModal
+        expandPrompt={expandPrompt}
+        nodeLabel={nodeMap.get(expandPrompt.nodeId ?? "")?.data.label}
+        onClose={() => setExpandPrompt((prev) => ({ ...prev, open: false }))}
+        onInputChange={(input) => setExpandPrompt((prev) => ({ ...prev, input }))}
+        onExpand={(nodeId, input) => handleExpandNode(nodeId, input)}
+      />
     </div>
   );
 }

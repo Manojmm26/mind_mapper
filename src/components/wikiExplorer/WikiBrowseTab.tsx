@@ -69,14 +69,14 @@ export function WikiBrowseTab({
             placeholder="Search topics, tags, summaries..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-2xl border border-slate-200/80 bg-white/80 py-3 pl-11 pr-4 text-sm font-medium text-slate-800 placeholder-slate-400 shadow-sm ring-1 ring-slate-100 transition-all focus:border-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-100"
+            className="w-full rounded-2xl border border-slate-200/80 bg-white/80 dark:border-white/10 dark:bg-slate-800/80 py-3 pl-11 pr-4 text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 shadow-sm ring-1 ring-slate-100 dark:ring-white/10 transition-all focus:border-cyan-200 dark:focus:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-100"
           />
         </div>
 
         {isFileSystemAccessSupported() && (
           <button
             onClick={handleSyncToVault}
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-indigo-50 px-4 py-3 text-xs font-black uppercase tracking-[0.16em] text-indigo-700 hover:bg-indigo-100 ring-1 ring-indigo-200 transition-all shadow-sm"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 px-4 py-3 text-xs font-black uppercase tracking-[0.16em] text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900 ring-1 ring-indigo-200 dark:ring-indigo-800/40 transition-all shadow-sm"
             title="Sync wiki pages to a local folder or Obsidian vault"
           >
             <FolderSync size={15} />
@@ -86,7 +86,7 @@ export function WikiBrowseTab({
       </div>
 
       {syncStatus && (
-        <div className="flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-800 ring-1 ring-emerald-200">
+        <div className="flex items-center gap-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 px-4 py-2 text-xs font-bold text-emerald-800 dark:text-emerald-300 ring-1 ring-emerald-200 dark:ring-emerald-800/40">
           <CheckCircle2 size={14} />
           {syncStatus}
         </div>
@@ -94,24 +94,24 @@ export function WikiBrowseTab({
 
       {/* Loading State */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-16 text-slate-500">
+        <div className="flex items-center justify-center py-16 text-slate-500 dark:text-slate-400">
           <span className="text-sm font-bold">Loading knowledge base...</span>
         </div>
       ) : filteredPages.length === 0 ? (
         /* Empty State */
-        <div className="flex flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-200 bg-slate-50/50 py-16 text-slate-500">
+        <div className="flex flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-slate-900/40 py-16 text-slate-500 dark:text-slate-400">
           <div className="relative mb-4 flex h-16 w-16 items-center justify-center">
             <div className="absolute inset-0 rounded-full bg-cyan-400/20 blur-xl animate-pulse" />
-            <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-400 shadow-md ring-1 ring-slate-100">
-              <FileText size={24} className="text-cyan-600" />
+            <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-white dark:bg-slate-800 text-slate-400 shadow-md ring-1 ring-slate-100 dark:ring-white/10">
+              <FileText size={24} className="text-cyan-600 dark:text-cyan-400" />
             </div>
           </div>
-          <p className="text-sm font-bold text-slate-700">
+          <p className="text-sm font-bold text-slate-700 dark:text-slate-200">
             {searchQuery
               ? "No matching pages found."
               : "Your knowledge base is empty."}
           </p>
-          <p className="mt-1 text-xs leading-5 text-slate-500 text-center max-w-xs">
+          <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400 text-center max-w-xs">
             {searchQuery
               ? "Try a different search term."
               : "Generate a mind map or upload a document to start building your wiki."}
@@ -124,30 +124,30 @@ export function WikiBrowseTab({
             <div
               key={page.id}
               onClick={() => onLoadPage(page.id)}
-              className="group cursor-pointer rounded-[20px] border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm transition-all hover:border-cyan-200 hover:shadow-md"
+              className="group cursor-pointer rounded-[20px] border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white dark:border-white/10 dark:from-slate-800/80 dark:to-slate-900/90 p-4 shadow-sm transition-all hover:border-cyan-200 dark:hover:border-cyan-500/50 hover:shadow-md"
             >
               <div className="flex items-start justify-between gap-3">
-                <h3 className="text-sm font-black tracking-tight text-slate-950 group-hover:text-cyan-700 transition-colors truncate">
+                <h3 className="text-sm font-black tracking-tight text-slate-950 dark:text-white group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors truncate">
                   {page.title}
                 </h3>
-                <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold text-slate-500">
+                <span className="shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[9px] font-bold text-slate-500 dark:text-slate-400">
                   {formatTimeAgo(page.updatedAt)}
                 </span>
               </div>
-              <p className="mt-1.5 text-xs leading-5 text-slate-600 line-clamp-2">
+              <p className="mt-1.5 text-xs leading-5 text-slate-600 dark:text-slate-300 line-clamp-2">
                 {page.summary || "No summary available."}
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1 rounded-full bg-cyan-50 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.16em] text-cyan-700">
+                <span className="inline-flex items-center gap-1 rounded-full bg-cyan-50 dark:bg-cyan-950/60 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.16em] text-cyan-700 dark:text-cyan-300">
                   <ChevronRight size={10} /> {page.nodeCount} nodes
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold text-slate-600 capitalize">
+                <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-[10px] font-bold text-slate-600 dark:text-slate-300 capitalize">
                   {page.sourceType}
                 </span>
                 {page.tags.slice(0, 3).map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700"
+                    className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300"
                   >
                     <Tag size={10} /> {tag}
                   </span>

@@ -33,25 +33,25 @@ export function WikiHealthCheckTab({
   return (
     <div className="space-y-4">
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center py-16 text-slate-500">
-          <RefreshCw size={24} className="mb-3 animate-spin text-slate-400" />
+        <div className="flex flex-col items-center justify-center py-16 text-slate-500 dark:text-slate-400">
+          <RefreshCw size={24} className="mb-3 animate-spin text-slate-400 dark:text-slate-500" />
           <span className="text-sm font-bold">Running health check...</span>
         </div>
       ) : !lintReport ? (
-        <div className="flex flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-200 bg-slate-50/50 py-16 text-slate-500">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 mb-4">
-            <ShieldCheck size={24} className="text-slate-400" />
+        <div className="flex flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-slate-900/40 py-16 text-slate-500 dark:text-slate-400">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 mb-4">
+            <ShieldCheck size={24} className="text-slate-400 dark:text-slate-500" />
           </div>
-          <p className="text-sm font-bold text-slate-700">
+          <p className="text-sm font-bold text-slate-700 dark:text-slate-200">
             No health check run yet.
           </p>
-          <p className="mt-1 text-xs leading-5 text-slate-500 text-center max-w-xs mb-4">
+          <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400 text-center max-w-xs mb-4">
             Scan your knowledge base for broken links, stale content, and
             structural issues.
           </p>
           <button
             onClick={onRunLint}
-            className="inline-flex items-center gap-2 rounded-2xl bg-cyan-600 px-5 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-cyan-700 hover:shadow-md active:scale-[0.98]"
+            className="inline-flex items-center gap-2 rounded-2xl bg-cyan-600 dark:bg-cyan-500 px-5 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-cyan-700 dark:hover:bg-cyan-400 hover:shadow-md active:scale-[0.98]"
           >
             <ShieldCheck size={16} />
             Run Health Check
@@ -60,10 +60,10 @@ export function WikiHealthCheckTab({
       ) : (
         <>
           {/* Score Card */}
-          <div className="rounded-[28px] bg-white p-5 shadow-sm ring-1 ring-slate-100">
+          <div className="rounded-[28px] bg-white dark:bg-slate-800/90 p-5 shadow-sm ring-1 ring-slate-100 dark:ring-white/10">
             <div className="flex items-center justify-between">
               <div>
-                <div className="inline-flex items-center gap-2 rounded-full bg-slate-100/80 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">
+                <div className="inline-flex items-center gap-2 rounded-full bg-slate-100/80 dark:bg-slate-700/80 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-300 mb-2">
                   <ShieldCheck size={10} /> Health Score
                 </div>
                 <p
@@ -74,26 +74,26 @@ export function WikiHealthCheckTab({
               </div>
               <div className="flex gap-3">
                 <div className="flex flex-col items-center gap-1">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-red-50 text-red-500">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-red-50 dark:bg-red-950/80 text-red-500 dark:text-red-400">
                     <X size={16} />
                   </span>
-                  <span className="text-[10px] font-black text-slate-500">
+                  <span className="text-[10px] font-black text-slate-500 dark:text-slate-400">
                     {lintReport.summary.errors}
                   </span>
                 </div>
                 <div className="flex flex-col items-center gap-1">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-500">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-950/80 text-amber-500 dark:text-amber-400">
                     <AlertTriangle size={16} />
                   </span>
-                  <span className="text-[10px] font-black text-slate-500">
+                  <span className="text-[10px] font-black text-slate-500 dark:text-slate-400">
                     {lintReport.summary.warnings}
                   </span>
                 </div>
                 <div className="flex flex-col items-center gap-1">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-cyan-50 text-cyan-500">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-cyan-50 dark:bg-cyan-950/80 text-cyan-500 dark:text-cyan-400">
                     <Info size={16} />
                   </span>
-                  <span className="text-[10px] font-black text-slate-500">
+                  <span className="text-[10px] font-black text-slate-500 dark:text-slate-400">
                     {lintReport.summary.info}
                   </span>
                 </div>

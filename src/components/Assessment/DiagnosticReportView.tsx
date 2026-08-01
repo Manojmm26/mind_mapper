@@ -169,11 +169,11 @@ export function DiagnosticReportView({
         </div>
 
         {/* Action CTAs */}
-        <div className="relative z-10 mt-8 flex flex-wrap gap-4 border-t border-white/10 pt-6">
+        <div className="relative z-10 mt-8 flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 border-t border-white/10 pt-6">
           <button
             type="button"
             onClick={onViewMap}
-            className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-900 shadow-lg transition-all hover:bg-slate-100 hover:scale-105 active:scale-95"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-900 shadow-lg transition-all hover:bg-slate-100 hover:scale-105 active:scale-95 w-full sm:w-auto"
           >
             <Map size={18} className="text-cyan-600" />
             Explore Color-Coded Map
@@ -182,31 +182,31 @@ export function DiagnosticReportView({
           <button
             type="button"
             onClick={onGenerateRoadmap}
-            className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-cyan-500/25 transition-all hover:scale-105 active:scale-95"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-cyan-500/25 transition-all hover:scale-105 active:scale-95 w-full sm:w-auto"
           >
-            <Rocket size={18} />
+            <Sparkles size={18} />
             Generate Tailored Action Plan
           </button>
-
-          {onStartFlashcards && (
-            <button
-              type="button"
-              onClick={onStartFlashcards}
-              className="inline-flex items-center gap-2 rounded-2xl bg-purple-600 px-5 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-purple-700 hover:scale-105 active:scale-95"
-            >
-              <Zap size={18} />
-              Practice Flashcards
-            </button>
-          )}
 
           {onStartReassessment && (
             <button
               type="button"
               onClick={onStartReassessment}
-              className="inline-flex items-center gap-2 rounded-2xl border border-cyan-300 bg-cyan-50 px-5 py-3 text-sm font-bold text-cyan-800 shadow-sm transition-all hover:bg-cyan-100 hover:scale-105 active:scale-95"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-amber-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-amber-500/25 transition-all hover:bg-amber-600 hover:scale-105 active:scale-95 w-full sm:w-auto"
             >
               <RefreshCw size={18} />
               Re-Assess Knowledge
+            </button>
+          )}
+
+          {onStartFlashcards && (
+            <button
+              type="button"
+              onClick={onStartFlashcards}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/25 transition-all hover:bg-indigo-700 hover:scale-105 active:scale-95 w-full sm:w-auto"
+            >
+              <Layers size={18} />
+              Practice Flashcards
             </button>
           )}
 
@@ -214,7 +214,7 @@ export function DiagnosticReportView({
             <button
               type="button"
               onClick={onExportReport}
-              className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:scale-105 active:scale-95"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white/10 px-5 py-3 text-sm font-bold text-white backdrop-blur-md transition-all hover:bg-white/20 hover:scale-105 active:scale-95 w-full sm:w-auto border border-white/20"
             >
               <Download size={18} />
               Export Report
@@ -224,10 +224,10 @@ export function DiagnosticReportView({
       </section>
 
       {/* Category Mastery Breakdown */}
-      <section className="rounded-[28px] border border-white/80 bg-white/90 p-6 shadow-sm backdrop-blur-xl">
-        <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
-          <BarChart3 size={18} className="text-cyan-600" />
-          <h3 className="text-lg font-black tracking-tight text-slate-900">
+      <section className="rounded-[28px] border border-white/80 bg-white/90 dark:border-white/10 dark:bg-slate-900/90 p-6 shadow-sm backdrop-blur-xl">
+        <div className="flex items-center gap-2 border-b border-slate-100 dark:border-white/10 pb-4">
+          <BarChart3 size={18} className="text-cyan-600 dark:text-cyan-400" />
+          <h3 className="text-lg font-black tracking-tight text-slate-900 dark:text-white">
             Pillar & Category Performance
           </h3>
         </div>
@@ -240,29 +240,29 @@ export function DiagnosticReportView({
             return (
               <div
                 key={categoryName}
-                className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 transition-all hover:border-cyan-300 hover:bg-white"
+                className="rounded-2xl border border-slate-200/80 bg-slate-50/50 dark:border-white/10 dark:bg-slate-800/60 p-4 transition-all hover:border-cyan-300 dark:hover:bg-slate-800"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-slate-600">
+                  <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
                     <Layers size={12} />
                     {categoryName}
                   </span>
-                  <span className="text-sm font-black text-slate-900">
+                  <span className="text-sm font-black text-slate-900 dark:text-white">
                     {catPercent}%
                   </span>
                 </div>
 
-                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-200">
+                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
                   <div
                     className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 transition-all duration-300"
                     style={{ width: `${catPercent}%` }}
                   />
                 </div>
 
-                <div className="mt-3 flex items-center justify-between text-[11px] font-bold text-slate-500">
-                  <span className="text-emerald-700">{cat.mastered} Mastered</span>
-                  <span className="text-amber-700">{cat.review} Review</span>
-                  <span className="text-rose-700">{cat.gap} Gaps</span>
+                <div className="mt-3 flex items-center justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                  <span className="text-emerald-700 dark:text-emerald-400">{cat.mastered} Mastered</span>
+                  <span className="text-amber-700 dark:text-amber-400">{cat.review} Review</span>
+                  <span className="text-rose-700 dark:text-rose-400">{cat.gap} Gaps</span>
                 </div>
               </div>
             );
@@ -271,15 +271,15 @@ export function DiagnosticReportView({
       </section>
 
       {/* Concept Diagnostic Checklist */}
-      <section className="rounded-[28px] border border-white/80 bg-white/90 p-6 shadow-sm backdrop-blur-xl">
-        <h3 className="text-lg font-black tracking-tight text-slate-900">
+      <section className="rounded-[28px] border border-white/80 bg-white/90 dark:border-white/10 dark:bg-slate-900/90 p-6 shadow-sm backdrop-blur-xl">
+        <h3 className="text-lg font-black tracking-tight text-slate-900 dark:text-white">
           Detailed Diagnostic Breakdown
         </h3>
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
           Review your self-evaluation and verification results per concept.
         </p>
 
-        <div className="mt-6 space-y-3 max-h-[440px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200">
+        <div className="mt-6 space-y-3 max-h-[440px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700">
           {stage1Data.concepts.map((concept) => {
             const selfAns = selfReportAnswers[concept.id];
             let status: "mastered" | "review" | "gap" = "gap";
@@ -298,41 +298,41 @@ export function DiagnosticReportView({
                 key={concept.id}
                 className={`flex flex-col gap-3 rounded-2xl border p-4 transition-all sm:flex-row sm:items-center sm:justify-between ${
                   status === "mastered"
-                    ? "border-emerald-200 bg-emerald-50/40"
+                    ? "border-emerald-200 bg-emerald-50/40 dark:border-emerald-800/40 dark:bg-emerald-950/40"
                     : status === "review"
-                    ? "border-amber-200 bg-amber-50/40"
-                    : "border-rose-200 bg-rose-50/40"
+                    ? "border-amber-200 bg-amber-50/40 dark:border-amber-800/40 dark:bg-amber-950/40"
+                    : "border-rose-200 bg-rose-50/40 dark:border-rose-800/40 dark:bg-rose-950/40"
                 }`}
               >
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
                       {concept.category}
                     </span>
                   </div>
-                  <h4 className="mt-1 text-sm font-bold text-slate-900">
+                  <h4 className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
                     {concept.label}
                   </h4>
-                  <p className="mt-0.5 text-xs text-slate-600">
+                  <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-300">
                     {concept.description}
                   </p>
                 </div>
 
                 <div className="shrink-0">
                   {status === "mastered" && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 px-3 py-1 text-xs font-bold text-emerald-800 dark:text-emerald-300">
                       <CheckCircle2 size={14} />
                       Mastered
                     </span>
                   )}
                   {status === "review" && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-amber-950/80 px-3 py-1 text-xs font-bold text-amber-800 dark:text-amber-300">
                       <AlertTriangle size={14} />
                       Needs Review
                     </span>
                   )}
                   {status === "gap" && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1 text-xs font-bold text-rose-800">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-100 dark:bg-rose-950/80 px-3 py-1 text-xs font-bold text-rose-800 dark:text-rose-300">
                       <XCircle size={14} />
                       Knowledge Gap
                     </span>
