@@ -26,6 +26,12 @@ export function ComparisonWorkspace({ data }: ComparisonWorkspaceProps) {
   const [view, setView] = useState<ComparisonView>("cards");
   const normalized = normalizeComparisonData(data);
   const { criteria, options } = normalized;
+  const nextSteps: string[] = (normalized as any).nextSteps || normalized.suggestedNextSteps || [
+    "Evaluate SLA & operational complexity",
+    "Benchmark under production load",
+    "Run pilot deployment"
+  ];
+  const recommendedApproach: string = (normalized as any).recommendedApproach || "Review architectural trade-offs across latency, operational complexity, and cost scalability before finalizing selection.";
 
   // Determine the highest-rated option for the "Recommended" badge
   const recommendedOptionId = (() => {
@@ -82,7 +88,7 @@ export function ComparisonWorkspace({ data }: ComparisonWorkspaceProps) {
                   Next steps
                 </p>
                 <p className="mt-2 text-2xl font-black">
-                  {normalized.nextSteps.length}
+                  {nextSteps.length}
                 </p>
               </div>
             </div>
@@ -94,11 +100,11 @@ export function ComparisonWorkspace({ data }: ComparisonWorkspaceProps) {
               Recommended approach
             </div>
             <p className="mt-4 text-sm leading-7 text-slate-700 dark:text-slate-200">
-              {normalized.recommendedApproach}
+              {recommendedApproach}
             </p>
 
             <div className="mt-6 space-y-3">
-              {normalized.nextSteps.slice(0, 3).map((step, index) => (
+              {nextSteps.slice(0, 3).map((step, index) => (
                 <div
                   key={step}
                   className="flex items-start gap-3 rounded-2xl bg-white dark:bg-slate-800/80 px-4 py-4 shadow-sm"
@@ -232,7 +238,7 @@ export function ComparisonWorkspace({ data }: ComparisonWorkspaceProps) {
         )}
 
         {/* Action Lane */}
-        {normalized.nextSteps.length > 0 && (
+        {nextSteps.length > 0 && (
           <section className="rounded-[28px] border border-indigo-100/60 dark:border-white/10 bg-gradient-to-br from-indigo-50/60 to-white/90 dark:from-indigo-950/40 dark:to-slate-900/90 p-5 shadow-[0_14px_40px_rgba(15,23,42,0.04)] md:p-6">
             <div className="flex items-center gap-2 text-sm font-black text-slate-950 dark:text-white">
               <Compass size={16} className="text-indigo-600 dark:text-indigo-400" />
@@ -242,7 +248,7 @@ export function ComparisonWorkspace({ data }: ComparisonWorkspaceProps) {
               Concrete steps to move forward after reviewing your options.
             </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {normalized.nextSteps.map((step, index) => (
+              {nextSteps.map((step, index) => (
                 <div
                   key={step}
                   className="group flex items-start gap-3 rounded-[20px] border border-indigo-100/50 dark:border-white/10 bg-white/80 dark:bg-slate-800/80 px-4 py-4 transition-all hover:border-indigo-200 dark:hover:border-indigo-500/50 hover:shadow-sm"

@@ -327,9 +327,11 @@ export function WorkspaceInspector({
             <Compass size={14} className="animate-spin-slow" />
             Decision Intelligence
           </div>
-          <p className="mt-4 text-[13px] font-semibold leading-relaxed text-amber-950/80">{comparisonData.recommendedApproach}</p>
+          <p className="mt-4 text-[13px] font-semibold leading-relaxed text-amber-950/80">
+            {(comparisonData as any).recommendedApproach || "Review trade-offs across performance, complexity, and operational overhead before selecting the optimal architecture."}
+          </p>
           <div className="mt-5 space-y-2.5">
-            {comparisonData.nextSteps.slice(0, 3).map((step, i) => (
+            {((comparisonData as any).nextSteps || comparisonData.suggestedNextSteps || []).slice(0, 3).map((step: string, i: number) => (
               <div key={step} className="flex gap-3 items-start rounded-2xl bg-white/60 p-3 text-[12px] font-bold text-slate-700 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
                 <span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-lg bg-white shadow-sm text-[10px] font-black text-amber-600">
                   {i + 1}
