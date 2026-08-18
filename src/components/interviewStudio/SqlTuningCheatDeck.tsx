@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { SQL_PERFORMANCE_RULES, SqlRule } from "../../data/examples/fullStackDotNetAngularMatrix";
 import {
   Database,
@@ -10,10 +10,26 @@ import {
   TrendingUp,
   Sparkles,
   Layers,
+  Search,
+  Lock,
+  Cpu,
+  Boxes,
+  Flame,
 } from "lucide-react";
 
 export function SqlTuningCheatDeck() {
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  const categories = [
+    "All",
+    "Indexing & SARGability",
+    "Concurrency & Locking",
+    "Query Engine & Plan Cache",
+    "High-Throughput & Ingestion",
+    "EF Core & Dapper Integration",
+  ];
 
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
@@ -21,25 +37,92 @@ export function SqlTuningCheatDeck() {
     setTimeout(() => setCopiedKey(null), 2000);
   };
 
+  const filteredRules = useMemo(() => {
+    return SQL_PERFORMANCE_RULES.filter((rule) => {
+      const matchesCat = selectedCategory === "All" || rule.category === selectedCategory;
+      const q = searchQuery.toLowerCase().trim();
+      if (!q) return matchesCat;
+
+      const matchesSearch =
+        rule.title.toLowerCase().includes(q) ||
+        rule.badPattern.toLowerCase().includes(q) ||
+        rule.optimizedPattern.toLowerCase().includes(q) ||
+        rule.explanation.toLowerCase().includes(q) ||
+        rule.productionImpact.toLowerCase().includes(q);
+
+      return matchesCat && matchesSearch;
+    });
+  }, [selectedCategory, searchQuery]);
+
   return (
     <div className="space-y-6">
       {/* Header Banner */}
       <div className="rounded-[28px] bg-gradient-to-r from-emerald-600/90 via-teal-600/90 to-cyan-600/90 p-6 text-white shadow-xl">
         <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-black uppercase tracking-wider backdrop-blur-md">
           <Database size={14} />
-          SQL-to-.NET Performance Tuning Rules
+          SQL-to-.NET Performance Tuning Rules (20 Enterprise Standards)
         </div>
         <h2 className="mt-3 text-2xl sm:text-3xl font-black tracking-tight">
-          SARGability, Index Seeks & EF Core High-Throughput Rules
+          SARGability, Index Seeks, Concurrency & Ingestion Mastery
         </h2>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-white/90">
-          Essential rules for database query optimization: converting catastrophic table scans into microsecond B-Tree index seeks, eliminating Cartesian explosions, and preventing migration lock contention.
+          Master the complete relational database performance playbook: B-Tree range seeks, RCSI lock contention elimination, Parameter Sniffing defense, Columnstore compression, and high-throughput SqlBulkCopy streaming.
         </p>
+      </div>
+
+      {/* Category Pills & Search Bar */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-2xl bg-white/80 dark:bg-slate-900/80 p-4 shadow-sm border border-slate-200/80 dark:border-slate-800 backdrop-blur-md">
+        {/* Category Pills */}
+        <div className="flex flex-wrap gap-2" role="tablist" aria-label="SQL Tuning Categories">
+          {categories.map((cat) => {
+            const count =
+              cat === "All"
+                ? SQL_PERFORMANCE_RULES.length
+                : SQL_PERFORMANCE_RULES.filter((r) => r.category === cat).length;
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`rounded-xl px-3.5 py-2 min-h-[36px] text-xs font-bold transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/50 flex items-center gap-1.5 ${
+                  selectedCategory === cat
+                    ? "bg-slate-900 text-white dark:bg-emerald-500 dark:text-slate-950 shadow-md"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                }`}
+              >
+                <span>{cat}</span>
+                <span
+                  className={`rounded-full px-1.5 py-0.2 text-[10px] font-black ${
+                    selectedCategory === cat
+                      ? "bg-white/20 text-white dark:bg-slate-950/30 dark:text-slate-950"
+                      : "bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400"
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Search Input */}
+        <div className="relative min-w-[240px]">
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+          />
+          <input
+            type="text"
+            placeholder="Search 20 SQL rules & anti-patterns..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 pl-9 pr-4 py-2 min-h-[36px] text-xs font-medium text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+          />
+        </div>
       </div>
 
       {/* Rules Grid */}
       <div className="grid gap-6 md:grid-cols-2">
-        {SQL_PERFORMANCE_RULES.map((rule) => (
+        {filteredRules.map((rule) => (
           <div
             key={rule.id}
             className="rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
@@ -50,8 +133,8 @@ export function SqlTuningCheatDeck() {
                 <h3 className="text-base font-black text-slate-900 dark:text-white">
                   {rule.title}
                 </h3>
-                <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
-                  SQL Rule
+                <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-emerald-700 dark:text-emerald-300 shrink-0">
+                  {rule.category.split(" ")[0]}
                 </span>
               </div>
 
@@ -71,11 +154,12 @@ export function SqlTuningCheatDeck() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
                     <CheckCircle2 size={14} />
-                    <span>✅ Optimized SARGable / Set-Based Pattern</span>
+                    <span>✅ Optimized Production Pattern</span>
                   </div>
                   <button
                     onClick={() => handleCopy(rule.optimizedPattern, `${rule.id}-opt`)}
-                    className="p-1 rounded-md text-slate-400 hover:text-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-label={`Copy optimized code for ${rule.title}`}
+                    className="p-2 min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity"
                     title="Copy Optimized Pattern"
                   >
                     {copiedKey === `${rule.id}-opt` ? (

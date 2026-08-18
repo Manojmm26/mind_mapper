@@ -19,9 +19,14 @@ import {
   ShieldAlert,
   ChevronRight,
   BookOpen,
+  Swords,
 } from "lucide-react";
 
-export function ScenarioTeleprompter() {
+interface ScenarioTeleprompterProps {
+  onLaunchGrill?: (scenarioId: string) => void;
+}
+
+export function ScenarioTeleprompter({ onLaunchGrill }: ScenarioTeleprompterProps) {
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>("threadpool-starvation");
   const [activeTab, setActiveTab] = useState<"script" | "anchor" | "bait" | "traps">("script");
   const [selectedArchetype, setSelectedArchetype] = useState<string>("All");
@@ -103,13 +108,14 @@ export function ScenarioTeleprompter() {
         <div className="space-y-4">
           {/* Archetype Filter */}
           <div className="rounded-2xl bg-white/80 dark:bg-slate-900/80 p-3 shadow-sm border border-slate-200/80 dark:border-slate-800 backdrop-blur-md">
-            <label className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-2">
+            <label htmlFor="archetype-select" className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-2">
               Filter by Archetype
             </label>
             <select
+              id="archetype-select"
               value={selectedArchetype}
               onChange={(e) => setSelectedArchetype(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 p-2 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 p-2.5 min-h-[40px] text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
             >
               {archetypes.map((a) => (
                 <option key={a} value={a}>
@@ -130,7 +136,7 @@ export function ScenarioTeleprompter() {
                     setSelectedScenarioId(s.id);
                     handleResetTimer();
                   }}
-                  className={`w-full text-left rounded-2xl p-3 transition-all flex items-center justify-between ${
+                  className={`w-full text-left rounded-2xl p-3 min-h-[48px] transition-all flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-amber-500/50 ${
                     isSelected
                       ? "bg-amber-500 text-white shadow-md font-bold"
                       : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
@@ -159,9 +165,20 @@ export function ScenarioTeleprompter() {
           <div className="rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 shadow-sm p-5 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
-                <span className="rounded-full bg-amber-100 dark:bg-amber-950/60 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-300">
-                  {currentScenario.archetype}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-amber-100 dark:bg-amber-950/60 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-300">
+                    {currentScenario.archetype}
+                  </span>
+                  {onLaunchGrill && (
+                    <button
+                      onClick={() => onLaunchGrill(currentScenario.id)}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 text-[11px] font-black shadow-sm transition-all"
+                    >
+                      <Swords size={12} />
+                      <span>Simulate AI Grill</span>
+                    </button>
+                  )}
+                </div>
                 <h3 className="mt-2 text-xl font-black text-slate-900 dark:text-white">
                   {currentScenario.title}
                 </h3>
@@ -186,20 +203,22 @@ export function ScenarioTeleprompter() {
                   <span className="text-[10px] text-slate-400 font-bold">/ 1:30</span>
                 </div>
 
-                <div className="flex items-center gap-1 border-l border-white/20 pl-3">
+                <div className="flex items-center gap-1.5 border-l border-white/20 pl-3">
                   <button
                     onClick={() => setIsRunning(!isRunning)}
-                    className="rounded-lg bg-white/20 p-2 hover:bg-white/30 text-white transition-colors"
+                    aria-label={isRunning ? "Pause rehearsal timer" : "Start rehearsal timer"}
+                    className="rounded-xl bg-white/20 p-2.5 min-w-[36px] min-h-[36px] flex items-center justify-center hover:bg-white/30 text-white transition-colors"
                     title={isRunning ? "Pause" : "Start"}
                   >
-                    {isRunning ? <Pause size={14} /> : <Play size={14} />}
+                    {isRunning ? <Pause size={16} /> : <Play size={16} />}
                   </button>
                   <button
                     onClick={handleResetTimer}
-                    className="rounded-lg bg-white/10 p-2 hover:bg-white/20 text-slate-300 transition-colors"
+                    aria-label="Reset rehearsal timer"
+                    className="rounded-xl bg-white/10 p-2.5 min-w-[36px] min-h-[36px] flex items-center justify-center hover:bg-white/20 text-slate-300 transition-colors"
                     title="Reset Timer"
                   >
-                    <RotateCcw size={14} />
+                    <RotateCcw size={16} />
                   </button>
                 </div>
               </div>
@@ -207,7 +226,7 @@ export function ScenarioTeleprompter() {
 
             {/* Pacing Progress Bar */}
             <div className="space-y-1">
-              <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+              <div className="h-2.5 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                 <div
                   className={`h-full transition-all duration-300 ${
                     seconds > 90
@@ -227,10 +246,10 @@ export function ScenarioTeleprompter() {
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex border-b border-slate-100 dark:border-slate-800 gap-2 pt-2">
+            <div className="flex flex-wrap border-b border-slate-100 dark:border-slate-800 gap-2 pt-2" role="tablist">
               <button
                 onClick={() => setActiveTab("script")}
-                className={`pb-2.5 px-3 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 ${
+                className={`pb-2.5 px-3 min-h-[36px] text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 ${
                   activeTab === "script"
                     ? "border-amber-500 text-amber-600 dark:text-amber-400"
                     : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
@@ -241,7 +260,7 @@ export function ScenarioTeleprompter() {
               </button>
               <button
                 onClick={() => setActiveTab("anchor")}
-                className={`pb-2.5 px-3 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 ${
+                className={`pb-2.5 px-3 min-h-[36px] text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 ${
                   activeTab === "anchor"
                     ? "border-amber-500 text-amber-600 dark:text-amber-400"
                     : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
@@ -252,7 +271,7 @@ export function ScenarioTeleprompter() {
               </button>
               <button
                 onClick={() => setActiveTab("bait")}
-                className={`pb-2.5 px-3 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 ${
+                className={`pb-2.5 px-3 min-h-[36px] text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 ${
                   activeTab === "bait"
                     ? "border-amber-500 text-amber-600 dark:text-amber-400"
                     : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
@@ -263,7 +282,7 @@ export function ScenarioTeleprompter() {
               </button>
               <button
                 onClick={() => setActiveTab("traps")}
-                className={`pb-2.5 px-3 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 ${
+                className={`pb-2.5 px-3 min-h-[36px] text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 ${
                   activeTab === "traps"
                     ? "border-amber-500 text-amber-600 dark:text-amber-400"
                     : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
@@ -294,7 +313,8 @@ export function ScenarioTeleprompter() {
 
                     <button
                       onClick={() => handleCopy(currentScenario.fullScript, "script-copy")}
-                      className="inline-flex items-center gap-1.5 font-bold text-amber-600 dark:text-amber-400 hover:underline"
+                      aria-label="Copy full spoken script"
+                      className="inline-flex items-center gap-1.5 p-2 min-h-[36px] font-bold text-amber-600 dark:text-amber-400 hover:underline"
                     >
                       {copiedKey === "script-copy" ? (
                         <>
@@ -322,12 +342,13 @@ export function ScenarioTeleprompter() {
                     </span>
                     <button
                       onClick={() => handleCopy(currentScenario.tenSecondAnchor, "anchor-copy")}
-                      className="inline-flex items-center gap-1 rounded-lg bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 shadow-sm hover:bg-slate-50"
+                      aria-label="Copy 10-second opening anchor"
+                      className="inline-flex items-center gap-1 rounded-xl bg-white dark:bg-slate-800 px-3.5 py-2 min-h-[36px] text-xs font-bold text-slate-700 dark:text-slate-200 shadow-sm hover:bg-slate-50"
                     >
                       {copiedKey === "anchor-copy" ? (
-                        <Check size={12} className="text-emerald-500" />
+                        <Check size={14} className="text-emerald-500" />
                       ) : (
-                        <Copy size={12} />
+                        <Copy size={14} />
                       )}
                       <span>Copy</span>
                     </button>
@@ -362,7 +383,8 @@ export function ScenarioTeleprompter() {
                       </div>
                       <button
                         onClick={() => handleCopy(bait, `bait-${idx}`)}
-                        className="shrink-0 p-1 text-slate-400 hover:text-blue-600"
+                        aria-label={`Copy steering bait phrase ${idx + 1}`}
+                        className="shrink-0 p-2 min-w-[32px] min-h-[32px] flex items-center justify-center text-slate-400 hover:text-blue-600"
                         title="Copy Bait"
                       >
                         {copiedKey === `bait-${idx}` ? (
