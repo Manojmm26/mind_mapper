@@ -57,6 +57,7 @@ import { EMBEDDING_MODELS_COMPARISON_EXAMPLE } from "./embeddingModelsComparison
 import { FEATURE_FLAGS_COMPARISON_EXAMPLE } from "./featureFlagsComparison";
 import { FINTECH_SYSTEMS_EXAMPLE } from "./fintechSystems";
 import { FRONTEND_STATE_ARCHITECTURE_COMPARISON_EXAMPLE } from "./frontendStateArchitectureComparison";
+import { FULLSTACK_DOTNET_ANGULAR_MATRIX_EXAMPLE } from "./fullStackDotNetAngularMatrix";
 import { FULLSTACK_WEB_EXAMPLE } from "./fullStackWeb";
 import { GAME_ENGINES_COMPARISON_EXAMPLE } from "./gameEnginesComparison";
 import { GPU_COMPUTING_EXAMPLE } from "./gpuComputing";
@@ -830,6 +831,18 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
     data: FRONTEND_STATE_ARCHITECTURE_COMPARISON_EXAMPLE,
+  },
+  {
+    id: "full-stack-dotnet-angular-matrix",
+    title: "Master Full-Stack (.NET 8/9 + Angular 18+ + SQL) Interview Studio",
+    category: "Software & AI",
+    type: "compare",
+    description: "Senior & Lead architectural mastery blueprint: 22 Rosetta Stone cross-framework paradigms, 18 scenario-based incident narratives, and SQL Server performance tuning.",
+    nodeCount: "22 Paradigms / 18 Scenarios",
+    tags: ["Software & AI", "Comparisons", ".NET 8/9", "Angular 18+", "SQL Server", "Architecture", "Interview Prep"],
+    icon: "GraduationCap" as any,
+    gradient: "from-red-500 via-purple-500 to-blue-600",
+    data: FULLSTACK_DOTNET_ANGULAR_MATRIX_EXAMPLE,
   },
   {
     id: "full-stack-web",

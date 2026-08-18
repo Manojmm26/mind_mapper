@@ -16,6 +16,8 @@ import {
   Network,
   Shield,
   Target,
+  Mic,
+  Flame,
 } from "lucide-react";
 import { ModelSelector } from "./ModelSelector";
 import { ThemeToggle } from "./ThemeToggle";
@@ -47,6 +49,7 @@ export interface HomePageProps {
   onSelectCompareExample?: (data: ComparisonWorkspaceData) => void;
   onOpenShowcase: () => void;
   onOpenGallery: () => void;
+  onOpenInterviewStudio?: () => void;
   onOpenWikiExplorer: () => void;
   showWikiExplorer: boolean;
   onCloseWikiExplorer: () => void;
@@ -71,6 +74,7 @@ export function HomePage({
   onSelectCompareExample,
   onOpenShowcase,
   onOpenGallery,
+  onOpenInterviewStudio,
   onOpenWikiExplorer,
   showWikiExplorer,
   onCloseWikiExplorer,
@@ -347,6 +351,53 @@ export function HomePage({
               accept=".json"
               className="hidden"
             />
+          </div>
+        </div>
+      </div>
+
+      {/* Master Full-Stack (.NET + Angular + SQL) Interview Studio Entry */}
+      <div className="w-full rounded-[34px] border border-red-500/30 bg-gradient-to-br from-white/90 via-red-50/20 to-blue-50/20 dark:from-slate-900/90 dark:via-red-950/20 dark:to-blue-950/20 shadow-[0_20px_80px_rgba(239,68,68,0.12)] backdrop-blur-2xl overflow-hidden ring-1 ring-red-500/20">
+        {/* Top gradient band */}
+        <div className="h-1.5 w-full bg-gradient-to-r from-red-500 via-purple-500 to-blue-600 animate-pulse" />
+        <div className="p-6 sm:p-8">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            {/* Left: text */}
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 dark:border-red-800/40 dark:bg-red-950/50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-widest text-red-700 dark:text-red-300">
+                <GraduationCap size={13} />
+                Staff / Lead Architectural Studio
+              </div>
+              <h2 className="text-2xl font-black tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+                Master Full-Stack (.NET 8/9 + Angular 18+ + SQL)
+              </h2>
+              <p className="max-w-xl text-sm leading-6 text-slate-600 dark:text-slate-300">
+                Master the 22 cross-framework <strong className="font-semibold text-slate-900 dark:text-white">Rosetta Stone paradigms</strong>, rehearse 18 battle-tested <strong className="font-semibold text-slate-900 dark:text-white">90-second incident narratives</strong> with the live teleprompter, and drill SQL Server SARGability rules.
+              </p>
+              {/* Feature Pills */}
+              <div className="flex flex-wrap gap-2 pt-1">
+                <span className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 dark:border-red-800/40 dark:bg-red-950/60 px-2.5 py-1 text-[11px] font-semibold text-red-700 dark:text-red-300">
+                  <Sparkles size={11} /> 22 Rosetta Paradigms
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 dark:border-amber-800/40 dark:bg-amber-950/60 px-2.5 py-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
+                  <Mic size={11} /> 18 Timed 90s War Stories
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 dark:border-emerald-800/40 dark:bg-emerald-950/60 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
+                  <Flame size={11} /> SARGable & EF Core Rules
+                </span>
+              </div>
+            </div>
+            {/* Right: CTA */}
+            {onOpenInterviewStudio && (
+              <button
+                type="button"
+                onClick={onOpenInterviewStudio}
+                className="group flex shrink-0 items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-red-600 via-purple-600 to-blue-600 px-6 py-4 text-sm font-black text-white shadow-xl shadow-red-500/20 transition-all hover:shadow-2xl hover:shadow-purple-500/30 hover:scale-[1.03] active:scale-[0.98]"
+              >
+                <GraduationCap size={18} />
+                Launch Interview Studio
+                <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+              </button>
+            )}
           </div>
         </div>
       </div>

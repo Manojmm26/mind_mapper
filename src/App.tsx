@@ -18,6 +18,12 @@ const GalleryPageComponent = lazy(() =>
   })),
 );
 
+const InterviewStudioWorkspace = lazy(() =>
+  import("./components/interviewStudio/InterviewStudioWorkspace").then((module) => ({
+    default: module.InterviewStudioWorkspace,
+  })),
+);
+
 const WorkspaceViewComponent = lazy(() =>
   import("./components/WorkspaceView").then((module) => ({
     default: module.WorkspaceViewComponent,
@@ -156,6 +162,20 @@ export default function App() {
     );
   }
 
+  // Master Full-Stack Interview Studio experience
+  if (state.experience === "interview") {
+    return (
+      <>
+        <Suspense fallback={<FullScreenLoadingMessage message="Loading interview studio…" />}>
+          <InterviewStudioWorkspace
+            onBackToHome={() => state.setExperience("classic")}
+          />
+        </Suspense>
+        <ThemeToggle />
+      </>
+    );
+  }
+
   // Workspace view (when a map, assessment, or comparison is loaded)
   if (state.workspaceGraph.nodes.length > 0 || state.assessmentStage1Data || state.comparisonData) {
     return (
@@ -227,6 +247,7 @@ export default function App() {
         onSelectCompareExample={handlers.handleSelectCompareExample}
         onOpenShowcase={() => state.setExperience("pretext")}
         onOpenGallery={() => state.setExperience("gallery")}
+        onOpenInterviewStudio={() => state.setExperience("interview")}
         onOpenWikiExplorer={() => state.setShowWikiExplorer(true)}
         showWikiExplorer={state.showWikiExplorer}
         onCloseWikiExplorer={() => state.setShowWikiExplorer(false)}
