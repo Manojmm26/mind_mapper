@@ -27,8 +27,11 @@ import {
   FileCode2,
 } from "lucide-react";
 
+import { TechStackProfile, ANGULAR_DOTNET_STACK } from "../../data/techStacks";
+
 interface ParadigmDetailModalProps {
   paradigm: RosettaParadigm;
+  techStack?: TechStackProfile;
   initialFramework?: "angular" | "dotnet" | "bridge";
   onClose: () => void;
   onSelectParadigm: (paradigm: RosettaParadigm) => void;
@@ -36,27 +39,29 @@ interface ParadigmDetailModalProps {
 
 export function ParadigmDetailModal({
   paradigm,
+  techStack = ANGULAR_DOTNET_STACK,
   initialFramework = "bridge",
   onClose,
   onSelectParadigm,
 }: ParadigmDetailModalProps) {
+  const paradigms = techStack.paradigms || ROSETTA_STONE_PARADIGMS;
   const [activeTab, setActiveTab] = useState<"angular" | "dotnet" | "bridge">(
     initialFramework
   );
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   // Find index for Prev / Next navigation
-  const currentIndex = ROSETTA_STONE_PARADIGMS.findIndex(
+  const currentIndex = paradigms.findIndex(
     (p) => p.id === paradigm.id
   );
   const prevParadigm =
     currentIndex > 0
-      ? ROSETTA_STONE_PARADIGMS[currentIndex - 1]
-      : ROSETTA_STONE_PARADIGMS[ROSETTA_STONE_PARADIGMS.length - 1];
+      ? paradigms[currentIndex - 1]
+      : paradigms[paradigms.length - 1];
   const nextParadigm =
-    currentIndex < ROSETTA_STONE_PARADIGMS.length - 1
-      ? ROSETTA_STONE_PARADIGMS[currentIndex + 1]
-      : ROSETTA_STONE_PARADIGMS[0];
+    currentIndex < paradigms.length - 1
+      ? paradigms[currentIndex + 1]
+      : paradigms[0];
 
   // Keyboard navigation (ArrowLeft, ArrowRight, Escape)
   useEffect(() => {
@@ -107,7 +112,7 @@ export function ParadigmDetailModal({
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Paradigm {currentIndex + 1} of {ROSETTA_STONE_PARADIGMS.length}
+                Paradigm {currentIndex + 1} of {paradigms.length} • {techStack.shortBadge}
               </p>
             </div>
           </div>
@@ -163,7 +168,7 @@ export function ParadigmDetailModal({
             }`}
           >
             <Cpu size={14} />
-            <span>🅰️ Angular 18+ Architecture Dossier</span>
+            <span>{techStack.frontend.name} Architecture Dossier</span>
           </button>
 
           <button
@@ -175,7 +180,7 @@ export function ParadigmDetailModal({
             }`}
           >
             <Server size={14} />
-            <span>🔷 .NET 8/9 & SQL Architecture Dossier</span>
+            <span>{techStack.backend.name} Architecture Dossier</span>
           </button>
         </div>
 

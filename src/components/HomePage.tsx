@@ -18,6 +18,7 @@ import {
   Target,
   Mic,
   Flame,
+  Swords,
 } from "lucide-react";
 import { ModelSelector } from "./ModelSelector";
 import { ThemeToggle } from "./ThemeToggle";
@@ -363,26 +364,32 @@ export function HomePage({
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             {/* Left: text */}
             <div className="space-y-3">
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 dark:border-red-800/40 dark:bg-red-950/50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-widest text-red-700 dark:text-red-300">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-purple-200 bg-purple-50 dark:border-purple-800/40 dark:bg-purple-950/50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-widest text-purple-700 dark:text-purple-300">
                 <GraduationCap size={13} />
-                Staff / Lead Architectural Studio
+                Staff / Principal Multi-Stack Prep Studio
               </div>
               <h2 className="text-2xl font-black tracking-tight text-slate-950 dark:text-white sm:text-3xl">
-                Master Full-Stack (.NET 8/9 + Angular 18+ + SQL)
+                Master Full-Stack Interview Studio
               </h2>
               <p className="max-w-xl text-sm leading-6 text-slate-600 dark:text-slate-300">
-                Master the 22 cross-framework <strong className="font-semibold text-slate-900 dark:text-white">Rosetta Stone paradigms</strong>, rehearse 18 battle-tested <strong className="font-semibold text-slate-900 dark:text-white">90-second incident narratives</strong> with the live teleprompter, and drill SQL Server SARGability rules.
+                Pluggable cross-framework preparation across <strong className="font-semibold text-slate-900 dark:text-white">Angular 18+, .NET 8/9, Java 21 Spring Boot 3, React 19, Node.js & SQL/Postgres</strong>. Master 32 deep-dive architecture dossiers, rehearse 18 timed 90s war stories, and face interactive AI mock grills with voice dictation.
               </p>
               {/* Feature Pills */}
               <div className="flex flex-wrap gap-2 pt-1">
-                <span className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 dark:border-red-800/40 dark:bg-red-950/60 px-2.5 py-1 text-[11px] font-semibold text-red-700 dark:text-red-300">
-                  <Sparkles size={11} /> 22 Rosetta Paradigms
+                <span className="inline-flex items-center gap-1 rounded-full border border-purple-200 bg-purple-50 dark:border-purple-800/40 dark:bg-purple-950/60 px-2.5 py-1 text-[11px] font-semibold text-purple-700 dark:text-purple-300">
+                  <Sparkles size={11} /> 32 Architecture Dossiers
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 dark:border-blue-800/40 dark:bg-blue-950/60 px-2.5 py-1 text-[11px] font-semibold text-blue-700 dark:text-blue-300">
+                  <Layers size={11} /> Multi-Stack Switcher & AI Generator
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 dark:border-amber-800/40 dark:bg-amber-950/60 px-2.5 py-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
-                  <Mic size={11} /> 18 Timed 90s War Stories
+                  <Mic size={11} /> 18 Timed War Stories
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 dark:border-emerald-800/40 dark:bg-emerald-950/60 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
-                  <Flame size={11} /> SARGable & EF Core Rules
+                  <Flame size={11} /> 20 DB & SQL Tuning Rules
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 dark:border-indigo-800/40 dark:bg-indigo-950/60 px-2.5 py-1 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300">
+                  <Swords size={11} /> ⚔️ AI Mock Grill Simulator
                 </span>
               </div>
             </div>
@@ -391,7 +398,7 @@ export function HomePage({
               <button
                 type="button"
                 onClick={onOpenInterviewStudio}
-                className="group flex shrink-0 items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-red-600 via-purple-600 to-blue-600 px-6 py-4 text-sm font-black text-white shadow-xl shadow-red-500/20 transition-all hover:shadow-2xl hover:shadow-purple-500/30 hover:scale-[1.03] active:scale-[0.98]"
+                className="group flex shrink-0 items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-red-600 via-purple-600 to-blue-600 px-6 py-4 text-sm font-black text-white shadow-xl shadow-purple-500/20 transition-all hover:shadow-2xl hover:shadow-purple-500/30 hover:scale-[1.03] active:scale-[0.98]"
               >
                 <GraduationCap size={18} />
                 Launch Interview Studio

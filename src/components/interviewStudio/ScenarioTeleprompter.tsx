@@ -22,14 +22,30 @@ import {
   Swords,
 } from "lucide-react";
 
+import { TechStackProfile, ANGULAR_DOTNET_STACK } from "../../data/techStacks";
+
 interface ScenarioTeleprompterProps {
+  techStack?: TechStackProfile;
   onLaunchGrill?: (scenarioId: string) => void;
 }
 
-export function ScenarioTeleprompter({ onLaunchGrill }: ScenarioTeleprompterProps) {
-  const [selectedScenarioId, setSelectedScenarioId] = useState<string>("threadpool-starvation");
+export function ScenarioTeleprompter({
+  techStack = ANGULAR_DOTNET_STACK,
+  onLaunchGrill,
+}: ScenarioTeleprompterProps) {
+  const scenarios = techStack.scenarios || SCENARIO_NARRATIVES;
+  const [selectedScenarioId, setSelectedScenarioId] = useState<string>(
+    scenarios[0]?.id || "threadpool-starvation"
+  );
   const [activeTab, setActiveTab] = useState<"script" | "anchor" | "bait" | "traps">("script");
   const [selectedArchetype, setSelectedArchetype] = useState<string>("All");
+
+  // Reset selected scenario when stack changes
+  useEffect(() => {
+    if (scenarios.length > 0) {
+      setSelectedScenarioId(scenarios[0].id);
+    }
+  }, [techStack]);
 
   // Timer State
   const [seconds, setSeconds] = useState(0);
@@ -48,7 +64,8 @@ export function ScenarioTeleprompter({ onLaunchGrill }: ScenarioTeleprompterProp
   ];
 
   const currentScenario =
-    SCENARIO_NARRATIVES.find((s) => s.id === selectedScenarioId) ||
+    scenarios.find((s) => s.id === selectedScenarioId) ||
+    scenarios[0] ||
     SCENARIO_NARRATIVES[0];
 
   // Timer Effect

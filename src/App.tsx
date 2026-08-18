@@ -168,7 +168,10 @@ export default function App() {
       <>
         <Suspense fallback={<FullScreenLoadingMessage message="Loading interview studio…" />}>
           <InterviewStudioWorkspace
-            onBackToHome={() => state.setExperience("classic")}
+            onBackToHome={() => {
+              state.resetWorkspaceState();
+              state.setExperience("classic");
+            }}
           />
         </Suspense>
         <ThemeToggle />

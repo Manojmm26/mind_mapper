@@ -17,14 +17,17 @@ import { ComparisonMatrix } from "./comparison/ComparisonMatrix";
 import { OptionCard } from "./comparison/OptionCard";
 
 interface ComparisonWorkspaceProps {
-  data: ComparisonWorkspaceData;
+  data?: ComparisonWorkspaceData;
+  initialData?: ComparisonWorkspaceData;
+  allowEditing?: boolean;
 }
 
 type ComparisonView = "cards" | "matrix";
 
-export function ComparisonWorkspace({ data }: ComparisonWorkspaceProps) {
+export function ComparisonWorkspace({ data, initialData }: ComparisonWorkspaceProps) {
   const [view, setView] = useState<ComparisonView>("cards");
-  const normalized = normalizeComparisonData(data);
+  const effectiveData = data || initialData;
+  const normalized = normalizeComparisonData(effectiveData as any);
   const { criteria, options } = normalized;
   const nextSteps: string[] = (normalized as any).nextSteps || normalized.suggestedNextSteps || [
     "Evaluate SLA & operational complexity",

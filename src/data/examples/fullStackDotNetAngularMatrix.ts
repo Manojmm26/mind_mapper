@@ -20,6 +20,46 @@ export interface FrameworkConceptDossier {
   }[];
 }
 
+export interface FrameworkConceptDossier {
+  framework: "Angular 18+" | ".NET 8/9 & C# 12 / SQL Server";
+  conceptTitle: string;
+  architectureOverview: string;
+  underTheHoodMechanics: string;
+  extendedProductionCode: string;
+  codeExplanation: string;
+  productionBestPractices: string[];
+  seniorInterviewProbes: {
+    interviewerQuestion: string;
+    modelLeadAnswer: string;
+    whyThisMatters: string;
+  }[];
+  criticalPitfallsAndAntiPatterns: {
+    antiPattern: string;
+    consequence: string;
+    remediation: string;
+  }[];
+}
+
+export interface FrameworkConceptDossier {
+  framework: "Angular 18+" | ".NET 8/9 & C# 12 / SQL Server";
+  conceptTitle: string;
+  architectureOverview: string;
+  underTheHoodMechanics: string;
+  extendedProductionCode: string;
+  codeExplanation: string;
+  productionBestPractices: string[];
+  seniorInterviewProbes: {
+    interviewerQuestion: string;
+    modelLeadAnswer: string;
+    whyThisMatters: string;
+  }[];
+  criticalPitfallsAndAntiPatterns: {
+    antiPattern: string;
+    consequence: string;
+    remediation: string;
+  }[];
+}
+
 export interface RosettaParadigm {
   id: string;
   category:

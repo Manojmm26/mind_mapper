@@ -17,7 +17,14 @@ import {
   Flame,
 } from "lucide-react";
 
-export function SqlTuningCheatDeck() {
+import { TechStackProfile, ANGULAR_DOTNET_STACK } from "../../data/techStacks";
+
+interface SqlTuningCheatDeckProps {
+  techStack?: TechStackProfile;
+}
+
+export function SqlTuningCheatDeck({ techStack = ANGULAR_DOTNET_STACK }: SqlTuningCheatDeckProps) {
+  const rules = techStack.sqlRules || SQL_PERFORMANCE_RULES;
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -38,10 +45,11 @@ export function SqlTuningCheatDeck() {
   };
 
   const filteredRules = useMemo(() => {
-    return SQL_PERFORMANCE_RULES.filter((rule) => {
-      const matchesCat = selectedCategory === "All" || rule.category === selectedCategory;
+    return rules.filter((rule) => {
+      const matchesCategory =
+        selectedCategory === "All" || rule.category === selectedCategory;
       const q = searchQuery.toLowerCase().trim();
-      if (!q) return matchesCat;
+      if (!q) return matchesCategory;
 
       const matchesSearch =
         rule.title.toLowerCase().includes(q) ||
@@ -50,9 +58,9 @@ export function SqlTuningCheatDeck() {
         rule.explanation.toLowerCase().includes(q) ||
         rule.productionImpact.toLowerCase().includes(q);
 
-      return matchesCat && matchesSearch;
+      return matchesCategory && matchesSearch;
     });
-  }, [selectedCategory, searchQuery]);
+  }, [rules, selectedCategory, searchQuery]);
 
   return (
     <div className="space-y-6">

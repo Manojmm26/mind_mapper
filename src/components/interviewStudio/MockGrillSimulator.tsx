@@ -47,18 +47,24 @@ import {
   AlertTriangle,
 } from "lucide-react";
 
+import { TechStackProfile, ANGULAR_DOTNET_STACK } from "../../data/techStacks";
+
 interface MockGrillSimulatorProps {
+  techStack?: TechStackProfile;
   initialScenarioId?: string;
   onNavigateToHistory?: () => void;
 }
 
 export function MockGrillSimulator({
+  techStack = ANGULAR_DOTNET_STACK,
   initialScenarioId,
   onNavigateToHistory,
 }: MockGrillSimulatorProps) {
+  const baseScenarios = techStack.scenarios || SCENARIO_NARRATIVES;
+
   // Scenario Selection & Filter State
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>(
-    initialScenarioId || "threadpool-starvation"
+    initialScenarioId || baseScenarios[0]?.id || "threadpool-starvation"
   );
   const [scenarioSearchQuery, setScenarioSearchQuery] = useState("");
   const [selectedArchetypeFilter, setSelectedArchetypeFilter] = useState<string>("All");
@@ -133,10 +139,10 @@ export function MockGrillSimulator({
     return map;
   }, [pastSessions]);
 
-  // Combined scenarios (curated + custom)
+  // Combined scenarios (curated for this stack + custom)
   const allScenarios = useMemo(() => {
-    return [...customScenarios, ...SCENARIO_NARRATIVES];
-  }, [customScenarios]);
+    return [...customScenarios, ...baseScenarios];
+  }, [customScenarios, baseScenarios]);
 
   const currentScenario =
     allScenarios.find((s) => s.id === selectedScenarioId) || allScenarios[0];

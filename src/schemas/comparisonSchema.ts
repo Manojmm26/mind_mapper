@@ -300,10 +300,95 @@ export function validateComparisonWorkspace(
 }
 
 export function normalizeComparisonData(
-  raw: ComparisonWorkspaceDataRaw,
+  raw?: any,
 ): ComparisonWorkspaceData {
+  if (!raw) {
+    return {
+      topic: "System Architecture Comparison",
+      overview: "Comparing architectural approaches, trade-offs, and design decisions.",
+      domainType: "approaches",
+      criteria: [],
+      options: [],
+    };
+  }
+
+  // If raw has 2-subject structure (leftSubject, rightSubject, dimensions)
+  if (raw.leftSubject && raw.rightSubject && Array.isArray(raw.dimensions)) {
+    const criteria = raw.dimensions.map((d: any, idx: number) => ({
+      id: d.id || `c_${idx}`,
+      label: d.title || `Dimension ${idx + 1}`,
+      description: d.category || undefined,
+      weight: (d.impactScore ? d.impactScore / 10 : 0.8),
+      type: "text" as const,
+    }));
+
+    const options = [
+      {
+        id: "opt_left",
+        label: raw.leftSubject.name || "Frontend Tier",
+        badge: raw.leftSubject.badge || "Client",
+        description: raw.leftSubject.summary || "Client-side architecture and reactivity.",
+        tagline: raw.leftSubject.badge || "Frontend",
+        scores: Object.fromEntries(
+          raw.dimensions.map((d: any, idx: number) => [
+            d.id || `c_${idx}`,
+            {
+              criterionId: d.id || `c_${idx}`,
+              displayValue: d.leftDetail || "Standard capability",
+              numericRating: 5,
+              note: d.strategicVerdict || undefined,
+            },
+          ]),
+        ),
+      },
+      {
+        id: "opt_right",
+        label: raw.rightSubject.name || "Backend Tier",
+        badge: raw.rightSubject.badge || "Server",
+        description: raw.rightSubject.summary || "Server-side architecture and data access.",
+        tagline: raw.rightSubject.badge || "Backend",
+        scores: Object.fromEntries(
+          raw.dimensions.map((d: any, idx: number) => [
+            d.id || `c_${idx}`,
+            {
+              criterionId: d.id || `c_${idx}`,
+              displayValue: d.rightDetail || "Standard capability",
+              numericRating: 5,
+              note: d.strategicVerdict || undefined,
+            },
+          ]),
+        ),
+      },
+    ];
+
+    return {
+      topic: raw.title || raw.topic || "Full-Stack System Architecture Decision Matrix",
+      overview: raw.verdict?.summary || raw.overview || "Strategic evaluation across client reactivity, backend concurrency, and database indexing.",
+      domainType: "approaches",
+      criteria,
+      options,
+      suggestedNextSteps: raw.verdict?.recommendations || raw.suggestedNextSteps || [
+        "Benchmark end-to-end payload latency under high concurrency",
+        "Validate zero-trust token refresh interceptors in staging",
+        "Profile database execution plans for covering index seeks"
+      ],
+    };
+  }
+
   return {
-    ...raw,
-    domainType: raw.domainType || "products",
+    topic: raw.topic || raw.title || "Architectural Comparison",
+    overview: raw.overview || "Comparative analysis of options.",
+    domainType: raw.domainType || "approaches",
+    criteria: Array.isArray(raw.criteria) ? raw.criteria : [],
+    options: (Array.isArray(raw.options) ? raw.options : []).map((opt: any) => ({
+      ...opt,
+      name: opt.name || opt.label || "Option",
+      label: opt.label || opt.name || "Option",
+      summary: opt.summary || opt.description || "",
+      description: opt.description || opt.summary || "",
+      scores: opt.scores || {},
+    })),
+    suggestedNextSteps: Array.isArray(raw.suggestedNextSteps) ? raw.suggestedNextSteps : undefined,
+    mindMap: raw.mindMap,
   };
 }

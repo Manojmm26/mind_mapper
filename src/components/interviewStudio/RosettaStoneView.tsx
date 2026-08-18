@@ -3,6 +3,7 @@ import {
   ROSETTA_STONE_PARADIGMS,
   RosettaParadigm,
 } from "../../data/examples/fullStackDotNetAngularMatrix";
+import { TechStackProfile, ANGULAR_DOTNET_STACK } from "../../data/techStacks";
 import { ParadigmDetailModal } from "./ParadigmDetailModal";
 import {
   Search,
@@ -25,10 +26,15 @@ import {
   Maximize2,
 } from "lucide-react";
 
-export function RosettaStoneView() {
+interface RosettaStoneViewProps {
+  techStack?: TechStackProfile;
+}
+
+export function RosettaStoneView({ techStack = ANGULAR_DOTNET_STACK }: RosettaStoneViewProps) {
+  const paradigms = techStack.paradigms || ROSETTA_STONE_PARADIGMS;
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  const [expandedId, setExpandedId] = useState<string | null>("di");
+  const [expandedId, setExpandedId] = useState<string | null>(paradigms[0]?.id || "di");
   const [activeSubTab, setActiveSubTab] = useState<Record<string, "nuances" | "physics" | "traps">>({});
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -63,7 +69,7 @@ export function RosettaStoneView() {
   };
 
   const filteredParadigms = useMemo(() => {
-    return ROSETTA_STONE_PARADIGMS.filter((item) => {
+    return paradigms.filter((item) => {
       const matchesCat =
         selectedCategory === "All" || item.category === selectedCategory;
       const q = searchQuery.toLowerCase().trim();
@@ -82,7 +88,7 @@ export function RosettaStoneView() {
 
       return matchesCat && matchesSearch;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [paradigms, searchQuery, selectedCategory]);
 
   return (
     <div className="space-y-6">
@@ -90,13 +96,13 @@ export function RosettaStoneView() {
       <div className="rounded-[28px] bg-gradient-to-r from-red-600/90 via-purple-600/90 to-blue-600/90 p-6 text-white shadow-xl">
         <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-black uppercase tracking-wider backdrop-blur-md">
           <Sparkles size={14} className="animate-spin-slow" />
-          The Rosetta Stone (32 Strategic Enterprise Paradigms)
+          The Rosetta Stone ({paradigms.length} Strategic Enterprise Paradigms)
         </div>
         <h2 className="mt-3 text-2xl sm:text-3xl font-black tracking-tight">
-          Angular 18+ ↔ .NET 8/9 & SQL Architectural Parity
+          {techStack.frontend.name} ↔ {techStack.backend.name} & {techStack.database.name}
         </h2>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-white/90">
-          The ultimate cross-framework master blueprint: 32 side-by-side paradigms covering Signals, Primary Constructors, Channels, Hybrid CQRS, Zero-Allocation Memory, Micro-Frontends, and SARGable SQL tuning. Click on any paradigm for individual deep dive architecture dossiers!
+          The ultimate cross-framework master blueprint: {paradigms.length} side-by-side paradigms bridging {techStack.frontend.name} with {techStack.backend.name} and {techStack.database.name}. Click on any card for deep dive architecture dossiers!
         </p>
       </div>
 
@@ -107,8 +113,8 @@ export function RosettaStoneView() {
           {categories.map((cat) => {
             const count =
               cat === "All"
-                ? ROSETTA_STONE_PARADIGMS.length
-                : ROSETTA_STONE_PARADIGMS.filter((p) => p.category === cat).length;
+                ? paradigms.length
+                : paradigms.filter((p) => p.category === cat).length;
             return (
               <button
                 key={cat}
@@ -142,7 +148,7 @@ export function RosettaStoneView() {
           />
           <input
             type="text"
-            placeholder="Search 32 paradigms, physics & traps..."
+            placeholder={`Search ${paradigms.length} paradigms, physics & traps...`}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 pl-9 pr-4 py-2 min-h-[36px] text-xs font-medium text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
@@ -212,12 +218,12 @@ export function RosettaStoneView() {
               {/* Side-by-Side Symmetrical Body */}
               <div className="p-5 pt-0">
                 <div className="mt-4 grid gap-5 lg:grid-cols-2">
-                  {/* Angular Side */}
+                  {/* Frontend Side */}
                   <div className="rounded-2xl border border-red-100 dark:border-red-950/50 bg-gradient-to-b from-red-50/40 to-white dark:from-red-950/20 dark:to-slate-900/40 p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-red-600 dark:text-red-400">
                         <Cpu size={14} />
-                        Angular 18+ Paradigm
+                        {techStack.frontend.name} Paradigm
                       </div>
                       <button
                         onClick={(e) => {
@@ -226,7 +232,7 @@ export function RosettaStoneView() {
                         }}
                         className="text-[11px] font-bold text-red-700 dark:text-red-400 hover:underline flex items-center gap-1"
                       >
-                        <span>Angular Deep Dive</span>
+                        <span>{techStack.frontend.shortName} Deep Dive</span>
                         <ExternalLink size={11} />
                       </button>
                     </div>
@@ -243,7 +249,7 @@ export function RosettaStoneView() {
                           e.stopPropagation();
                           handleCopy(p.angularCode, `${p.id}-ang-code`);
                         }}
-                        aria-label="Copy Angular code snippet"
+                        aria-label={`Copy ${techStack.frontend.name} code snippet`}
                         className="absolute right-2 top-2 rounded-lg bg-white/10 p-2 min-w-[32px] min-h-[32px] flex items-center justify-center text-slate-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
                         title="Copy Code"
                       >
@@ -267,7 +273,7 @@ export function RosettaStoneView() {
                             e.stopPropagation();
                             handleCopy(p.angularSoundbite, `${p.id}-ang-sound`);
                           }}
-                          aria-label="Copy Angular soundbite"
+                          aria-label={`Copy ${techStack.frontend.name} soundbite`}
                           className="shrink-0 p-2 min-w-[32px] min-h-[32px] flex items-center justify-center text-slate-500 hover:text-red-600 dark:hover:text-red-300"
                           title="Copy Soundbite"
                         >
@@ -281,12 +287,12 @@ export function RosettaStoneView() {
                     </div>
                   </div>
 
-                  {/* .NET Side */}
+                  {/* Backend Side */}
                   <div className="rounded-2xl border border-blue-100 dark:border-blue-950/50 bg-gradient-to-b from-blue-50/40 to-white dark:from-blue-950/20 dark:to-slate-900/40 p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">
                         <Server size={14} />
-                        .NET 8/9 & SQL Paradigm
+                        {techStack.backend.name} & {techStack.database.name}
                       </div>
                       <button
                         onClick={(e) => {
@@ -295,7 +301,7 @@ export function RosettaStoneView() {
                         }}
                         className="text-[11px] font-bold text-blue-700 dark:text-blue-400 hover:underline flex items-center gap-1"
                       >
-                        <span>.NET / SQL Deep Dive</span>
+                        <span>{techStack.backend.shortName} Deep Dive</span>
                         <ExternalLink size={11} />
                       </button>
                     </div>
@@ -312,7 +318,7 @@ export function RosettaStoneView() {
                           e.stopPropagation();
                           handleCopy(p.dotnetCode, `${p.id}-net-code`);
                         }}
-                        aria-label="Copy .NET code snippet"
+                        aria-label={`Copy ${techStack.backend.name} code snippet`}
                         className="absolute right-2 top-2 rounded-lg bg-white/10 p-2 min-w-[32px] min-h-[32px] flex items-center justify-center text-slate-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
                         title="Copy Code"
                       >
@@ -336,7 +342,7 @@ export function RosettaStoneView() {
                             e.stopPropagation();
                             handleCopy(p.dotnetSoundbite, `${p.id}-net-sound`);
                           }}
-                          aria-label="Copy .NET soundbite"
+                          aria-label={`Copy ${techStack.backend.name} soundbite`}
                           className="shrink-0 p-2 min-w-[32px] min-h-[32px] flex items-center justify-center text-slate-500 hover:text-blue-600 dark:hover:text-blue-300"
                           title="Copy Soundbite"
                         >
@@ -378,7 +384,7 @@ export function RosettaStoneView() {
                           }`}
                         >
                           <Microscope size={13} />
-                          <span>🔬 Runtime Physics (V8 vs CLR)</span>
+                          <span>🔬 Runtime Physics</span>
                         </button>
 
                         <button
@@ -390,7 +396,7 @@ export function RosettaStoneView() {
                           }`}
                         >
                           <ShieldAlert size={13} />
-                          <span>🚨 Mid-Level Trap to Avoid</span>
+                          <span>🚨 Mid-Level Trap</span>
                         </button>
                       </div>
 
@@ -419,13 +425,13 @@ export function RosettaStoneView() {
                         <div className="grid gap-3 sm:grid-cols-2 text-slate-700 dark:text-slate-300">
                           <div className="rounded-xl bg-red-50/50 dark:bg-red-950/20 p-3 border border-red-200/50 dark:border-red-900/30">
                             <strong className="text-red-700 dark:text-red-400 block mb-1">
-                              Angular 18+ Architectural Nuance:
+                              {techStack.frontend.name} Architectural Nuance:
                             </strong>
                             <p>{p.angularNuance}</p>
                           </div>
                           <div className="rounded-xl bg-blue-50/50 dark:bg-blue-950/20 p-3 border border-blue-200/50 dark:border-blue-900/30">
                             <strong className="text-blue-700 dark:text-blue-400 block mb-1">
-                              .NET 8/9 & SQL Architectural Nuance:
+                              {techStack.backend.name} & {techStack.database.name} Nuance:
                             </strong>
                             <p>{p.dotnetNuance}</p>
                           </div>
@@ -441,7 +447,7 @@ export function RosettaStoneView() {
                       <div className="rounded-xl bg-purple-50/60 dark:bg-purple-950/20 p-4 border border-purple-200/60 dark:border-purple-900/40 text-xs text-slate-800 dark:text-slate-200 leading-relaxed space-y-2 animate-fadeIn">
                         <div className="flex items-center gap-2 font-black uppercase text-[11px] text-purple-700 dark:text-purple-300">
                           <Microscope size={14} />
-                          Under-The-Hood Engine Mechanics (V8 Microtasks & JIT Compilation)
+                          Under-The-Hood Engine Mechanics
                         </div>
                         <p>{p.runtimePhysics}</p>
                       </div>
@@ -469,6 +475,7 @@ export function RosettaStoneView() {
       {selectedModalParadigm && (
         <ParadigmDetailModal
           paradigm={selectedModalParadigm}
+          techStack={techStack}
           initialFramework={modalInitialTab}
           onClose={() => setSelectedModalParadigm(null)}
           onSelectParadigm={(p) => setSelectedModalParadigm(p)}
