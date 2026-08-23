@@ -1,5 +1,19 @@
 import React, { useState } from "react";
-import { TechStackProfile, saveCustomTechStack } from "../../data/techStacks";
+import {
+  TechStackProfile,
+  saveCustomTechStack,
+} from "../../data/techStacks";
+import { normalizeComparisonData } from "../../services/llmSchemas";
+import {
+  generateCustomTechStackPayload,
+  buildFallbackCustomStackParadigms,
+  buildFallbackCustomStackScenarios,
+} from "../../services/techStackGeneratorService";
+import type {
+  GeneratedParadigm,
+  GeneratedScenario,
+  TechStackGeneratedPayload,
+} from "../../schemas/techStackGenSchema";
 import {
   X,
   Sparkles,
@@ -7,8 +21,6 @@ import {
   Server,
   Database,
   BrainCircuit,
-  Check,
-  Zap,
 } from "lucide-react";
 
 interface CustomTechStackGeneratorModalProps {
@@ -36,24 +48,162 @@ export function CustomTechStackGeneratorModal({
   ];
   const databasePresets = ["PostgreSQL 16", "SQL Server", "MongoDB", "MySQL 8", "DynamoDB / Redis"];
 
-  const handleGenerate = async () => {
-    if (!frontendName.trim() || !backendName.trim() || !databaseName.trim()) {
-      alert("Please select or specify Frontend, Backend, and Database.");
-      return;
-    }
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [statusTone, setStatusTone] = useState<"info" | "error" | "success">("info");
 
-    setIsGenerating(true);
+  const mapDossier = (
+    d: GeneratedParadigm["frontendDossier"],
+    frameworkName: string
+  ) =>
+    d && {
+      framework: frameworkName,
+      conceptTitle: d.conceptTitle,
+      architectureOverview: d.architectureOverview,
+      underTheHoodMechanics: d.underTheHoodMechanics,
+      extendedProductionCode: d.extendedProductionCode,
+      codeExplanation: d.codeExplanation,
+      productionBestPractices: d.productionBestPractices,
+      seniorInterviewProbes: d.seniorInterviewProbes,
+      criticalPitfallsAndAntiPatterns: d.criticalPitfallsAndAntiPatterns,
+    };
 
-    // Simulate AI generation or synthesize dynamic stack profile
-    await new Promise((r) => setTimeout(r, 1200));
+  const mapParadigm = (
+    p: GeneratedParadigm,
+    i: number,
+    frontendName: string,
+    backendName: string
+  ) => ({
+    id: `custom-paradigm-${i + 1}`,
+    category: p.category,
+    name: `${i + 1}. ${p.name.replace(/^\d+\.\s*/, "")}`,
+    angularTitle: p.frontendTitle,
+    angularCode: p.frontendCode,
+    angularSoundbite: p.frontendSoundbite,
+    angularNuance: p.frontendNuance,
+    dotnetTitle: p.backendTitle,
+    dotnetCode: p.backendCode,
+    dotnetSoundbite: p.backendSoundbite,
+    dotnetNuance: p.backendNuance,
+    runtimePhysics: p.runtimePhysics,
+    candidateTrap: p.candidateTrap,
+    coreEquivalency: p.coreEquivalency,
+    interviewPunchline: p.interviewPunchline,
+    angularDossier: mapDossier(p.frontendDossier, frontendName),
+    dotnetDossier: mapDossier(p.backendDossier, backendName),
+  });
 
-    const stackId = `custom-${frontendName.toLowerCase().replace(/[^a-z0-9]/g, "")}-${backendName.toLowerCase().replace(/[^a-z0-9]/g, "")}-${Date.now()}`;
+  const mapScenario = (s: GeneratedScenario, i: number) => ({
+    id: `custom-scenario-${i + 1}`,
+    title: s.title,
+    archetype: s.archetype,
+    coreIssue: s.coreIssue,
+    tenSecondAnchor: s.tenSecondAnchor,
+    fullScript: s.fullScript,
+    steeringBait: s.steeringBait,
+    redFlagPitfalls: s.redFlagPitfalls,
+    telemetryMetrics: s.telemetryMetrics,
+  });
 
-    const newProfile: TechStackProfile = {
+  const buildStackProfile = (
+    baseId: string,
+    payload: TechStackGeneratedPayload | null,
+    input: { frontendName: string; backendName: string; databaseName: string }
+  ): TechStackProfile => {
+    const { frontendName, backendName, databaseName } = input;
+    const stackId = baseId;
+
+    // Per-section salvage: any AI-generated content for a section is used;
+    // sections with nothing usable fall back to the starter template.
+    const paradigms =
+      payload && payload.paradigms.length > 0
+        ? payload.paradigms.map((p, i) => mapParadigm(p, i, input.frontendName, input.backendName))
+        : buildFallbackCustomStackParadigms(input).map((p, i) =>
+            mapParadigm(p, i, input.frontendName, input.backendName)
+          );
+
+    const scenarios =
+      payload && payload.scenarios.length > 0
+        ? payload.scenarios.map(mapScenario)
+        : buildFallbackCustomStackScenarios(input).map((s, i) => mapScenario(s, i));
+
+    const sqlRules =
+      payload && payload.sqlRules.length > 0
+        ? payload.sqlRules.map((r, i) => ({
+          id: `custom-sql-rule-${i + 1}`,
+          category: r.category,
+          title: r.title,
+          badPattern: r.badPattern,
+          optimizedPattern: r.optimizedPattern,
+          explanation: r.explanation,
+          productionImpact: r.productionImpact,
+        }))
+      : [
+          {
+            id: "custom-db-rule-1",
+            category: "Indexing & SARGability" as const,
+            title: `1. ${databaseName} Index Optimization & Covering Indexes`,
+            badPattern: `-- Unindexed query causing full table scan\nSELECT * FROM table WHERE date_col = ...`,
+            optimizedPattern: `-- Indexed query using B-Tree seek\nCREATE INDEX idx_perf ON table (filter_col) INCLUDE (select_col);`,
+            explanation: `Covering indexes allow the ${databaseName} engine to satisfy queries directly from index leaf pages.`,
+            productionImpact: "Eliminates full table scans and reduces disk I/O by 90%.",
+          },
+        ];
+
+    const matrix = payload?.decisionMatrix;
+    const comparisonData = normalizeComparisonData({
+      title: `${frontendName} vs ${backendName} Full-Stack Architecture`,
+      overview:
+        matrix?.overview ||
+        `Strategic evaluation across ${frontendName} client reactivity, ${backendName} backend concurrency, and ${databaseName} data access.`,
+      leftSubject: {
+        name: `${frontendName} (Frontend)`,
+        badge: frontendName,
+        summary: `Modern client-side architecture powered by ${frontendName}.`,
+      },
+      rightSubject: {
+        name: `${backendName} (Backend)`,
+        badge: backendName,
+        summary: `High-performance server architecture driven by ${backendName} and ${databaseName}.`,
+      },
+      dimensions:
+        matrix?.dimensions.map((d, i) => ({
+          id: d.category ? `dim-${i}-${d.category.toLowerCase().replace(/[^a-z0-9]+/g, "-")}` : `dim-${i}`,
+          category: d.category,
+          title: d.title,
+          leftDetail: d.leftDetail,
+          rightDetail: d.rightDetail,
+          winner: d.winner,
+          impactScore: d.impactScore,
+          strategicVerdict: d.strategicVerdict,
+        })) ?? [
+          {
+            id: "dim-custom-1",
+            category: "Architecture",
+            title: "Client-Server Contract Symmetry",
+            leftDetail: `Reactive UI state driven by ${frontendName}.`,
+            rightDetail: `Scalable API endpoints driven by ${backendName}.`,
+            winner: "tie" as const,
+            impactScore: 9,
+            strategicVerdict: `Both tiers combine for rapid development and high throughput.`,
+          },
+        ],
+      verdict: matrix
+        ? matrix.verdict
+        : {
+            title: `Full-Stack Parity: ${frontendName} & ${backendName}`,
+            summary: `Combining ${frontendName} with ${backendName} delivers strong developer velocity and runtime performance.`,
+            recommendations: [
+              `Enforce typed API contracts between ${frontendName} and ${backendName}.`,
+              `Optimize ${databaseName} access patterns for covering reads.`,
+            ],
+          },
+    });
+
+    return {
       id: stackId,
       title: `${frontendName} ↔ ${backendName} & ${databaseName}`,
       shortBadge: `✨ ${frontendName.split(" ")[0]} + ${backendName.split(" ")[0]}`,
-      description: `Custom AI-synthesized architectural matrix bridging ${frontendName} with ${backendName} and ${databaseName}.`,
+      description: `AI-synthesized architectural matrix bridging ${frontendName} with ${backendName} and ${databaseName}.`,
       category: "Custom AI-Generated",
       isCustom: true,
       frontend: {
@@ -77,95 +227,87 @@ export function CustomTechStackGeneratorModal({
       database: {
         name: databaseName,
         engine: databaseName.toLowerCase().includes("sql server")
-          ? "SQL Server"
+          ? ("SQL Server" as const)
           : databaseName.toLowerCase().includes("mongo")
-          ? "MongoDB"
-          : "PostgreSQL",
+          ? ("MongoDB" as const)
+          : ("PostgreSQL" as const),
         iconName: "Database",
       },
-      paradigms: [
-        {
-          id: "di-custom",
-          category: "DI & Lifecycles",
-          name: "1. State & Dependency Management",
-          angularTitle: `${frontendName} State & Injection Architecture`,
-          angularCode: `// ${frontendName} Component State Pattern\nexport function useFeatureState() {\n  // Encapsulated state management\n}`,
-          angularSoundbite: `${frontendName} encapsulates state lifecycle and reactive dependencies cleanly.`,
-          angularNuance: `Ensure state teardown and memory cleanup on view unmounting in ${frontendName}.`,
-          dotnetTitle: `${backendName} Dependency & Service Architecture`,
-          dotnetCode: `// ${backendName} Service\nclass Service {\n  // Injected dependencies\n}`,
-          dotnetSoundbite: `${backendName} enforces modular service encapsulation and non-blocking I/O.`,
-          dotnetNuance: `Configure thread pools and async handlers to avoid thread contention.`,
-          runtimePhysics: `Client V8 runtime handles UI reactivity while ${backendName} executes non-blocking socket handling.`,
-          candidateTrap: `Blocking the backend event loop or failing to unsubscribe from long-lived event listeners on the client.`,
-          coreEquivalency: `Both ${frontendName} and ${backendName} provide structured separation between presentation and domain services.`,
-          interviewPunchline: `We maintain strict separation of concerns between ${frontendName} frontend reactivity and ${backendName} scalable backend pipelines.`,
-        },
-      ],
-      scenarios: [
-        {
-          id: "custom-outage-1",
-          title: `1. ${backendName} High-Concurrency Latency Spike & Scale Bottleneck`,
-          archetype: "Production Outages & War Stories",
-          coreIssue: `Under 10,000 RPS, the ${backendName} service experienced p99 latency spikes due to unindexed queries on ${databaseName}.`,
-          tenSecondAnchor: `Always profile database query execution plans and ensure backend connection pools are sized properly.`,
-          fullScript: `During a traffic surge, our ${backendName} API response time degraded. We analyzed query execution plans against ${databaseName}, added covering indexes, and optimized async worker threads, reducing latency from 4.2s to 12ms.`,
-          steeringBait: ["Query Execution Plan Analysis", "Connection Pool Tuning", "Non-blocking Async I/O"],
-          redFlagPitfalls: ["Failing to index high-frequency query predicates.", "Over-allocating connection pool threads."],
-          telemetryMetrics: "Reduced p99 latency from 4.2s to 12ms at 15k RPS.",
-        },
-      ],
-      sqlRules: [
-        {
-          id: "custom-db-rule-1",
-          category: "Indexing & SARGability",
-          title: `1. ${databaseName} Index Optimization & Covering Indexes`,
-          badPattern: `-- Unindexed query causing full table scan\nSELECT * FROM table WHERE date_col = ...`,
-          optimizedPattern: `-- Indexed query using B-Tree seek\nCREATE INDEX idx_perf ON table (filter_col) INCLUDE (select_col);`,
-          explanation: `Covering indexes allow the ${databaseName} engine to satisfy queries directly from index leaf pages.`,
-          productionImpact: "Eliminates full table scans and reduces disk I/O by 90%.",
-        },
-      ],
-      comparisonData: {
-        id: stackId,
-        title: `${frontendName} vs ${backendName} Full-Stack Architecture`,
-        leftSubject: {
-          name: `${frontendName} (Frontend)`,
-          badge: frontendName,
-          summary: `Modern client-side architecture powered by ${frontendName}.`,
-        },
-        rightSubject: {
-          name: `${backendName} (Backend)`,
-          badge: backendName,
-          summary: `High-performance server architecture driven by ${backendName} and ${databaseName}.`,
-        },
-        dimensions: [
-          {
-            id: "dim-custom-1",
-            category: "Architecture",
-            title: "Client-Server Contract Symmetry",
-            leftDetail: `Reactive UI state driven by ${frontendName}.`,
-            rightDetail: `Scalable API endpoints driven by ${backendName}.`,
-            winner: "tie",
-            impactScore: 9,
-            strategicVerdict: `Both tiers combine for rapid development and high throughput.`,
-          },
-        ],
-        verdict: {
-          title: `Full-Stack Parity: ${frontendName} & ${backendName}`,
-          summary: `Combining ${frontendName} with ${backendName} delivers exceptional developer velocity and runtime performance.`,
-          recommendations: [
-            `Enforce typed API contracts between ${frontendName} and ${backendName}.`,
-            `Optimize ${databaseName} indices for covering reads.`,
-          ],
-        },
-      },
+      paradigms,
+      scenarios,
+      sqlRules,
+      comparisonData,
     };
+  };
+
+  const handleGenerate = async () => {
+    if (!frontendName.trim() || !backendName.trim() || !databaseName.trim()) {
+      alert("Please select or specify Frontend, Backend, and Database.");
+      return;
+    }
+
+    setIsGenerating(true);
+    setStatusMessage(null);
+    setStatusTone("info");
+
+    const stackId = `custom-${frontendName.toLowerCase().replace(/[^a-z0-9]/g, "")}-${backendName.toLowerCase().replace(/[^a-z0-9]/g, "")}-${Date.now()}`;
+    const input = { frontendName, backendName, databaseName };
+
+    let payload: TechStackGeneratedPayload | null = null;
+    try {
+      const stageLabels: Record<string, string> = {
+        paradigms: "Rosetta Stone paradigms",
+        scenarios: "war-story scenarios",
+        sqlRules: "database tuning rules",
+        decision: "decision board",
+      };
+      payload = await generateCustomTechStackPayload(input, (p) => {
+        setStatusTone("info");
+        setStatusMessage(
+          `Generating ${stageLabels[p.stage]}… (${p.done}/${p.total})`
+        );
+      });
+      const used: string[] = [];
+      const missed: string[] = [];
+      const sectionDefs: Array<[string, number, string, string]> = [
+        ["paradigms", payload.paradigms.length, "paradigm(s)", "Rosetta paradigms"],
+        ["scenarios", payload.scenarios.length, "scenario(s)", "war-story scenarios"],
+        ["sqlRules", payload.sqlRules.length, "rule(s)", "tuning rules"],
+      ];
+      for (const [key, n, label, pretty] of sectionDefs) {
+        if (n > 0) {
+          used.push(`${n} ${label}`);
+        } else {
+          missed.push(pretty);
+        }
+      }
+      const matrixNote = payload.decisionMatrix ? "" : " Decision board uses a starter layout.";
+      setStatusMessage(
+        `AI generated ${used.join(", ")}.${
+          missed.length ? ` ${missed.join(" & ")} fell back to the starter template.` : ""
+        }${matrixNote}`
+      );
+      setStatusTone(missed.length || !payload.decisionMatrix ? "info" : "success");
+    } catch (err: any) {
+      console.warn("AI tech-stack generation failed; using starter template instead.", err);
+      setStatusMessage(
+        "AI generation unavailable right now — created a starter template for this stack instead. You can retry from the stack switcher."
+      );
+      setStatusTone("error");
+    }
+
+    const newProfile = buildStackProfile(stackId, payload, input);
 
     saveCustomTechStack(newProfile);
-    setIsGenerating(false);
     onStackGenerated(newProfile);
-    onClose();
+
+    // Let the user read the status before closing on fallback; close
+    // immediately on success.
+    if (payload) {
+      onClose();
+    } else {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -285,11 +427,28 @@ export function CustomTechStackGeneratorModal({
           </div>
         </div>
 
+        {/* Generation Status */}
+        {statusMessage && (
+          <div
+            className={`rounded-xl px-3.5 py-2.5 text-xs font-bold ring-1 ${
+              statusTone === "error"
+                ? "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 ring-amber-200/60 dark:ring-amber-800/40"
+                : statusTone === "success"
+                ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 ring-emerald-200/60 dark:ring-emerald-800/40"
+                : "bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 ring-slate-200/60 dark:ring-slate-700/40"
+            }`}
+            role="status"
+          >
+            {statusMessage}
+          </div>
+        )}
+
         {/* Action Buttons */}
         <div className="flex justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
           <button
             onClick={onClose}
-            className="rounded-xl px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+            disabled={isGenerating}
+            className="rounded-xl px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50"
           >
             Cancel
           </button>

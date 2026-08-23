@@ -1,7 +1,9 @@
 import { MindMapData, ComparisonWorkspaceData } from "../../services/llmService";
 
 export interface FrameworkConceptDossier {
-  framework: "Angular 18+" | ".NET 8/9 & C# 12 / SQL Server";
+  // Widened from a hardcoded union so non-.NET tech stacks can carry
+  // dossiers too (React/Node and Spring data already did this cast-free).
+  framework: string;
   conceptTitle: string;
   architectureOverview: string;
   underTheHoodMechanics: string;
@@ -21,7 +23,9 @@ export interface FrameworkConceptDossier {
 }
 
 export interface FrameworkConceptDossier {
-  framework: "Angular 18+" | ".NET 8/9 & C# 12 / SQL Server";
+  // Widened from a hardcoded union so non-.NET tech stacks can carry
+  // dossiers too (React/Node and Spring data already did this cast-free).
+  framework: string;
   conceptTitle: string;
   architectureOverview: string;
   underTheHoodMechanics: string;
@@ -41,7 +45,9 @@ export interface FrameworkConceptDossier {
 }
 
 export interface FrameworkConceptDossier {
-  framework: "Angular 18+" | ".NET 8/9 & C# 12 / SQL Server";
+  // Widened from a hardcoded union so non-.NET tech stacks can carry
+  // dossiers too (React/Node and Spring data already did this cast-free).
+  framework: string;
   conceptTitle: string;
   architectureOverview: string;
   underTheHoodMechanics: string;
