@@ -68,13 +68,14 @@ export function SqlTuningCheatDeck({ techStack = ANGULAR_DOTNET_STACK }: SqlTuni
       <div className="rounded-[28px] bg-gradient-to-r from-emerald-600/90 via-teal-600/90 to-cyan-600/90 p-6 text-white shadow-xl">
         <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-black uppercase tracking-wider backdrop-blur-md">
           <Database size={14} />
-          SQL-to-.NET Performance Tuning Rules (20 Enterprise Standards)
+          {techStack.database.engine} Tuning Rules ({rules.length}{" "}
+          Enterprise Standards)
         </div>
         <h2 className="mt-3 text-2xl sm:text-3xl font-black tracking-tight">
-          SARGability, Index Seeks, Concurrency & Ingestion Mastery
+          Indexing, Concurrency & Query Engine Mastery
         </h2>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-white/90">
-          Master the complete relational database performance playbook: B-Tree range seeks, RCSI lock contention elimination, Parameter Sniffing defense, Columnstore compression, and high-throughput SqlBulkCopy streaming.
+          Master the complete {techStack.database.name} performance playbook: access-path selection, lock and concurrency control, plan-level diagnostics, and high-throughput ingestion patterns.
         </p>
       </div>
 
@@ -85,8 +86,8 @@ export function SqlTuningCheatDeck({ techStack = ANGULAR_DOTNET_STACK }: SqlTuni
           {categories.map((cat) => {
             const count =
               cat === "All"
-                ? SQL_PERFORMANCE_RULES.length
-                : SQL_PERFORMANCE_RULES.filter((r) => r.category === cat).length;
+                ? rules.length
+                : rules.filter((r) => r.category === cat).length;
             return (
               <button
                 key={cat}
