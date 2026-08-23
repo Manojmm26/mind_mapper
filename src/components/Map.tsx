@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import {
   ReactFlow,
   MiniMap,
@@ -34,6 +34,99 @@ interface MapProps {
   initialEdges?: Edge[];
   selectedNodeId?: string | null;
   onSelectNode?: (nodeId: string) => void;
+}
+
+// Graphs larger than this are mounted in batches so the first paint happens
+// before the full node set is committed, keeping the main thread responsive.
+const PROGRESSIVE_RENDER_THRESHOLD = 250;
+const PROGRESSIVE_BATCH_SIZE = 150;
+
+function buildProgressiveBatches(
+  nodes: Node[],
+  edges: Edge[],
+  batchSize: number
+): Array<{ nodes: Node[]; edges: Edge[] }> {
+  // Plain dictionaries are used because the exported `Map` component below
+  // shadows the built-in Map constructor within this module.
+  const nodeById: Record<string, Node> = {};
+  const edgeById: Record<string, Edge> = {};
+  nodes.forEach((n) => {
+    nodeById[n.id] = n;
+  });
+  edges.forEach((e) => {
+    edgeById[e.id] = e;
+  });
+  const outgoing: Record<string, string[]> = {};
+  const pendingEdgesByTarget: Record<string, Edge[]> = {};
+  const hasIncoming = new Set<string>();
+
+  edges.forEach((e) => {
+    if (!outgoing[e.source]) outgoing[e.source] = [];
+    outgoing[e.source].push(e.id);
+    hasIncoming.add(e.target);
+    if (pendingEdgesByTarget[e.target]) pendingEdgesByTarget[e.target].push(e);
+    else pendingEdgesByTarget[e.target] = [e];
+  });
+
+  const visited = new Set<string>();
+  const batches: Array<{ nodes: Node[]; edges: Edge[] }> = [];
+  let currentNodes: Node[] = [];
+  let currentEdges: Edge[] = [];
+
+  const flush = () => {
+    if (currentNodes.length || currentEdges.length) {
+      batches.push({ nodes: currentNodes, edges: currentEdges });
+      currentNodes = [];
+      currentEdges = [];
+    }
+  };
+
+  const addNode = (id: string): boolean => {
+    if (visited.has(id)) return false;
+    const n = nodeById[id];
+    if (!n) return false;
+    visited.add(id);
+    currentNodes.push(n);
+    // Edges are committed only once their target exists so React Flow
+    // never sees an edge with a missing endpoint.
+    const pending = pendingEdgesByTarget[id];
+    if (pending) {
+      currentEdges.push(...pending);
+      delete pendingEdgesByTarget[id];
+    }
+    return true;
+  };
+
+  let queue: string[] = [];
+  for (const n of nodes) {
+    if (!hasIncoming.has(n.id)) queue.push(n.id);
+  }
+  if (!queue.length && nodes.length) queue = [nodes[0].id];
+
+  while (queue.length) {
+    const nextQueue: string[] = [];
+    for (const id of queue) {
+      if (!addNode(id)) continue;
+      if (currentNodes.length >= batchSize) flush();
+      for (const eid of outgoing[id] || []) {
+        const target = edgeById[eid]?.target;
+        if (target && !visited.has(target)) nextQueue.push(target);
+      }
+    }
+    if (!nextQueue.length) break;
+    queue = nextQueue;
+  }
+
+  // Any leftovers (disconnected or cyclic fragments)
+  for (const n of nodes) {
+    if (!visited.has(n.id)) {
+      addNode(n.id);
+      if (currentNodes.length >= batchSize) flush();
+    }
+  }
+  flush();
+
+  return batches.length ? batches : [{ nodes, edges }];
 }
 
 const THEMES = ['blue', 'green', 'amber', 'purple', 'teal', 'pink', 'orange', 'red'];
@@ -83,9 +176,12 @@ const buildGraphMetadata = (nodes: Node[], edges: Edge[]): GraphMetadata => {
     parentMap[edge.target] = edge.source;
   });
 
-  const roots = nodes
-    .filter((node) => inDegree[node.id] === 0)
-    .map((node) => node.id);
+  const roots = nodes.reduce<string[]>((acc, node) => {
+    if (inDegree[node.id] === 0) {
+      acc.push(node.id);
+    }
+    return acc;
+  }, []);
 
   const visit = (nodeId: string, depth: number) => {
     if (depths[nodeId] !== undefined) {
@@ -282,9 +378,12 @@ const getVisibleNodes = (
 const updateLayout = (currentNodes: Node[], currentEdges: Edge[]) => {
   const metadata = buildGraphMetadata(currentNodes, currentEdges);
   const collapsedNodeIds = new Set(
-    currentNodes
-      .filter((node) => Boolean(node.data?.isCollapsed))
-      .map((node) => node.id),
+    currentNodes.reduce<string[]>((acc, node) => {
+      if (Boolean(node.data?.isCollapsed)) {
+        acc.push(node.id);
+      }
+      return acc;
+    }, []),
   );
   const visibleNodeIds = getVisibleNodes(currentNodes, currentEdges, metadata);
   const visibleNodes = currentNodes.filter(n => visibleNodeIds.has(n.id));
@@ -360,6 +459,43 @@ export function Map({ data, onSave, initialNodes, initialEdges, selectedNodeId, 
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   useEffect(() => {
+    let cancelled = false;
+    let pendingTimers: number[] = [];
+
+    const applyGraph = (layoutedNodes: Node[], layoutedEdges: Edge[]) => {
+      if (layoutedNodes.length <= PROGRESSIVE_RENDER_THRESHOLD) {
+        setNodes(layoutedNodes);
+        setEdges(layoutedEdges);
+        return;
+      }
+
+      // Progressive mount: paint the first batch immediately, then append
+      // remaining nodes/edges in batches across event-loop turns.
+      const batches = buildProgressiveBatches(
+        layoutedNodes,
+        layoutedEdges,
+        PROGRESSIVE_BATCH_SIZE
+      );
+      const first = batches[0] ?? { nodes: [], edges: [] };
+      let acc = { nodes: first.nodes, edges: first.edges };
+      setNodes(acc.nodes);
+      setEdges(acc.edges);
+
+      for (let i = 1; i < batches.length; i++) {
+        const batch = batches[i];
+        const timer = window.setTimeout(() => {
+          if (cancelled) return;
+          acc = {
+            nodes: acc.nodes.concat(batch.nodes),
+            edges: acc.edges.concat(batch.edges),
+          };
+          setNodes(acc.nodes);
+          setEdges(acc.edges);
+        }, 0);
+        pendingTimers.push(timer);
+      }
+    };
+
     if (data && !initialNodes && !initialEdges) {
       const rawNodes: Node[] = data.nodes.map((node) => createFlowNode(node));
       const rawEdges: Edge[] = data.edges.map((edge) => createFlowEdge(edge));
@@ -367,16 +503,19 @@ export function Map({ data, onSave, initialNodes, initialEdges, selectedNodeId, 
         ? revealSelectedPath(rawNodes, rawEdges, selectedNodeId)
         : rawNodes;
       const { nodes: layoutedNodes, edges: layoutedEdges } = prepareGraph(preparedNodes, rawEdges);
-      setNodes(layoutedNodes);
-      setEdges(layoutedEdges);
+      applyGraph(layoutedNodes, layoutedEdges);
     } else if (initialNodes && initialEdges) {
       const preparedNodes = selectedNodeId
         ? revealSelectedPath(initialNodes, initialEdges, selectedNodeId)
         : initialNodes;
       const { nodes: layoutedNodes, edges: layoutedEdges } = prepareGraph(preparedNodes, initialEdges);
-      setNodes(layoutedNodes);
-      setEdges(layoutedEdges);
+      applyGraph(layoutedNodes, layoutedEdges);
     }
+
+    return () => {
+      cancelled = true;
+      pendingTimers.forEach((t) => window.clearTimeout(t));
+    };
   }, [data, initialNodes, initialEdges, selectedNodeId, setNodes, setEdges]);
 
   useEffect(() => {
@@ -467,8 +606,10 @@ export function Map({ data, onSave, initialNodes, initialEdges, selectedNodeId, 
 
   const { theme } = useTheme();
 
+  const mapContextValue = useMemo(() => ({ onToggle: handleToggle }), [handleToggle]);
+
   return (
-    <MapContext.Provider value={{ onToggle: handleToggle }}>
+    <MapContext.Provider value={mapContextValue}>
       <div ref={containerRef} className="h-full w-full relative bg-slate-100 dark:bg-slate-950 transition-colors">
         <ReactFlow
           nodes={nodes}
