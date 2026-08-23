@@ -1,130 +1,7 @@
 import { MindMapData, ComparisonWorkspaceData } from "../../services/llmService";
-import exampleData from "../../../backend_mind_map.json";
 
-import { AEROSPACE_ROCKETRY_EXAMPLE } from "./aerospaceRocketry";
-import { AGENT_MEMORY_ARCHITECTURES_COMPARISON_EXAMPLE } from "./agentMemoryArchitecturesComparison";
-import { AGENT_REASONING_STRATEGIES_COMPARISON_EXAMPLE } from "./agentReasoningStrategiesComparison";
-import { AI_CODE_ASSISTANTS_COMPARISON_EXAMPLE } from "./aiCodeAssistantsComparison";
-import { AI_ENGINEERING_EXAMPLE } from "./aiEngineering";
-import { AI_GUARDRAILS_COMPARISON_EXAMPLE } from "./aiGuardrailsComparison";
-import { API_ARCHITECTURES_COMPARISON_EXAMPLE } from "./apiArchitecturesComparison";
-import { API_AUTH_SCHEMES_COMPARISON_EXAMPLE } from "./apiAuthSchemesComparison";
-import { API_GATEWAYS_COMPARISON_EXAMPLE } from "./apiGatewaysComparison";
-import { API_PROTOCOLS_COMPARISON_EXAMPLE } from "./apiProtocolsComparison";
-import { API_TESTING_TOOLS_COMPARISON_EXAMPLE } from "./apiTestingToolsComparison";
-import { ARCHITECTURAL_TOPOLOGIES_COMPARISON_EXAMPLE } from "./architecturalTopologiesComparison";
-import { AUTH_PROVIDERS_COMPARISON_EXAMPLE } from "./authProvidersComparison";
-import { AUTONOMOUS_CODING_AGENTS_COMPARISON_EXAMPLE } from "./autonomousCodingAgentsComparison";
-import { AUTONOMOUS_ROBOTICS_EXAMPLE } from "./autonomousRobotics";
-import { BIOINFORMATICS_EXAMPLE } from "./bioinformatics";
-import { BUILD_TOOLS_COMPARISON_EXAMPLE } from "./buildToolsComparison";
-import { CD_PROGRESSIVE_ROLLOUTS_COMPARISON_EXAMPLE } from "./cdProgressiveRolloutsComparison";
-import { CHIP_DESIGN_SEMICONDUCTORS_EXAMPLE } from "./chipDesignSemiconductors";
-import { CICD_PIPELINES_COMPARISON_EXAMPLE } from "./cicdPipelinesComparison";
-import { CLOUD_ARCHITECTURE_EXAMPLE } from "./cloudArchitecture";
-import { CMS_COMPARISON_EXAMPLE } from "./cmsComparison";
-import { CNI_PLUGINS_COMPARISON_EXAMPLE } from "./cniPluginsComparison";
-import { CODE_QUALITY_TOOLS_COMPARISON_EXAMPLE } from "./codeQualityToolsComparison";
-import { COMPILER_INTERNALS_EXAMPLE } from "./compilerInternals";
-import { COMPUTER_NETWORKS_EXAMPLE } from "./computerNetworks";
-import { CONTAINER_ORCHESTRATION_COMPARISON_EXAMPLE } from "./containerOrchestrationComparison";
-import { CONTAINER_REGISTRIES_COMPARISON_EXAMPLE } from "./containerRegistriesComparison";
-import { CONTAINER_RUNTIMES_COMPARISON_EXAMPLE } from "./containerRuntimesComparison";
-import { CONTAINER_SECURITY_COMPARISON_EXAMPLE } from "./containerSecurityComparison";
-import { CRYPTOGRAPHY_EXAMPLE } from "./cryptography";
-import { CSS_STYLING_COMPARISON_EXAMPLE } from "./cssStylingComparison";
-import { DATA_ENGINEERING_EXAMPLE } from "./dataEngineering";
-import { DATA_PIPELINE_ORCHESTRATORS_COMPARISON_EXAMPLE } from "./dataPipelineOrchestratorsComparison";
-import { DATA_SERIALIZATION_COMPARISON_EXAMPLE } from "./dataSerializationComparison";
-import { DATA_WAREHOUSE_COMPARISON_EXAMPLE } from "./dataWarehouseComparison";
-import { DB_COMPARISON_EXAMPLE } from "./dbComparison";
-import { DB_INDEXING_STRUCTURES_COMPARISON_EXAMPLE } from "./dbIndexingStructuresComparison";
-import { DB_PARADIGMS_COMPARISON_EXAMPLE } from "./dbParadigmsComparison";
-import { DESKTOP_FRAMEWORKS_COMPARISON_EXAMPLE } from "./desktopFrameworksComparison";
-import { DEVSECOPS_EXAMPLE } from "./devSecOps";
-import { DIAGRAMMING_LIBRARIES_COMPARISON_EXAMPLE } from "./diagrammingLibrariesComparison";
-import { DISTRIBUTED_CONSENSUS_COMPARISON_EXAMPLE } from "./distributedConsensusComparison";
-import { DISTRIBUTED_FILE_SYSTEMS_COMPARISON_EXAMPLE } from "./distributedFileSystemsComparison";
-import { DISTRIBUTED_LOCKS_COMPARISON_EXAMPLE } from "./distributedLocksComparison";
-import { DISTRIBUTED_TRACING_COMPARISON_EXAMPLE } from "./distributedTracingComparison";
-import { DISTRIBUTED_TRANSACTIONS_COMPARISON_EXAMPLE } from "./distributedTransactionsComparison";
-import { DNS_CDN_PLATFORMS_COMPARISON_EXAMPLE } from "./dnsCdnPlatformsComparison";
-import { E2E_TESTING_COMPARISON_EXAMPLE } from "./e2eTestingComparison";
-import { EDGE_AI_FRAMEWORKS_COMPARISON_EXAMPLE } from "./edgeAiFrameworksComparison";
-import { EDGE_STORAGE_COMPARISON_EXAMPLE } from "./edgeStorageComparison";
-import { EMBEDDED_SYSTEMS_EXAMPLE } from "./embeddedSystems";
-import { EMBEDDING_MODELS_COMPARISON_EXAMPLE } from "./embeddingModelsComparison";
-import { FEATURE_FLAGS_COMPARISON_EXAMPLE } from "./featureFlagsComparison";
-import { FINTECH_SYSTEMS_EXAMPLE } from "./fintechSystems";
-import { FRONTEND_STATE_ARCHITECTURE_COMPARISON_EXAMPLE } from "./frontendStateArchitectureComparison";
-import { FULLSTACK_DOTNET_ANGULAR_MATRIX_EXAMPLE } from "./fullStackDotNetAngularMatrix";
-import { FULLSTACK_WEB_EXAMPLE } from "./fullStackWeb";
-import { GAME_ENGINES_COMPARISON_EXAMPLE } from "./gameEnginesComparison";
-import { GPU_COMPUTING_EXAMPLE } from "./gpuComputing";
-import { GRAPH_DATABASES_COMPARISON_EXAMPLE } from "./graphDatabasesComparison";
-import { HTTP_SERVER_RUNTIMES_COMPARISON_EXAMPLE } from "./httpServerRuntimesComparison";
-import { IAC_FRAMEWORKS_COMPARISON_EXAMPLE } from "./iacFrameworksComparison";
-import { IAC_TOOLS_COMPARISON_EXAMPLE } from "./iacToolsComparison";
-import { IAM_PROTOCOLS_COMPARISON_EXAMPLE } from "./iamProtocolsComparison";
-import { IN_MEMORY_CACHE_COMPARISON_EXAMPLE } from "./inMemoryCacheComparison";
-import { JS_RUNTIMES_COMPARISON_EXAMPLE } from "./jsRuntimesComparison";
-import { KUBERNETES_CLOUD_NATIVE_EXAMPLE } from "./kubernetesCloudNative";
-import { LAKEHOUSE_FORMATS_COMPARISON_EXAMPLE } from "./lakehouseFormatsComparison";
-import { LINUX_DISTROS_COMPARISON_EXAMPLE } from "./linuxDistrosComparison";
-import { LLM_BASE_MODELS_COMPARISON_EXAMPLE } from "./llmBaseModelsComparison";
-import { LLM_EVALUATION_COMPARISON_EXAMPLE } from "./llmEvaluationComparison";
-import { LLM_FRAMEWORKS_COMPARISON_EXAMPLE } from "./llmFrameworksComparison";
-import { LLM_ORCHESTRATION_COMPARISON_EXAMPLE } from "./llmOrchestrationComparison";
-import { LLM_QUANTIZATION_COMPARISON_EXAMPLE } from "./llmQuantizationComparison";
-import { LLM_SERVING_ENGINES_COMPARISON_EXAMPLE } from "./llmServingEnginesComparison";
-import { LOAD_TESTING_TOOLS_COMPARISON_EXAMPLE } from "./loadTestingToolsComparison";
-import { LOCAL_FIRST_SYNC_COMPARISON_EXAMPLE } from "./localFirstSyncComparison";
-import { LOG_AGGREGATION_BACKENDS_COMPARISON_EXAMPLE } from "./logAggregationBackendsComparison";
-import { MANAGED_KUBERNETES_COMPARISON_EXAMPLE } from "./managedKubernetesComparison";
-import { MESSAGE_BROKERS_EXAMPLE } from "./messageBrokers";
-import { MESSAGING_BROKERS_COMPARISON_EXAMPLE } from "./messagingBrokersComparison";
-import { META_FRAMEWORKS_COMPARISON_EXAMPLE } from "./metaFrameworksComparison";
-import { ML_FROM_FIRST_PRINCIPLES_EXAMPLE } from "./mlFromFirstPrinciples";
-import { ML_INFRASTRUCTURE_EXAMPLE } from "./mlInfrastructure";
-import { MOBILE_CROSS_PLATFORM_COMPARISON_EXAMPLE } from "./mobileCrossPlatformComparison";
-import { MOBILE_FRAMEWORKS_COMPARISON_EXAMPLE } from "./mobileFrameworksComparison";
-import { MOBILE_STATE_MANAGEMENT_COMPARISON_EXAMPLE } from "./mobileStateManagementComparison";
-import { MONITORING_PLATFORMS_COMPARISON_EXAMPLE } from "./monitoringPlatformsComparison";
-import { MONOREPO_TOOLS_COMPARISON_EXAMPLE } from "./monorepoToolsComparison";
-import { NEUROSCIENCE_EXAMPLE } from "./neuroscience";
-import { OBJECT_STORAGE_COMPARISON_EXAMPLE } from "./objectStorageComparison";
-import { OBSERVABILITY_COMPARISON_EXAMPLE } from "./observabilityComparison";
-import { PACKAGE_MANAGERS_COMPARISON_EXAMPLE } from "./packageManagersComparison";
-import { POD_AUTOSCALING_ENGINES_COMPARISON_EXAMPLE } from "./podAutoscalingEnginesComparison";
-import { PRODUCT_MANAGEMENT_EXAMPLE } from "./productManagement";
-import { PYTHON_FRAMEWORKS_COMPARISON_EXAMPLE } from "./pythonFrameworksComparison";
-import { QUANTUM_COMPUTING_EXAMPLE } from "./quantumComputing";
-import { RATE_LIMITING_ALGORITHMS_COMPARISON_EXAMPLE } from "./rateLimitingAlgorithmsComparison";
-import { REALTIME_PROTOCOLS_COMPARISON_EXAMPLE } from "./realtimeProtocolsComparison";
-import { RENDERING_STRATEGIES_COMPARISON_EXAMPLE } from "./renderingStrategiesComparison";
-import { SAAS_GROWTH_EXAMPLE } from "./saasGrowth";
-import { SCHEMA_MIGRATIONS_COMPARISON_EXAMPLE } from "./schemaMigrationsComparison";
-import { SEARCH_ENGINES_COMPARISON_EXAMPLE } from "./searchEnginesComparison";
-import { SECRET_MANAGEMENT_COMPARISON_EXAMPLE } from "./secretManagementComparison";
-import { SERVERLESS_COMPUTE_COMPARISON_EXAMPLE } from "./serverlessComputeComparison";
-import { SERVERLESS_DATABASES_COMPARISON_EXAMPLE } from "./serverlessDatabasesComparison";
-import { SERVICE_MESH_COMPARISON_EXAMPLE } from "./serviceMeshComparison";
-import { STAFF_ENGINEERING_EXAMPLE } from "./staffEngineering";
-import { STARTUP_BLUEPRINT_EXAMPLE } from "./startupBlueprint";
-import { STATE_MANAGEMENT_COMPARISON_EXAMPLE } from "./stateManagementComparison";
-import { STREAM_PROCESSING_COMPARISON_EXAMPLE } from "./streamProcessingComparison";
-import { SYSTEM_ARCHITECTURES_COMPARISON_EXAMPLE } from "./systemArchitecturesComparison";
-import { SYSTEM_DESIGN_EXAMPLE } from "./systemDesign";
-import { SYSTEM_LANGUAGES_COMPARISON_EXAMPLE } from "./systemLanguagesComparison";
-import { TASK_QUEUES_COMPARISON_EXAMPLE } from "./taskQueuesComparison";
-import { TIME_SERIES_DATABASES_COMPARISON_EXAMPLE } from "./timeSeriesDatabasesComparison";
-import { UI_COMPONENT_LIBRARIES_COMPARISON_EXAMPLE } from "./uiComponentLibrariesComparison";
-import { VECTOR_DATABASE_ENGINES_COMPARISON_EXAMPLE } from "./vectorDatabaseEnginesComparison";
-import { VECTOR_DATABASES_COMPARISON_EXAMPLE } from "./vectorDatabasesComparison";
-import { WAF_SECURITY_COMPARISON_EXAMPLE } from "./wafSecurityComparison";
-import { WEB_BUNDLERS_COMPARISON_EXAMPLE } from "./webBundlersComparison";
-import { WEB_FRONTEND_EXAMPLE } from "./webFrontend";
-import { ZERO_TRUST_SECURITY_COMPARISON_EXAMPLE } from "./zeroTrustSecurityComparison";
+// NOTE: example payloads are lazy-loaded per card via dynamic imports below.
+// This module only carries lightweight metadata so the gallery chunk stays small.
 
 export type ExampleCategory =
   | "All"
@@ -156,10 +33,10 @@ export interface CuratedExample {
   tags: string[];
   icon: "Cpu" | "Network" | "Scale" | "Rocket" | "Atom" | "Server" | "Shield" | "Globe" | "Cloud" | "Brain" | "BarChart" | "Layers" | "Star";
   gradient: string;
-  data: MindMapData | ComparisonWorkspaceData;
 }
 
 export const CURATED_EXAMPLES: CuratedExample[] = [
+
   {
     id: "aerospace-rocketry",
     title: "aerospaceRocketry",
@@ -170,7 +47,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "aerospaceRocketry"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: AEROSPACE_ROCKETRY_EXAMPLE,
   },
   {
     id: "agent-memory-architectures-comparison",
@@ -182,7 +58,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "agentMemoryArchitecturesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: AGENT_MEMORY_ARCHITECTURES_COMPARISON_EXAMPLE,
   },
   {
     id: "agent-reasoning-strategies-comparison",
@@ -194,7 +69,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "agentReasoningStrategiesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: AGENT_REASONING_STRATEGIES_COMPARISON_EXAMPLE,
   },
   {
     id: "ai-code-assistants-comparison",
@@ -206,7 +80,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "aiCodeAssistantsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: AI_CODE_ASSISTANTS_COMPARISON_EXAMPLE,
   },
   {
     id: "ai-engineering",
@@ -218,7 +91,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "aiEngineering"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: AI_ENGINEERING_EXAMPLE,
   },
   {
     id: "ai-guardrails-comparison",
@@ -230,7 +102,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "aiGuardrailsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: AI_GUARDRAILS_COMPARISON_EXAMPLE,
   },
   {
     id: "api-architectures-comparison",
@@ -242,7 +113,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "apiArchitecturesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: API_ARCHITECTURES_COMPARISON_EXAMPLE,
   },
   {
     id: "api-auth-schemes-comparison",
@@ -254,7 +124,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "apiAuthSchemesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: API_AUTH_SCHEMES_COMPARISON_EXAMPLE,
   },
   {
     id: "api-gateways-comparison",
@@ -266,7 +135,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "apiGatewaysComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: API_GATEWAYS_COMPARISON_EXAMPLE,
   },
   {
     id: "api-protocols-comparison",
@@ -278,7 +146,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "apiProtocolsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: API_PROTOCOLS_COMPARISON_EXAMPLE,
   },
   {
     id: "api-testing-tools-comparison",
@@ -290,7 +157,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "apiTestingToolsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: API_TESTING_TOOLS_COMPARISON_EXAMPLE,
   },
   {
     id: "architectural-topologies-comparison",
@@ -302,7 +168,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "architecturalTopologiesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: ARCHITECTURAL_TOPOLOGIES_COMPARISON_EXAMPLE,
   },
   {
     id: "auth-providers-comparison",
@@ -314,7 +179,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "authProvidersComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: AUTH_PROVIDERS_COMPARISON_EXAMPLE,
   },
   {
     id: "autonomous-coding-agents-comparison",
@@ -326,7 +190,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "autonomousCodingAgentsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: AUTONOMOUS_CODING_AGENTS_COMPARISON_EXAMPLE,
   },
   {
     id: "autonomous-robotics",
@@ -338,7 +201,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "autonomousRobotics"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: AUTONOMOUS_ROBOTICS_EXAMPLE,
   },
   {
     id: "bioinformatics",
@@ -350,7 +212,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "bioinformatics"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: BIOINFORMATICS_EXAMPLE,
   },
   {
     id: "build-tools-comparison",
@@ -362,7 +223,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "buildToolsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: BUILD_TOOLS_COMPARISON_EXAMPLE,
   },
   {
     id: "cd-progressive-rollouts-comparison",
@@ -374,7 +234,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "cdProgressiveRolloutsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: CD_PROGRESSIVE_ROLLOUTS_COMPARISON_EXAMPLE,
   },
   {
     id: "chip-design-semiconductors",
@@ -386,7 +245,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "chipDesignSemiconductors"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: CHIP_DESIGN_SEMICONDUCTORS_EXAMPLE,
   },
   {
     id: "cicd-pipelines-comparison",
@@ -398,7 +256,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "cicdPipelinesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: CICD_PIPELINES_COMPARISON_EXAMPLE,
   },
   {
     id: "cloud-architecture",
@@ -410,7 +267,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "cloudArchitecture"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: CLOUD_ARCHITECTURE_EXAMPLE,
   },
   {
     id: "cms-comparison",
@@ -422,7 +278,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "cmsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: CMS_COMPARISON_EXAMPLE,
   },
   {
     id: "cni-plugins-comparison",
@@ -434,7 +289,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "cniPluginsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: CNI_PLUGINS_COMPARISON_EXAMPLE,
   },
   {
     id: "code-quality-tools-comparison",
@@ -446,7 +300,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "codeQualityToolsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: CODE_QUALITY_TOOLS_COMPARISON_EXAMPLE,
   },
   {
     id: "compiler-internals",
@@ -458,7 +311,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "compilerInternals"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: COMPILER_INTERNALS_EXAMPLE,
   },
   {
     id: "computer-networks",
@@ -470,7 +322,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "computerNetworks"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: COMPUTER_NETWORKS_EXAMPLE,
   },
   {
     id: "container-orchestration-comparison",
@@ -482,7 +333,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "containerOrchestrationComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: CONTAINER_ORCHESTRATION_COMPARISON_EXAMPLE,
   },
   {
     id: "container-registries-comparison",
@@ -494,7 +344,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "containerRegistriesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: CONTAINER_REGISTRIES_COMPARISON_EXAMPLE,
   },
   {
     id: "container-runtimes-comparison",
@@ -506,7 +355,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "containerRuntimesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: CONTAINER_RUNTIMES_COMPARISON_EXAMPLE,
   },
   {
     id: "container-security-comparison",
@@ -518,7 +366,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "containerSecurityComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: CONTAINER_SECURITY_COMPARISON_EXAMPLE,
   },
   {
     id: "cryptography",
@@ -530,7 +377,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "cryptography"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: CRYPTOGRAPHY_EXAMPLE,
   },
   {
     id: "css-styling-comparison",
@@ -542,7 +388,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "cssStylingComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: CSS_STYLING_COMPARISON_EXAMPLE,
   },
   {
     id: "data-engineering",
@@ -554,7 +399,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "dataEngineering"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: DATA_ENGINEERING_EXAMPLE,
   },
   {
     id: "data-pipeline-orchestrators-comparison",
@@ -566,7 +410,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "dataPipelineOrchestratorsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: DATA_PIPELINE_ORCHESTRATORS_COMPARISON_EXAMPLE,
   },
   {
     id: "data-serialization-comparison",
@@ -578,7 +421,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "dataSerializationComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: DATA_SERIALIZATION_COMPARISON_EXAMPLE,
   },
   {
     id: "data-warehouse-comparison",
@@ -590,7 +432,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "dataWarehouseComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: DATA_WAREHOUSE_COMPARISON_EXAMPLE,
   },
   {
     id: "db-comparison",
@@ -602,7 +443,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "dbComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: DB_COMPARISON_EXAMPLE,
   },
   {
     id: "db-indexing-structures-comparison",
@@ -614,7 +454,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "dbIndexingStructuresComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: DB_INDEXING_STRUCTURES_COMPARISON_EXAMPLE,
   },
   {
     id: "db-paradigms-comparison",
@@ -626,7 +465,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "dbParadigmsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: DB_PARADIGMS_COMPARISON_EXAMPLE,
   },
   {
     id: "desktop-frameworks-comparison",
@@ -638,7 +476,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "desktopFrameworksComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: DESKTOP_FRAMEWORKS_COMPARISON_EXAMPLE,
   },
   {
     id: "dev-sec-ops",
@@ -650,7 +487,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "devSecOps"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: DEVSECOPS_EXAMPLE,
   },
   {
     id: "diagramming-libraries-comparison",
@@ -662,7 +498,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "diagrammingLibrariesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: DIAGRAMMING_LIBRARIES_COMPARISON_EXAMPLE,
   },
   {
     id: "distributed-consensus-comparison",
@@ -674,7 +509,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "distributedConsensusComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: DISTRIBUTED_CONSENSUS_COMPARISON_EXAMPLE,
   },
   {
     id: "distributed-file-systems-comparison",
@@ -686,7 +520,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "distributedFileSystemsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: DISTRIBUTED_FILE_SYSTEMS_COMPARISON_EXAMPLE,
   },
   {
     id: "distributed-locks-comparison",
@@ -698,7 +531,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "distributedLocksComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: DISTRIBUTED_LOCKS_COMPARISON_EXAMPLE,
   },
   {
     id: "distributed-tracing-comparison",
@@ -710,7 +542,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "distributedTracingComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: DISTRIBUTED_TRACING_COMPARISON_EXAMPLE,
   },
   {
     id: "distributed-transactions-comparison",
@@ -722,7 +553,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "distributedTransactionsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: DISTRIBUTED_TRANSACTIONS_COMPARISON_EXAMPLE,
   },
   {
     id: "dns-cdn-platforms-comparison",
@@ -734,7 +564,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "dnsCdnPlatformsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: DNS_CDN_PLATFORMS_COMPARISON_EXAMPLE,
   },
   {
     id: "e2e-testing-comparison",
@@ -746,7 +575,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "e2eTestingComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: E2E_TESTING_COMPARISON_EXAMPLE,
   },
   {
     id: "edge-ai-frameworks-comparison",
@@ -758,7 +586,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "edgeAiFrameworksComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: EDGE_AI_FRAMEWORKS_COMPARISON_EXAMPLE,
   },
   {
     id: "edge-storage-comparison",
@@ -770,7 +597,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "edgeStorageComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: EDGE_STORAGE_COMPARISON_EXAMPLE,
   },
   {
     id: "embedded-systems",
@@ -782,7 +608,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "embeddedSystems"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: EMBEDDED_SYSTEMS_EXAMPLE,
   },
   {
     id: "embedding-models-comparison",
@@ -794,7 +619,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "embeddingModelsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: EMBEDDING_MODELS_COMPARISON_EXAMPLE,
   },
   {
     id: "feature-flags-comparison",
@@ -806,7 +630,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "featureFlagsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: FEATURE_FLAGS_COMPARISON_EXAMPLE,
   },
   {
     id: "fintech-systems",
@@ -818,7 +641,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "fintechSystems"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: FINTECH_SYSTEMS_EXAMPLE,
   },
   {
     id: "frontend-state-architecture-comparison",
@@ -830,7 +652,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "frontendStateArchitectureComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: FRONTEND_STATE_ARCHITECTURE_COMPARISON_EXAMPLE,
   },
   {
     id: "full-stack-dotnet-angular-matrix",
@@ -842,7 +663,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "Comparisons", ".NET 8/9", "Angular 18+", "SQL Server", "Architecture", "Interview Prep"],
     icon: "GraduationCap" as any,
     gradient: "from-red-500 via-purple-500 to-blue-600",
-    data: FULLSTACK_DOTNET_ANGULAR_MATRIX_EXAMPLE,
   },
   {
     id: "full-stack-web",
@@ -854,7 +674,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "fullStackWeb"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: FULLSTACK_WEB_EXAMPLE,
   },
   {
     id: "game-engines-comparison",
@@ -866,7 +685,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "gameEnginesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: GAME_ENGINES_COMPARISON_EXAMPLE,
   },
   {
     id: "gpu-computing",
@@ -878,7 +696,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "gpuComputing"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: GPU_COMPUTING_EXAMPLE,
   },
   {
     id: "graph-databases-comparison",
@@ -890,7 +707,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "graphDatabasesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: GRAPH_DATABASES_COMPARISON_EXAMPLE,
   },
   {
     id: "http-server-runtimes-comparison",
@@ -902,7 +718,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "httpServerRuntimesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: HTTP_SERVER_RUNTIMES_COMPARISON_EXAMPLE,
   },
   {
     id: "iac-frameworks-comparison",
@@ -914,7 +729,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "iacFrameworksComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: IAC_FRAMEWORKS_COMPARISON_EXAMPLE,
   },
   {
     id: "iac-tools-comparison",
@@ -926,7 +740,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "iacToolsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: IAC_TOOLS_COMPARISON_EXAMPLE,
   },
   {
     id: "iam-protocols-comparison",
@@ -938,7 +751,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "iamProtocolsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: IAM_PROTOCOLS_COMPARISON_EXAMPLE,
   },
   {
     id: "in-memory-cache-comparison",
@@ -950,7 +762,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "inMemoryCacheComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: IN_MEMORY_CACHE_COMPARISON_EXAMPLE,
   },
   {
     id: "js-runtimes-comparison",
@@ -962,7 +773,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "jsRuntimesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: JS_RUNTIMES_COMPARISON_EXAMPLE,
   },
   {
     id: "kubernetes-cloud-native",
@@ -974,7 +784,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "kubernetesCloudNative"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: KUBERNETES_CLOUD_NATIVE_EXAMPLE,
   },
   {
     id: "lakehouse-formats-comparison",
@@ -986,7 +795,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "lakehouseFormatsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: LAKEHOUSE_FORMATS_COMPARISON_EXAMPLE,
   },
   {
     id: "linux-distros-comparison",
@@ -998,7 +806,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "linuxDistrosComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: LINUX_DISTROS_COMPARISON_EXAMPLE,
   },
   {
     id: "llm-base-models-comparison",
@@ -1010,7 +817,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "llmBaseModelsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: LLM_BASE_MODELS_COMPARISON_EXAMPLE,
   },
   {
     id: "llm-evaluation-comparison",
@@ -1022,7 +828,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "llmEvaluationComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: LLM_EVALUATION_COMPARISON_EXAMPLE,
   },
   {
     id: "llm-frameworks-comparison",
@@ -1034,7 +839,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "llmFrameworksComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: LLM_FRAMEWORKS_COMPARISON_EXAMPLE,
   },
   {
     id: "llm-orchestration-comparison",
@@ -1046,7 +850,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "llmOrchestrationComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: LLM_ORCHESTRATION_COMPARISON_EXAMPLE,
   },
   {
     id: "llm-quantization-comparison",
@@ -1058,7 +861,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "llmQuantizationComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: LLM_QUANTIZATION_COMPARISON_EXAMPLE,
   },
   {
     id: "llm-serving-engines-comparison",
@@ -1070,7 +872,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "llmServingEnginesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: LLM_SERVING_ENGINES_COMPARISON_EXAMPLE,
   },
   {
     id: "load-testing-tools-comparison",
@@ -1082,7 +883,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "loadTestingToolsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: LOAD_TESTING_TOOLS_COMPARISON_EXAMPLE,
   },
   {
     id: "local-first-sync-comparison",
@@ -1094,7 +894,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "localFirstSyncComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: LOCAL_FIRST_SYNC_COMPARISON_EXAMPLE,
   },
   {
     id: "log-aggregation-backends-comparison",
@@ -1106,7 +905,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "logAggregationBackendsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: LOG_AGGREGATION_BACKENDS_COMPARISON_EXAMPLE,
   },
   {
     id: "managed-kubernetes-comparison",
@@ -1118,7 +916,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "managedKubernetesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: MANAGED_KUBERNETES_COMPARISON_EXAMPLE,
   },
   {
     id: "message-brokers",
@@ -1130,7 +927,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "messageBrokers"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: MESSAGE_BROKERS_EXAMPLE,
   },
   {
     id: "messaging-brokers-comparison",
@@ -1142,7 +938,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "messagingBrokersComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: MESSAGING_BROKERS_COMPARISON_EXAMPLE,
   },
   {
     id: "meta-frameworks-comparison",
@@ -1154,7 +949,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "metaFrameworksComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: META_FRAMEWORKS_COMPARISON_EXAMPLE,
   },
   {
     id: "ml-from-first-principles",
@@ -1166,7 +960,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "mlFromFirstPrinciples"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: ML_FROM_FIRST_PRINCIPLES_EXAMPLE,
   },
   {
     id: "ml-infrastructure",
@@ -1178,7 +971,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "mlInfrastructure"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: ML_INFRASTRUCTURE_EXAMPLE,
   },
   {
     id: "mobile-cross-platform-comparison",
@@ -1190,7 +982,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "mobileCrossPlatformComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: MOBILE_CROSS_PLATFORM_COMPARISON_EXAMPLE,
   },
   {
     id: "mobile-frameworks-comparison",
@@ -1202,7 +993,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "mobileFrameworksComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: MOBILE_FRAMEWORKS_COMPARISON_EXAMPLE,
   },
   {
     id: "mobile-state-management-comparison",
@@ -1214,7 +1004,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "mobileStateManagementComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: MOBILE_STATE_MANAGEMENT_COMPARISON_EXAMPLE,
   },
   {
     id: "monitoring-platforms-comparison",
@@ -1226,7 +1015,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "monitoringPlatformsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: MONITORING_PLATFORMS_COMPARISON_EXAMPLE,
   },
   {
     id: "monorepo-tools-comparison",
@@ -1238,7 +1026,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "monorepoToolsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: MONOREPO_TOOLS_COMPARISON_EXAMPLE,
   },
   {
     id: "neuroscience",
@@ -1250,7 +1037,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "neuroscience"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: NEUROSCIENCE_EXAMPLE,
   },
   {
     id: "object-storage-comparison",
@@ -1262,7 +1048,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "objectStorageComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: OBJECT_STORAGE_COMPARISON_EXAMPLE,
   },
   {
     id: "observability-comparison",
@@ -1274,7 +1059,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "observabilityComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: OBSERVABILITY_COMPARISON_EXAMPLE,
   },
   {
     id: "package-managers-comparison",
@@ -1286,7 +1070,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "packageManagersComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: PACKAGE_MANAGERS_COMPARISON_EXAMPLE,
   },
   {
     id: "pod-autoscaling-engines-comparison",
@@ -1298,7 +1081,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "podAutoscalingEnginesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: POD_AUTOSCALING_ENGINES_COMPARISON_EXAMPLE,
   },
   {
     id: "product-management",
@@ -1310,7 +1092,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "productManagement"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: PRODUCT_MANAGEMENT_EXAMPLE,
   },
   {
     id: "python-frameworks-comparison",
@@ -1322,7 +1103,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "pythonFrameworksComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: PYTHON_FRAMEWORKS_COMPARISON_EXAMPLE,
   },
   {
     id: "quantum-computing",
@@ -1334,7 +1114,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "quantumComputing"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: QUANTUM_COMPUTING_EXAMPLE,
   },
   {
     id: "rate-limiting-algorithms-comparison",
@@ -1346,7 +1125,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "rateLimitingAlgorithmsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: RATE_LIMITING_ALGORITHMS_COMPARISON_EXAMPLE,
   },
   {
     id: "realtime-protocols-comparison",
@@ -1358,7 +1136,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "realtimeProtocolsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: REALTIME_PROTOCOLS_COMPARISON_EXAMPLE,
   },
   {
     id: "rendering-strategies-comparison",
@@ -1370,7 +1147,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "renderingStrategiesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: RENDERING_STRATEGIES_COMPARISON_EXAMPLE,
   },
   {
     id: "saas-growth",
@@ -1382,7 +1158,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "saasGrowth"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: SAAS_GROWTH_EXAMPLE,
   },
   {
     id: "schema-migrations-comparison",
@@ -1394,7 +1169,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "schemaMigrationsComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: SCHEMA_MIGRATIONS_COMPARISON_EXAMPLE,
   },
   {
     id: "search-engines-comparison",
@@ -1406,7 +1180,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "searchEnginesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: SEARCH_ENGINES_COMPARISON_EXAMPLE,
   },
   {
     id: "secret-management-comparison",
@@ -1418,7 +1191,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "secretManagementComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: SECRET_MANAGEMENT_COMPARISON_EXAMPLE,
   },
   {
     id: "serverless-compute-comparison",
@@ -1430,7 +1202,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "serverlessComputeComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: SERVERLESS_COMPUTE_COMPARISON_EXAMPLE,
   },
   {
     id: "serverless-databases-comparison",
@@ -1442,7 +1213,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "serverlessDatabasesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: SERVERLESS_DATABASES_COMPARISON_EXAMPLE,
   },
   {
     id: "service-mesh-comparison",
@@ -1454,7 +1224,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "serviceMeshComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: SERVICE_MESH_COMPARISON_EXAMPLE,
   },
   {
     id: "staff-engineering",
@@ -1466,7 +1235,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "staffEngineering"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: STAFF_ENGINEERING_EXAMPLE,
   },
   {
     id: "startup-blueprint",
@@ -1478,7 +1246,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "startupBlueprint"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: STARTUP_BLUEPRINT_EXAMPLE,
   },
   {
     id: "state-management-comparison",
@@ -1490,7 +1257,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "stateManagementComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: STATE_MANAGEMENT_COMPARISON_EXAMPLE,
   },
   {
     id: "stream-processing-comparison",
@@ -1502,7 +1268,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "streamProcessingComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: STREAM_PROCESSING_COMPARISON_EXAMPLE,
   },
   {
     id: "system-architectures-comparison",
@@ -1514,7 +1279,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "systemArchitecturesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: SYSTEM_ARCHITECTURES_COMPARISON_EXAMPLE,
   },
   {
     id: "system-design",
@@ -1526,7 +1290,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "systemDesign"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: SYSTEM_DESIGN_EXAMPLE,
   },
   {
     id: "system-languages-comparison",
@@ -1538,7 +1301,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "systemLanguagesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: SYSTEM_LANGUAGES_COMPARISON_EXAMPLE,
   },
   {
     id: "task-queues-comparison",
@@ -1550,7 +1312,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "taskQueuesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: TASK_QUEUES_COMPARISON_EXAMPLE,
   },
   {
     id: "time-series-databases-comparison",
@@ -1562,7 +1323,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "timeSeriesDatabasesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: TIME_SERIES_DATABASES_COMPARISON_EXAMPLE,
   },
   {
     id: "ui-component-libraries-comparison",
@@ -1574,7 +1334,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "uiComponentLibrariesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: UI_COMPONENT_LIBRARIES_COMPARISON_EXAMPLE,
   },
   {
     id: "vector-database-engines-comparison",
@@ -1586,7 +1345,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "vectorDatabaseEnginesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: VECTOR_DATABASE_ENGINES_COMPARISON_EXAMPLE,
   },
   {
     id: "vector-databases-comparison",
@@ -1598,7 +1356,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "vectorDatabasesComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: VECTOR_DATABASES_COMPARISON_EXAMPLE,
   },
   {
     id: "waf-security-comparison",
@@ -1610,7 +1367,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "wafSecurityComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: WAF_SECURITY_COMPARISON_EXAMPLE,
   },
   {
     id: "web-bundlers-comparison",
@@ -1622,7 +1378,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "webBundlersComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: WEB_BUNDLERS_COMPARISON_EXAMPLE,
   },
   {
     id: "web-frontend",
@@ -1634,7 +1389,6 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Software & AI", "webFrontend"],
     icon: "Cpu",
     gradient: "from-blue-500 to-indigo-600",
-    data: WEB_FRONTEND_EXAMPLE,
   },
   {
     id: "zero-trust-security-comparison",
@@ -1646,6 +1400,145 @@ export const CURATED_EXAMPLES: CuratedExample[] = [
     tags: ["Comparisons", "zeroTrustSecurityComparison"],
     icon: "Scale",
     gradient: "from-blue-500 to-indigo-600",
-    data: ZERO_TRUST_SECURITY_COMPARISON_EXAMPLE,
   },
 ];
+
+const exampleLoaders: Record<
+  string,
+  () => Promise<MindMapData | ComparisonWorkspaceData>
+> = {
+    "aerospace-rocketry": () => import("./aerospaceRocketry").then((m) => m.AEROSPACE_ROCKETRY_EXAMPLE),
+    "agent-memory-architectures-comparison": () => import("./agentMemoryArchitecturesComparison").then((m) => m.AGENT_MEMORY_ARCHITECTURES_COMPARISON_EXAMPLE),
+    "agent-reasoning-strategies-comparison": () => import("./agentReasoningStrategiesComparison").then((m) => m.AGENT_REASONING_STRATEGIES_COMPARISON_EXAMPLE),
+    "ai-code-assistants-comparison": () => import("./aiCodeAssistantsComparison").then((m) => m.AI_CODE_ASSISTANTS_COMPARISON_EXAMPLE),
+    "ai-engineering": () => import("./aiEngineering").then((m) => m.AI_ENGINEERING_EXAMPLE),
+    "ai-guardrails-comparison": () => import("./aiGuardrailsComparison").then((m) => m.AI_GUARDRAILS_COMPARISON_EXAMPLE),
+    "api-architectures-comparison": () => import("./apiArchitecturesComparison").then((m) => m.API_ARCHITECTURES_COMPARISON_EXAMPLE),
+    "api-auth-schemes-comparison": () => import("./apiAuthSchemesComparison").then((m) => m.API_AUTH_SCHEMES_COMPARISON_EXAMPLE),
+    "api-gateways-comparison": () => import("./apiGatewaysComparison").then((m) => m.API_GATEWAYS_COMPARISON_EXAMPLE),
+    "api-protocols-comparison": () => import("./apiProtocolsComparison").then((m) => m.API_PROTOCOLS_COMPARISON_EXAMPLE),
+    "api-testing-tools-comparison": () => import("./apiTestingToolsComparison").then((m) => m.API_TESTING_TOOLS_COMPARISON_EXAMPLE),
+    "architectural-topologies-comparison": () => import("./architecturalTopologiesComparison").then((m) => m.ARCHITECTURAL_TOPOLOGIES_COMPARISON_EXAMPLE),
+    "auth-providers-comparison": () => import("./authProvidersComparison").then((m) => m.AUTH_PROVIDERS_COMPARISON_EXAMPLE),
+    "autonomous-coding-agents-comparison": () => import("./autonomousCodingAgentsComparison").then((m) => m.AUTONOMOUS_CODING_AGENTS_COMPARISON_EXAMPLE),
+    "autonomous-robotics": () => import("./autonomousRobotics").then((m) => m.AUTONOMOUS_ROBOTICS_EXAMPLE),
+    "bioinformatics": () => import("./bioinformatics").then((m) => m.BIOINFORMATICS_EXAMPLE),
+    "build-tools-comparison": () => import("./buildToolsComparison").then((m) => m.BUILD_TOOLS_COMPARISON_EXAMPLE),
+    "cd-progressive-rollouts-comparison": () => import("./cdProgressiveRolloutsComparison").then((m) => m.CD_PROGRESSIVE_ROLLOUTS_COMPARISON_EXAMPLE),
+    "chip-design-semiconductors": () => import("./chipDesignSemiconductors").then((m) => m.CHIP_DESIGN_SEMICONDUCTORS_EXAMPLE),
+    "cicd-pipelines-comparison": () => import("./cicdPipelinesComparison").then((m) => m.CICD_PIPELINES_COMPARISON_EXAMPLE),
+    "cloud-architecture": () => import("./cloudArchitecture").then((m) => m.CLOUD_ARCHITECTURE_EXAMPLE),
+    "cms-comparison": () => import("./cmsComparison").then((m) => m.CMS_COMPARISON_EXAMPLE),
+    "cni-plugins-comparison": () => import("./cniPluginsComparison").then((m) => m.CNI_PLUGINS_COMPARISON_EXAMPLE),
+    "code-quality-tools-comparison": () => import("./codeQualityToolsComparison").then((m) => m.CODE_QUALITY_TOOLS_COMPARISON_EXAMPLE),
+    "compiler-internals": () => import("./compilerInternals").then((m) => m.COMPILER_INTERNALS_EXAMPLE),
+    "computer-networks": () => import("./computerNetworks").then((m) => m.COMPUTER_NETWORKS_EXAMPLE),
+    "container-orchestration-comparison": () => import("./containerOrchestrationComparison").then((m) => m.CONTAINER_ORCHESTRATION_COMPARISON_EXAMPLE),
+    "container-registries-comparison": () => import("./containerRegistriesComparison").then((m) => m.CONTAINER_REGISTRIES_COMPARISON_EXAMPLE),
+    "container-runtimes-comparison": () => import("./containerRuntimesComparison").then((m) => m.CONTAINER_RUNTIMES_COMPARISON_EXAMPLE),
+    "container-security-comparison": () => import("./containerSecurityComparison").then((m) => m.CONTAINER_SECURITY_COMPARISON_EXAMPLE),
+    "cryptography": () => import("./cryptography").then((m) => m.CRYPTOGRAPHY_EXAMPLE),
+    "css-styling-comparison": () => import("./cssStylingComparison").then((m) => m.CSS_STYLING_COMPARISON_EXAMPLE),
+    "data-engineering": () => import("./dataEngineering").then((m) => m.DATA_ENGINEERING_EXAMPLE),
+    "data-pipeline-orchestrators-comparison": () => import("./dataPipelineOrchestratorsComparison").then((m) => m.DATA_PIPELINE_ORCHESTRATORS_COMPARISON_EXAMPLE),
+    "data-serialization-comparison": () => import("./dataSerializationComparison").then((m) => m.DATA_SERIALIZATION_COMPARISON_EXAMPLE),
+    "data-warehouse-comparison": () => import("./dataWarehouseComparison").then((m) => m.DATA_WAREHOUSE_COMPARISON_EXAMPLE),
+    "db-comparison": () => import("./dbComparison").then((m) => m.DB_COMPARISON_EXAMPLE),
+    "db-indexing-structures-comparison": () => import("./dbIndexingStructuresComparison").then((m) => m.DB_INDEXING_STRUCTURES_COMPARISON_EXAMPLE),
+    "db-paradigms-comparison": () => import("./dbParadigmsComparison").then((m) => m.DB_PARADIGMS_COMPARISON_EXAMPLE),
+    "desktop-frameworks-comparison": () => import("./desktopFrameworksComparison").then((m) => m.DESKTOP_FRAMEWORKS_COMPARISON_EXAMPLE),
+    "dev-sec-ops": () => import("./devSecOps").then((m) => m.DEVSECOPS_EXAMPLE),
+    "diagramming-libraries-comparison": () => import("./diagrammingLibrariesComparison").then((m) => m.DIAGRAMMING_LIBRARIES_COMPARISON_EXAMPLE),
+    "distributed-consensus-comparison": () => import("./distributedConsensusComparison").then((m) => m.DISTRIBUTED_CONSENSUS_COMPARISON_EXAMPLE),
+    "distributed-file-systems-comparison": () => import("./distributedFileSystemsComparison").then((m) => m.DISTRIBUTED_FILE_SYSTEMS_COMPARISON_EXAMPLE),
+    "distributed-locks-comparison": () => import("./distributedLocksComparison").then((m) => m.DISTRIBUTED_LOCKS_COMPARISON_EXAMPLE),
+    "distributed-tracing-comparison": () => import("./distributedTracingComparison").then((m) => m.DISTRIBUTED_TRACING_COMPARISON_EXAMPLE),
+    "distributed-transactions-comparison": () => import("./distributedTransactionsComparison").then((m) => m.DISTRIBUTED_TRANSACTIONS_COMPARISON_EXAMPLE),
+    "dns-cdn-platforms-comparison": () => import("./dnsCdnPlatformsComparison").then((m) => m.DNS_CDN_PLATFORMS_COMPARISON_EXAMPLE),
+    "e2e-testing-comparison": () => import("./e2eTestingComparison").then((m) => m.E2E_TESTING_COMPARISON_EXAMPLE),
+    "edge-ai-frameworks-comparison": () => import("./edgeAiFrameworksComparison").then((m) => m.EDGE_AI_FRAMEWORKS_COMPARISON_EXAMPLE),
+    "edge-storage-comparison": () => import("./edgeStorageComparison").then((m) => m.EDGE_STORAGE_COMPARISON_EXAMPLE),
+    "embedded-systems": () => import("./embeddedSystems").then((m) => m.EMBEDDED_SYSTEMS_EXAMPLE),
+    "embedding-models-comparison": () => import("./embeddingModelsComparison").then((m) => m.EMBEDDING_MODELS_COMPARISON_EXAMPLE),
+    "feature-flags-comparison": () => import("./featureFlagsComparison").then((m) => m.FEATURE_FLAGS_COMPARISON_EXAMPLE),
+    "fintech-systems": () => import("./fintechSystems").then((m) => m.FINTECH_SYSTEMS_EXAMPLE),
+    "frontend-state-architecture-comparison": () => import("./frontendStateArchitectureComparison").then((m) => m.FRONTEND_STATE_ARCHITECTURE_COMPARISON_EXAMPLE),
+    "full-stack-dotnet-angular-matrix": () => import("./fullStackDotNetAngularMatrix").then((m) => m.FULLSTACK_DOTNET_ANGULAR_MATRIX_EXAMPLE),
+    "full-stack-web": () => import("./fullStackWeb").then((m) => m.FULLSTACK_WEB_EXAMPLE),
+    "game-engines-comparison": () => import("./gameEnginesComparison").then((m) => m.GAME_ENGINES_COMPARISON_EXAMPLE),
+    "gpu-computing": () => import("./gpuComputing").then((m) => m.GPU_COMPUTING_EXAMPLE),
+    "graph-databases-comparison": () => import("./graphDatabasesComparison").then((m) => m.GRAPH_DATABASES_COMPARISON_EXAMPLE),
+    "http-server-runtimes-comparison": () => import("./httpServerRuntimesComparison").then((m) => m.HTTP_SERVER_RUNTIMES_COMPARISON_EXAMPLE),
+    "iac-frameworks-comparison": () => import("./iacFrameworksComparison").then((m) => m.IAC_FRAMEWORKS_COMPARISON_EXAMPLE),
+    "iac-tools-comparison": () => import("./iacToolsComparison").then((m) => m.IAC_TOOLS_COMPARISON_EXAMPLE),
+    "iam-protocols-comparison": () => import("./iamProtocolsComparison").then((m) => m.IAM_PROTOCOLS_COMPARISON_EXAMPLE),
+    "in-memory-cache-comparison": () => import("./inMemoryCacheComparison").then((m) => m.IN_MEMORY_CACHE_COMPARISON_EXAMPLE),
+    "js-runtimes-comparison": () => import("./jsRuntimesComparison").then((m) => m.JS_RUNTIMES_COMPARISON_EXAMPLE),
+    "kubernetes-cloud-native": () => import("./kubernetesCloudNative").then((m) => m.KUBERNETES_CLOUD_NATIVE_EXAMPLE),
+    "lakehouse-formats-comparison": () => import("./lakehouseFormatsComparison").then((m) => m.LAKEHOUSE_FORMATS_COMPARISON_EXAMPLE),
+    "linux-distros-comparison": () => import("./linuxDistrosComparison").then((m) => m.LINUX_DISTROS_COMPARISON_EXAMPLE),
+    "llm-base-models-comparison": () => import("./llmBaseModelsComparison").then((m) => m.LLM_BASE_MODELS_COMPARISON_EXAMPLE),
+    "llm-evaluation-comparison": () => import("./llmEvaluationComparison").then((m) => m.LLM_EVALUATION_COMPARISON_EXAMPLE),
+    "llm-frameworks-comparison": () => import("./llmFrameworksComparison").then((m) => m.LLM_FRAMEWORKS_COMPARISON_EXAMPLE),
+    "llm-orchestration-comparison": () => import("./llmOrchestrationComparison").then((m) => m.LLM_ORCHESTRATION_COMPARISON_EXAMPLE),
+    "llm-quantization-comparison": () => import("./llmQuantizationComparison").then((m) => m.LLM_QUANTIZATION_COMPARISON_EXAMPLE),
+    "llm-serving-engines-comparison": () => import("./llmServingEnginesComparison").then((m) => m.LLM_SERVING_ENGINES_COMPARISON_EXAMPLE),
+    "load-testing-tools-comparison": () => import("./loadTestingToolsComparison").then((m) => m.LOAD_TESTING_TOOLS_COMPARISON_EXAMPLE),
+    "local-first-sync-comparison": () => import("./localFirstSyncComparison").then((m) => m.LOCAL_FIRST_SYNC_COMPARISON_EXAMPLE),
+    "log-aggregation-backends-comparison": () => import("./logAggregationBackendsComparison").then((m) => m.LOG_AGGREGATION_BACKENDS_COMPARISON_EXAMPLE),
+    "managed-kubernetes-comparison": () => import("./managedKubernetesComparison").then((m) => m.MANAGED_KUBERNETES_COMPARISON_EXAMPLE),
+    "message-brokers": () => import("./messageBrokers").then((m) => m.MESSAGE_BROKERS_EXAMPLE),
+    "messaging-brokers-comparison": () => import("./messagingBrokersComparison").then((m) => m.MESSAGING_BROKERS_COMPARISON_EXAMPLE),
+    "meta-frameworks-comparison": () => import("./metaFrameworksComparison").then((m) => m.META_FRAMEWORKS_COMPARISON_EXAMPLE),
+    "ml-from-first-principles": () => import("./mlFromFirstPrinciples").then((m) => m.ML_FROM_FIRST_PRINCIPLES_EXAMPLE),
+    "ml-infrastructure": () => import("./mlInfrastructure").then((m) => m.ML_INFRASTRUCTURE_EXAMPLE),
+    "mobile-cross-platform-comparison": () => import("./mobileCrossPlatformComparison").then((m) => m.MOBILE_CROSS_PLATFORM_COMPARISON_EXAMPLE),
+    "mobile-frameworks-comparison": () => import("./mobileFrameworksComparison").then((m) => m.MOBILE_FRAMEWORKS_COMPARISON_EXAMPLE),
+    "mobile-state-management-comparison": () => import("./mobileStateManagementComparison").then((m) => m.MOBILE_STATE_MANAGEMENT_COMPARISON_EXAMPLE),
+    "monitoring-platforms-comparison": () => import("./monitoringPlatformsComparison").then((m) => m.MONITORING_PLATFORMS_COMPARISON_EXAMPLE),
+    "monorepo-tools-comparison": () => import("./monorepoToolsComparison").then((m) => m.MONOREPO_TOOLS_COMPARISON_EXAMPLE),
+    "neuroscience": () => import("./neuroscience").then((m) => m.NEUROSCIENCE_EXAMPLE),
+    "object-storage-comparison": () => import("./objectStorageComparison").then((m) => m.OBJECT_STORAGE_COMPARISON_EXAMPLE),
+    "observability-comparison": () => import("./observabilityComparison").then((m) => m.OBSERVABILITY_COMPARISON_EXAMPLE),
+    "package-managers-comparison": () => import("./packageManagersComparison").then((m) => m.PACKAGE_MANAGERS_COMPARISON_EXAMPLE),
+    "pod-autoscaling-engines-comparison": () => import("./podAutoscalingEnginesComparison").then((m) => m.POD_AUTOSCALING_ENGINES_COMPARISON_EXAMPLE),
+    "product-management": () => import("./productManagement").then((m) => m.PRODUCT_MANAGEMENT_EXAMPLE),
+    "python-frameworks-comparison": () => import("./pythonFrameworksComparison").then((m) => m.PYTHON_FRAMEWORKS_COMPARISON_EXAMPLE),
+    "quantum-computing": () => import("./quantumComputing").then((m) => m.QUANTUM_COMPUTING_EXAMPLE),
+    "rate-limiting-algorithms-comparison": () => import("./rateLimitingAlgorithmsComparison").then((m) => m.RATE_LIMITING_ALGORITHMS_COMPARISON_EXAMPLE),
+    "realtime-protocols-comparison": () => import("./realtimeProtocolsComparison").then((m) => m.REALTIME_PROTOCOLS_COMPARISON_EXAMPLE),
+    "rendering-strategies-comparison": () => import("./renderingStrategiesComparison").then((m) => m.RENDERING_STRATEGIES_COMPARISON_EXAMPLE),
+    "saas-growth": () => import("./saasGrowth").then((m) => m.SAAS_GROWTH_EXAMPLE),
+    "schema-migrations-comparison": () => import("./schemaMigrationsComparison").then((m) => m.SCHEMA_MIGRATIONS_COMPARISON_EXAMPLE),
+    "search-engines-comparison": () => import("./searchEnginesComparison").then((m) => m.SEARCH_ENGINES_COMPARISON_EXAMPLE),
+    "secret-management-comparison": () => import("./secretManagementComparison").then((m) => m.SECRET_MANAGEMENT_COMPARISON_EXAMPLE),
+    "serverless-compute-comparison": () => import("./serverlessComputeComparison").then((m) => m.SERVERLESS_COMPUTE_COMPARISON_EXAMPLE),
+    "serverless-databases-comparison": () => import("./serverlessDatabasesComparison").then((m) => m.SERVERLESS_DATABASES_COMPARISON_EXAMPLE),
+    "service-mesh-comparison": () => import("./serviceMeshComparison").then((m) => m.SERVICE_MESH_COMPARISON_EXAMPLE),
+    "staff-engineering": () => import("./staffEngineering").then((m) => m.STAFF_ENGINEERING_EXAMPLE),
+    "startup-blueprint": () => import("./startupBlueprint").then((m) => m.STARTUP_BLUEPRINT_EXAMPLE),
+    "state-management-comparison": () => import("./stateManagementComparison").then((m) => m.STATE_MANAGEMENT_COMPARISON_EXAMPLE),
+    "stream-processing-comparison": () => import("./streamProcessingComparison").then((m) => m.STREAM_PROCESSING_COMPARISON_EXAMPLE),
+    "system-architectures-comparison": () => import("./systemArchitecturesComparison").then((m) => m.SYSTEM_ARCHITECTURES_COMPARISON_EXAMPLE),
+    "system-design": () => import("./systemDesign").then((m) => m.SYSTEM_DESIGN_EXAMPLE),
+    "system-languages-comparison": () => import("./systemLanguagesComparison").then((m) => m.SYSTEM_LANGUAGES_COMPARISON_EXAMPLE),
+    "task-queues-comparison": () => import("./taskQueuesComparison").then((m) => m.TASK_QUEUES_COMPARISON_EXAMPLE),
+    "time-series-databases-comparison": () => import("./timeSeriesDatabasesComparison").then((m) => m.TIME_SERIES_DATABASES_COMPARISON_EXAMPLE),
+    "ui-component-libraries-comparison": () => import("./uiComponentLibrariesComparison").then((m) => m.UI_COMPONENT_LIBRARIES_COMPARISON_EXAMPLE),
+    "vector-database-engines-comparison": () => import("./vectorDatabaseEnginesComparison").then((m) => m.VECTOR_DATABASE_ENGINES_COMPARISON_EXAMPLE),
+    "vector-databases-comparison": () => import("./vectorDatabasesComparison").then((m) => m.VECTOR_DATABASES_COMPARISON_EXAMPLE),
+    "waf-security-comparison": () => import("./wafSecurityComparison").then((m) => m.WAF_SECURITY_COMPARISON_EXAMPLE),
+    "web-bundlers-comparison": () => import("./webBundlersComparison").then((m) => m.WEB_BUNDLERS_COMPARISON_EXAMPLE),
+    "web-frontend": () => import("./webFrontend").then((m) => m.WEB_FRONTEND_EXAMPLE),
+    "zero-trust-security-comparison": () => import("./zeroTrustSecurityComparison").then((m) => m.ZERO_TRUST_SECURITY_COMPARISON_EXAMPLE),
+};
+
+export async function loadCuratedExampleData(
+  id: string
+): Promise<MindMapData | ComparisonWorkspaceData> {
+  const loader = exampleLoaders[id];
+  if (!loader) {
+    throw new Error(`Unknown curated example: ${id}`);
+  }
+  return loader();
+}
