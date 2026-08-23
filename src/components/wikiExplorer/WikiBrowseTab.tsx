@@ -1,19 +1,26 @@
-import React, { useState, useMemo } from "react";
-import { Search, FileText, ChevronRight, Tag, FolderSync, CheckCircle2 } from "lucide-react";
+import React, { useState, useMemo, RefObject } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { Search, FileText, FolderSync, CheckCircle2 } from "lucide-react";
 import { WikiIndexEntry } from "../../services/wikiService";
 import { connectLocalVault, syncAllPagesToVault, isFileSystemAccessSupported } from "../../services/vaultSyncService";
 import { useWiki } from "../../hooks/useWiki";
+import { WikiPageCard } from "./WikiPageCard";
 
 export interface WikiBrowseTabProps {
   wikiIndex: WikiIndexEntry[];
   isLoading: boolean;
   onLoadPage: (pageId: string) => void;
+  scrollContainerRef?: RefObject<HTMLDivElement>;
 }
+
+const CARD_GAP = 12;
+const CARD_ESTIMATED_HEIGHT = 150;
 
 export function WikiBrowseTab({
   wikiIndex,
   isLoading,
   onLoadPage,
+  scrollContainerRef,
 }: WikiBrowseTabProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
@@ -43,18 +50,12 @@ export function WikiBrowseTab({
     );
   }, [wikiIndex, searchQuery]);
 
-  const formatTimeAgo = (iso: string) => {
-    try {
-      const diffMs = Date.now() - new Date(iso).getTime();
-      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-      if (diffDays === 0) return "Today";
-      if (diffDays === 1) return "Yesterday";
-      if (diffDays < 30) return `${diffDays} days ago`;
-      return `${Math.floor(diffDays / 30)} months ago`;
-    } catch {
-      return "";
-    }
-  };
+  const rowVirtualizer = useVirtualizer({
+    count: filteredPages.length,
+    getScrollElement: () => scrollContainerRef?.current ?? null,
+    estimateSize: () => CARD_ESTIMATED_HEIGHT,
+    overscan: 6,
+  });
 
   return (
     <div className="space-y-4">
@@ -69,14 +70,14 @@ export function WikiBrowseTab({
             placeholder="Search topics, tags, summaries..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-2xl border border-slate-200/80 bg-white/80 dark:border-white/10 dark:bg-slate-800/80 py-3 pl-11 pr-4 text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 shadow-sm ring-1 ring-slate-100 dark:ring-white/10 transition-all focus:border-cyan-200 dark:focus:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-100"
+            className="w-full rounded-2xl border border-slate-200/80 bg-white/80 dark:border-white/10 dark:bg-slate-800/80 py-3 pl-11 pr-4 text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 shadow-sm ring-1 ring-slate-100 dark:ring-white/10 transition-smooth focus:border-cyan-200 dark:focus:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-100"
           />
         </div>
 
         {isFileSystemAccessSupported() && (
           <button
             onClick={handleSyncToVault}
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 px-4 py-3 text-xs font-black uppercase tracking-[0.16em] text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900 ring-1 ring-indigo-200 dark:ring-indigo-800/40 transition-all shadow-sm"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 px-4 py-3 text-xs font-black uppercase tracking-[0.16em] text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900 ring-1 ring-indigo-200 dark:ring-indigo-800/40 transition-smooth shadow-sm"
             title="Sync wiki pages to a local folder or Obsidian vault"
           >
             <FolderSync size={15} />
@@ -118,43 +119,28 @@ export function WikiBrowseTab({
           </p>
         </div>
       ) : (
-        /* Page List */
-        <div className="space-y-3">
-          {filteredPages.map((page) => (
-            <div
-              key={page.id}
-              onClick={() => onLoadPage(page.id)}
-              className="group cursor-pointer rounded-[20px] border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white dark:border-white/10 dark:from-slate-800/80 dark:to-slate-900/90 p-4 shadow-sm transition-all hover:border-cyan-200 dark:hover:border-cyan-500/50 hover:shadow-md"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <h3 className="text-sm font-black tracking-tight text-slate-950 dark:text-white group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors truncate">
-                  {page.title}
-                </h3>
-                <span className="shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[9px] font-bold text-slate-500 dark:text-slate-400">
-                  {formatTimeAgo(page.updatedAt)}
-                </span>
+        /* Page List (virtualized) */
+        <div style={{ height: rowVirtualizer.getTotalSize(), position: "relative" }}>
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+            const page = filteredPages[virtualRow.index];
+            return (
+              <div
+                key={page.id}
+                data-index={virtualRow.index}
+                ref={rowVirtualizer.measureElement}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  transform: `translateY(${virtualRow.start}px)`,
+                  paddingBottom: CARD_GAP,
+                }}
+              >
+                <WikiPageCard page={page} onLoadPage={onLoadPage} />
               </div>
-              <p className="mt-1.5 text-xs leading-5 text-slate-600 dark:text-slate-300 line-clamp-2">
-                {page.summary || "No summary available."}
-              </p>
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1 rounded-full bg-cyan-50 dark:bg-cyan-950/60 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.16em] text-cyan-700 dark:text-cyan-300">
-                  <ChevronRight size={10} /> {page.nodeCount} nodes
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-[10px] font-bold text-slate-600 dark:text-slate-300 capitalize">
-                  {page.sourceType}
-                </span>
-                {page.tags.slice(0, 3).map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300"
-                  >
-                    <Tag size={10} /> {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

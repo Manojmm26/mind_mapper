@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState } from "react";
+import React, { Suspense, lazy, useRef, useState } from "react";
 import {
   BookOpen,
   Clock,
@@ -39,6 +39,7 @@ export function WikiExplorer({
   const wiki = useWiki();
   const [activeTab, setActiveTab] = useState<WikiTab>("browse");
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const contentScrollRef = useRef<HTMLDivElement>(null);
 
   const handleExportJSON = async () => {
     const json = await exportWikiToJSON();
@@ -52,9 +53,9 @@ export function WikiExplorer({
   };
 
   const handleExportMarkdown = async () => {
+    if (!wiki.conceptIndex) return;
     const { generateMarkdownIndex } =
       await import("../services/wikiMarkdownExport");
-    if (!wiki.conceptIndex) return;
     const md = generateMarkdownIndex(wiki.conceptIndex);
     const blob = new Blob([md], { type: "text/markdown" });
     const url = URL.createObjectURL(blob);
@@ -163,7 +164,7 @@ export function WikiExplorer({
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold transition-all ${
+            className={`flex-1 flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold transition-smooth ${
               activeTab === tab.id
                 ? "bg-white text-slate-900 dark:bg-slate-900 dark:text-white shadow-sm"
                 : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
@@ -176,12 +177,16 @@ export function WikiExplorer({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto rounded-[28px] bg-slate-50/50 dark:bg-slate-900/60 p-5 ring-1 ring-slate-100 dark:ring-white/10">
+      <div
+        ref={contentScrollRef}
+        className="flex-1 overflow-y-auto rounded-[28px] bg-slate-50/50 dark:bg-slate-900/60 p-5 ring-1 ring-slate-100 dark:ring-white/10"
+      >
         {activeTab === "browse" && (
           <WikiBrowseTab
             wikiIndex={wiki.wikiIndex}
             isLoading={wiki.isLoading}
             onLoadPage={onLoadPage ?? (() => {})}
+            scrollContainerRef={contentScrollRef}
           />
         )}
 
