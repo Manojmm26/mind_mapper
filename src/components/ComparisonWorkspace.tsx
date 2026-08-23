@@ -41,11 +41,17 @@ export function ComparisonWorkspace({ data, initialData }: ComparisonWorkspacePr
     let bestId: string | undefined;
     let bestAvg = -1;
     for (const opt of options) {
-      const ratings = criteria
-        .map((c) => opt.scores[c.id]?.rating ?? 0)
-        .filter((r) => r > 0);
-      if (ratings.length === 0) continue;
-      const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+      let ratingSum = 0;
+      let ratingCount = 0;
+      for (const c of criteria) {
+        const rating = opt.scores[c.id]?.rating ?? 0;
+        if (rating > 0) {
+          ratingSum += rating;
+          ratingCount += 1;
+        }
+      }
+      if (ratingCount === 0) continue;
+      const avg = ratingSum / ratingCount;
       if (avg > bestAvg) {
         bestAvg = avg;
         bestId = opt.id;
@@ -136,7 +142,7 @@ export function ComparisonWorkspace({ data, initialData }: ComparisonWorkspacePr
               {criteria.map((criterion) => (
                 <div
                   key={criterion.id}
-                  className="group rounded-[20px] border border-slate-200/80 dark:border-white/10 bg-gradient-to-br from-slate-50 to-white dark:from-slate-800/80 dark:to-slate-900/90 px-4 py-4 transition-all hover:border-cyan-200 dark:hover:border-cyan-500/50 hover:shadow-sm"
+                  className="group rounded-[20px] border border-slate-200/80 dark:border-white/10 bg-gradient-to-br from-slate-50 to-white dark:from-slate-800/80 dark:to-slate-900/90 px-4 py-4 transition-smooth hover:border-cyan-200 dark:hover:border-cyan-500/50 hover:shadow-sm"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-[11px] font-black uppercase tracking-[0.16em] text-slate-600 dark:text-slate-300">
@@ -188,7 +194,7 @@ export function ComparisonWorkspace({ data, initialData }: ComparisonWorkspacePr
                   <button
                     type="button"
                     onClick={() => setView("cards")}
-                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-bold transition-all ${
+                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-bold transition-smooth ${
                       view === "cards"
                         ? "bg-white text-slate-900 dark:bg-slate-900 dark:text-white shadow-sm"
                         : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
@@ -200,7 +206,7 @@ export function ComparisonWorkspace({ data, initialData }: ComparisonWorkspacePr
                   <button
                     type="button"
                     onClick={() => setView("matrix")}
-                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-bold transition-all ${
+                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-bold transition-smooth ${
                       view === "matrix"
                         ? "bg-white text-slate-900 dark:bg-slate-900 dark:text-white shadow-sm"
                         : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
@@ -254,7 +260,7 @@ export function ComparisonWorkspace({ data, initialData }: ComparisonWorkspacePr
               {nextSteps.map((step, index) => (
                 <div
                   key={step}
-                  className="group flex items-start gap-3 rounded-[20px] border border-indigo-100/50 dark:border-white/10 bg-white/80 dark:bg-slate-800/80 px-4 py-4 transition-all hover:border-indigo-200 dark:hover:border-indigo-500/50 hover:shadow-sm"
+                  className="group flex items-start gap-3 rounded-[20px] border border-indigo-100/50 dark:border-white/10 bg-white/80 dark:bg-slate-800/80 px-4 py-4 transition-smooth hover:border-indigo-200 dark:hover:border-indigo-500/50 hover:shadow-sm"
                 >
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 dark:bg-indigo-500 text-[11px] font-black text-white shadow-sm">
                     {index + 1}

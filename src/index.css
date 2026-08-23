@@ -2,6 +2,14 @@
 @custom-variant dark (&:where(.dark, .dark *));
 @import "@xyflow/react/dist/style.css";
 
+/* Transition only paint/compositor-friendly properties instead of `all`,
+   so hover/focus state changes don't animate layout properties. */
+@utility transition-smooth {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+}
+
 :root {
     --font-body: "IBM Plex Sans", sans-serif;
     --font-display: "Space Grotesk", "IBM Plex Sans", sans-serif;

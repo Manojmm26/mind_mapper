@@ -153,7 +153,7 @@ export function ScenarioTeleprompter({
                     setSelectedScenarioId(s.id);
                     handleResetTimer();
                   }}
-                  className={`w-full text-left rounded-2xl p-3 min-h-[48px] transition-all flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-amber-500/50 ${
+                  className={`w-full text-left rounded-2xl p-3 min-h-[48px] transition-smooth flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-amber-500/50 ${
                     isSelected
                       ? "bg-amber-500 text-white shadow-md font-bold"
                       : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
@@ -189,7 +189,7 @@ export function ScenarioTeleprompter({
                   {onLaunchGrill && (
                     <button
                       onClick={() => onLaunchGrill(currentScenario.id)}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 text-[11px] font-black shadow-sm transition-all"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 text-[11px] font-black shadow-sm transition-smooth"
                     >
                       <Swords size={12} />
                       <span>Simulate AI Grill</span>
@@ -245,7 +245,7 @@ export function ScenarioTeleprompter({
             <div className="space-y-1">
               <div className="h-2.5 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                 <div
-                  className={`h-full transition-all duration-300 ${
+                  className={`h-full transition-[width] duration-300 ${
                     seconds > 90
                       ? "bg-red-500"
                       : seconds > 75
@@ -266,7 +266,7 @@ export function ScenarioTeleprompter({
             <div className="flex flex-wrap border-b border-slate-100 dark:border-slate-800 gap-2 pt-2" role="tablist">
               <button
                 onClick={() => setActiveTab("script")}
-                className={`pb-2.5 px-3 min-h-[36px] text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 ${
+                className={`pb-2.5 px-3 min-h-[36px] text-xs font-bold transition-smooth border-b-2 flex items-center gap-1.5 ${
                   activeTab === "script"
                     ? "border-amber-500 text-amber-600 dark:text-amber-400"
                     : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
@@ -277,7 +277,7 @@ export function ScenarioTeleprompter({
               </button>
               <button
                 onClick={() => setActiveTab("anchor")}
-                className={`pb-2.5 px-3 min-h-[36px] text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 ${
+                className={`pb-2.5 px-3 min-h-[36px] text-xs font-bold transition-smooth border-b-2 flex items-center gap-1.5 ${
                   activeTab === "anchor"
                     ? "border-amber-500 text-amber-600 dark:text-amber-400"
                     : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
@@ -288,7 +288,7 @@ export function ScenarioTeleprompter({
               </button>
               <button
                 onClick={() => setActiveTab("bait")}
-                className={`pb-2.5 px-3 min-h-[36px] text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 ${
+                className={`pb-2.5 px-3 min-h-[36px] text-xs font-bold transition-smooth border-b-2 flex items-center gap-1.5 ${
                   activeTab === "bait"
                     ? "border-amber-500 text-amber-600 dark:text-amber-400"
                     : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
@@ -299,7 +299,7 @@ export function ScenarioTeleprompter({
               </button>
               <button
                 onClick={() => setActiveTab("traps")}
-                className={`pb-2.5 px-3 min-h-[36px] text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 ${
+                className={`pb-2.5 px-3 min-h-[36px] text-xs font-bold transition-smooth border-b-2 flex items-center gap-1.5 ${
                   activeTab === "traps"
                     ? "border-amber-500 text-amber-600 dark:text-amber-400"
                     : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
@@ -387,7 +387,7 @@ export function ScenarioTeleprompter({
                   </p>
                   {currentScenario.steeringBait.map((bait, idx) => (
                     <div
-                      key={idx}
+                      key={bait}
                       className="rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 p-4 border border-blue-200/60 dark:border-blue-900/40 flex items-start justify-between gap-3"
                     >
                       <div className="flex items-start gap-3">
@@ -423,7 +423,7 @@ export function ScenarioTeleprompter({
                   </p>
                   {currentScenario.redFlagPitfalls.map((trap, idx) => (
                     <div
-                      key={idx}
+                      key={trap}
                       className="rounded-2xl bg-red-50/60 dark:bg-red-950/30 p-4 border border-red-200/60 dark:border-red-900/40 flex items-start gap-3"
                     >
                       <ShieldAlert size={18} className="text-red-600 shrink-0 mt-0.5" />

@@ -47,7 +47,10 @@ export function NodeDetailsModal({
   const parentEdge = allEdges.find(e => e.target === node.id);
   const parentNode = parentEdge ? allNodes.find(n => n.id === parentEdge.source) : null;
   const childEdges = allEdges.filter(e => e.source === node.id);
-  const childNodes = childEdges.map(e => allNodes.find(n => n.id === e.target)).filter(Boolean) as Node[];
+  const childNodes = childEdges.flatMap(e => {
+    const n = allNodes.find(n => n.id === e.target);
+    return n ? [n] : [];
+  });
 
   const handleCopyCode = (code: string, index: number) => {
     navigator.clipboard.writeText(code);
@@ -172,7 +175,7 @@ export function NodeDetailsModal({
             <button
               onClick={handleGenerateDeepDetails}
               disabled={isGeneratingDetails}
-              className="inline-flex items-center gap-2 rounded-2xl border border-cyan-200 bg-cyan-50 dark:border-cyan-800/40 dark:bg-cyan-950/50 px-3.5 py-2 text-xs font-bold text-cyan-700 dark:text-cyan-300 hover:bg-cyan-100 dark:hover:bg-cyan-900/60 transition-all disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-2xl border border-cyan-200 bg-cyan-50 dark:border-cyan-800/40 dark:bg-cyan-950/50 px-3.5 py-2 text-xs font-bold text-cyan-700 dark:text-cyan-300 hover:bg-cyan-100 dark:hover:bg-cyan-900/60 transition-smooth disabled:opacity-50"
               title="Enhance this node with AI generated equations, code, and quiz"
             >
               {isGeneratingDetails ? (
@@ -185,7 +188,7 @@ export function NodeDetailsModal({
 
             <button
               onClick={onClose}
-              className="flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200/80 bg-slate-100/80 text-slate-500 hover:bg-slate-200 hover:text-slate-900 dark:border-white/10 dark:bg-slate-800/80 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white transition-all"
+              className="flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200/80 bg-slate-100/80 text-slate-500 hover:bg-slate-200 hover:text-slate-900 dark:border-white/10 dark:bg-slate-800/80 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white transition-smooth"
             >
               <X size={20} />
             </button>
@@ -211,7 +214,7 @@ export function NodeDetailsModal({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${
+              className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-smooth ${
                 activeTab === tab.id
                   ? 'bg-cyan-500 text-white shadow-md shadow-cyan-500/20 dark:bg-cyan-600'
                   : 'text-slate-600 hover:bg-slate-200/60 dark:text-slate-400 dark:hover:bg-slate-800/60'
@@ -264,7 +267,7 @@ export function NodeDetailsModal({
                 </h4>
                 <div className="grid gap-4 sm:grid-cols-1">
                   {misconceptions.map((item, idx) => (
-                    <div key={idx} className="rounded-2xl border border-amber-200/80 bg-amber-50/40 dark:border-amber-900/40 dark:bg-amber-950/20 p-5 space-y-2">
+                    <div key={item.misconception} className="rounded-2xl border border-amber-200/80 bg-amber-50/40 dark:border-amber-900/40 dark:bg-amber-950/20 p-5 space-y-2">
                       <div className="text-xs font-bold text-amber-800 dark:text-amber-300 flex items-center gap-2">
                         <XCircle size={14} className="text-amber-600" />
                         Misconception: {item.misconception}
@@ -292,7 +295,7 @@ export function NodeDetailsModal({
                     {parentNode ? (
                       <button
                         onClick={() => { setLocalNodeData(null); onSelectNode(parentNode.id); }}
-                        className="flex items-center justify-between w-full rounded-xl bg-white dark:bg-slate-800 p-3 text-xs font-bold text-slate-900 dark:text-white shadow-sm hover:border-cyan-400 transition-all border border-slate-200 dark:border-slate-700"
+                        className="flex items-center justify-between w-full rounded-xl bg-white dark:bg-slate-800 p-3 text-xs font-bold text-slate-900 dark:text-white shadow-sm hover:border-cyan-400 transition-smooth border border-slate-200 dark:border-slate-700"
                       >
                         <span>{String(parentNode.data?.label || '')}</span>
                         <ArrowRight size={14} className="text-cyan-500" />
@@ -311,7 +314,7 @@ export function NodeDetailsModal({
                           <button
                             key={child.id}
                             onClick={() => { setLocalNodeData(null); onSelectNode(child.id); }}
-                            className="flex items-center justify-between w-full rounded-xl bg-white dark:bg-slate-800 p-2.5 text-xs font-medium text-slate-800 dark:text-slate-200 shadow-sm hover:border-cyan-400 transition-all border border-slate-200 dark:border-slate-700"
+                            className="flex items-center justify-between w-full rounded-xl bg-white dark:bg-slate-800 p-2.5 text-xs font-medium text-slate-800 dark:text-slate-200 shadow-sm hover:border-cyan-400 transition-smooth border border-slate-200 dark:border-slate-700"
                           >
                             <span className="truncate">{String(child.data?.label || '')}</span>
                             <ArrowRight size={12} className="text-slate-400 shrink-0" />
@@ -349,7 +352,7 @@ export function NodeDetailsModal({
 
                 <div className="grid gap-6">
                   {(nodeData.fluidDetails?.middleTab2?.data?.latexFormulas || axioms).map((item, idx) => (
-                    <div key={idx} className="rounded-3xl border border-violet-200/80 bg-gradient-to-br from-violet-50/50 to-purple-50/30 dark:border-violet-900/40 dark:from-violet-950/30 dark:to-purple-950/20 p-6 space-y-4">
+                    <div key={'title' in item ? item.title : item.label} className="rounded-3xl border border-violet-200/80 bg-gradient-to-br from-violet-50/50 to-purple-50/30 dark:border-violet-900/40 dark:from-violet-950/30 dark:to-purple-950/20 p-6 space-y-4">
                       <div className="flex items-center justify-between">
                         <h4 className="text-base font-bold text-violet-950 dark:text-violet-200">
                           {'title' in item ? item.title : item.label}
@@ -397,7 +400,7 @@ export function NodeDetailsModal({
 
                 <div className="grid gap-6">
                   {(nodeData.fluidDetails?.middleTab3?.data?.codeSnippets || codeSnippets).map((item, idx) => (
-                    <div key={idx} className="rounded-3xl border border-slate-800 bg-slate-950 p-6 space-y-4 text-white shadow-xl">
+                    <div key={item.explanation || `${item.language}-${item.code.length}`} className="rounded-3xl border border-slate-800 bg-slate-950 p-6 space-y-4 text-white shadow-xl">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Cpu size={16} className="text-emerald-400" />
@@ -405,7 +408,7 @@ export function NodeDetailsModal({
                         </div>
                         <button
                           onClick={() => handleCopyCode(item.code, idx)}
-                          className="flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs font-bold text-slate-300 hover:bg-slate-800 transition-all"
+                          className="flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs font-bold text-slate-300 hover:bg-slate-800 transition-smooth"
                         >
                           {copiedCodeIndex === idx ? (
                             <>
@@ -472,10 +475,10 @@ export function NodeDetailsModal({
 
                     return (
                       <button
-                        key={idx}
+                        key={option}
                         disabled={quizSubmitted}
                         onClick={() => setSelectedQuizOption(idx)}
-                        className={`flex items-start gap-3 w-full text-left rounded-2xl border p-4 text-xs leading-relaxed transition-all shadow-sm ${optionStyle}`}
+                        className={`flex items-start gap-3 w-full text-left rounded-2xl border p-4 text-xs leading-relaxed transition-smooth shadow-sm ${optionStyle}`}
                       >
                         <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold">
                           {String.fromCharCode(65 + idx)}
@@ -492,7 +495,7 @@ export function NodeDetailsModal({
                   <button
                     disabled={selectedQuizOption === null}
                     onClick={() => setQuizSubmitted(true)}
-                    className="w-full rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 py-3.5 text-xs font-bold text-white shadow-md shadow-blue-500/25 transition-all hover:shadow-lg disabled:opacity-50"
+                    className="w-full rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 py-3.5 text-xs font-bold text-white shadow-md shadow-blue-500/25 transition-smooth hover:shadow-lg disabled:opacity-50"
                   >
                     Submit Answer
                   </button>

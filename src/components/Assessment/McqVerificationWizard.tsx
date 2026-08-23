@@ -60,7 +60,7 @@ export function McqVerificationWizard({ data, onSubmit }: McqVerificationWizardP
         {/* Progress Bar */}
         <div className="mt-5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
           <div
-            className="h-full bg-gradient-to-r from-amber-500 to-orange-600 transition-all duration-300"
+            className="h-full bg-gradient-to-r from-amber-500 to-orange-600 transition-[width] duration-300"
             style={{
               width: `${Math.round(((currentIndex + 1) / data.mcqs.length) * 100)}%`,
             }}
@@ -91,7 +91,7 @@ export function McqVerificationWizard({ data, onSubmit }: McqVerificationWizardP
                   key={optionText}
                   type="button"
                   onClick={() => handleSelectOption(optIndex)}
-                  className={`group flex w-full items-start gap-4 rounded-2xl border p-4 text-left transition-all ${
+                  className={`group flex w-full items-start gap-4 rounded-2xl border p-4 text-left transition-smooth ${
                     selected
                       ? "border-amber-500 bg-amber-50/80 text-amber-900 dark:border-amber-500/80 dark:bg-amber-950/60 dark:text-amber-200 ring-2 ring-amber-500/20"
                       : "border-slate-200 bg-slate-50/50 text-slate-700 dark:border-white/10 dark:bg-slate-800/60 dark:text-slate-200 hover:border-amber-300 hover:bg-white dark:hover:bg-slate-800"
@@ -121,7 +121,7 @@ export function McqVerificationWizard({ data, onSubmit }: McqVerificationWizardP
             type="button"
             disabled={!isSelected}
             onClick={handleNext}
-            className="inline-flex items-center gap-2 rounded-2xl bg-amber-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-amber-500/20 transition-all hover:bg-amber-700 hover:scale-105 disabled:opacity-40"
+            className="inline-flex items-center gap-2 rounded-2xl bg-amber-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-amber-500/20 transition-smooth hover:bg-amber-700 hover:scale-105 disabled:opacity-40"
           >
             {currentIndex === data.mcqs.length - 1 ? (
               <>

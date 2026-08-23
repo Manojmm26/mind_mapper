@@ -53,7 +53,7 @@ export function StudyRoadmapView({ roadmap }: StudyRoadmapViewProps) {
           {roadmap.milestones.map((milestone, index) => (
             <div
               key={milestone.id}
-              className="relative overflow-hidden rounded-[28px] border border-slate-200/90 dark:border-white/10 bg-white dark:bg-slate-900 p-6 shadow-sm transition-all hover:shadow-md sm:p-8"
+              className="relative overflow-hidden rounded-[28px] border border-slate-200/90 dark:border-white/10 bg-white dark:bg-slate-900 p-6 shadow-sm transition-smooth hover:shadow-md sm:p-8"
             >
               {/* Top Bar */}
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 dark:border-white/10 pb-4">

@@ -173,7 +173,7 @@ export function DiagnosticReportView({
           <button
             type="button"
             onClick={onViewMap}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-900 shadow-lg transition-all hover:bg-slate-100 hover:scale-105 active:scale-95 w-full sm:w-auto"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-900 shadow-lg transition-smooth hover:bg-slate-100 hover:scale-105 active:scale-95 w-full sm:w-auto"
           >
             <Map size={18} className="text-cyan-600" />
             Explore Color-Coded Map
@@ -182,7 +182,7 @@ export function DiagnosticReportView({
           <button
             type="button"
             onClick={onGenerateRoadmap}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-cyan-500/25 transition-all hover:scale-105 active:scale-95 w-full sm:w-auto"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-cyan-500/25 transition-smooth hover:scale-105 active:scale-95 w-full sm:w-auto"
           >
             <Sparkles size={18} />
             Generate Tailored Action Plan
@@ -192,7 +192,7 @@ export function DiagnosticReportView({
             <button
               type="button"
               onClick={onStartReassessment}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-amber-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-amber-500/25 transition-all hover:bg-amber-600 hover:scale-105 active:scale-95 w-full sm:w-auto"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-amber-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-amber-500/25 transition-smooth hover:bg-amber-600 hover:scale-105 active:scale-95 w-full sm:w-auto"
             >
               <RefreshCw size={18} />
               Re-Assess Knowledge
@@ -203,7 +203,7 @@ export function DiagnosticReportView({
             <button
               type="button"
               onClick={onStartFlashcards}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/25 transition-all hover:bg-indigo-700 hover:scale-105 active:scale-95 w-full sm:w-auto"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/25 transition-smooth hover:bg-indigo-700 hover:scale-105 active:scale-95 w-full sm:w-auto"
             >
               <Layers size={18} />
               Practice Flashcards
@@ -214,7 +214,7 @@ export function DiagnosticReportView({
             <button
               type="button"
               onClick={onExportReport}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white/10 px-5 py-3 text-sm font-bold text-white backdrop-blur-md transition-all hover:bg-white/20 hover:scale-105 active:scale-95 w-full sm:w-auto border border-white/20"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white/10 px-5 py-3 text-sm font-bold text-white backdrop-blur-md transition-smooth hover:bg-white/20 hover:scale-105 active:scale-95 w-full sm:w-auto border border-white/20"
             >
               <Download size={18} />
               Export Report
@@ -240,7 +240,7 @@ export function DiagnosticReportView({
             return (
               <div
                 key={categoryName}
-                className="rounded-2xl border border-slate-200/80 bg-slate-50/50 dark:border-white/10 dark:bg-slate-800/60 p-4 transition-all hover:border-cyan-300 dark:hover:bg-slate-800"
+                className="rounded-2xl border border-slate-200/80 bg-slate-50/50 dark:border-white/10 dark:bg-slate-800/60 p-4 transition-smooth hover:border-cyan-300 dark:hover:bg-slate-800"
               >
                 <div className="flex items-start justify-between gap-2">
                   <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
@@ -254,7 +254,7 @@ export function DiagnosticReportView({
 
                 <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
                   <div
-                    className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 transition-all duration-300"
+                    className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 transition-[width] duration-300"
                     style={{ width: `${catPercent}%` }}
                   />
                 </div>
@@ -296,7 +296,7 @@ export function DiagnosticReportView({
             return (
               <div
                 key={concept.id}
-                className={`flex flex-col gap-3 rounded-2xl border p-4 transition-all sm:flex-row sm:items-center sm:justify-between ${
+                className={`flex flex-col gap-3 rounded-2xl border p-4 transition-smooth sm:flex-row sm:items-center sm:justify-between ${
                   status === "mastered"
                     ? "border-emerald-200 bg-emerald-50/40 dark:border-emerald-800/40 dark:bg-emerald-950/40"
                     : status === "review"

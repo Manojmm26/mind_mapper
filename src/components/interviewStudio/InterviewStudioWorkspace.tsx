@@ -87,7 +87,7 @@ export function InterviewStudioWorkspace({ onBackToHome }: InterviewStudioWorksp
           <div className="flex flex-wrap items-center gap-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 p-1.5 border border-slate-200/60 dark:border-slate-700/60 overflow-x-auto scrollbar-thin" role="tablist" aria-label="Studio Navigation">
             <button
               onClick={() => setActiveTab("rosetta")}
-              className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all min-h-[36px] ${
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-smooth min-h-[36px] ${
                 activeTab === "rosetta"
                   ? "bg-white text-slate-900 dark:bg-slate-900 dark:text-white shadow-sm"
                   : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
@@ -99,7 +99,7 @@ export function InterviewStudioWorkspace({ onBackToHome }: InterviewStudioWorksp
 
             <button
               onClick={() => setActiveTab("teleprompter")}
-              className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all min-h-[36px] ${
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-smooth min-h-[36px] ${
                 activeTab === "teleprompter"
                   ? "bg-white text-slate-900 dark:bg-slate-900 dark:text-white shadow-sm"
                   : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
@@ -111,7 +111,7 @@ export function InterviewStudioWorkspace({ onBackToHome }: InterviewStudioWorksp
 
             <button
               onClick={() => setActiveTab("sql")}
-              className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all min-h-[36px] ${
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-smooth min-h-[36px] ${
                 activeTab === "sql"
                   ? "bg-white text-slate-900 dark:bg-slate-900 dark:text-white shadow-sm"
                   : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
@@ -123,7 +123,7 @@ export function InterviewStudioWorkspace({ onBackToHome }: InterviewStudioWorksp
 
             <button
               onClick={() => setActiveTab("grill")}
-              className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all min-h-[36px] ${
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-smooth min-h-[36px] ${
                 activeTab === "grill"
                   ? "bg-purple-600 text-white shadow-sm"
                   : "text-slate-500 hover:text-purple-600 dark:text-slate-400 dark:hover:text-purple-400"
@@ -135,7 +135,7 @@ export function InterviewStudioWorkspace({ onBackToHome }: InterviewStudioWorksp
 
             <button
               onClick={() => setActiveTab("history")}
-              className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all min-h-[36px] ${
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-smooth min-h-[36px] ${
                 activeTab === "history"
                   ? "bg-white text-slate-900 dark:bg-slate-900 dark:text-white shadow-sm"
                   : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
@@ -147,7 +147,7 @@ export function InterviewStudioWorkspace({ onBackToHome }: InterviewStudioWorksp
 
             <button
               onClick={() => setActiveTab("decision")}
-              className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all min-h-[36px] ${
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-smooth min-h-[36px] ${
                 activeTab === "decision"
                   ? "bg-white text-slate-900 dark:bg-slate-900 dark:text-white shadow-sm"
                   : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"

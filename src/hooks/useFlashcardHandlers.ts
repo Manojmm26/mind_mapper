@@ -47,9 +47,10 @@ export function useFlashcardHandlers({
 
       try {
         const targetConcepts = targetConceptIds
-          ? assessmentStage1Data.concepts.filter((c) =>
-              targetConceptIds.includes(c.id),
-            )
+          ? (() => {
+              const targetIdSet = new Set(targetConceptIds);
+              return assessmentStage1Data.concepts.filter((c) => targetIdSet.has(c.id));
+            })()
           : assessmentStage1Data.concepts;
 
         const wikiCtx = buildWikiContext(assessmentStage1Data.topic, wiki);

@@ -51,7 +51,7 @@ export function WikiHealthCheckTab({
           </p>
           <button
             onClick={onRunLint}
-            className="inline-flex items-center gap-2 rounded-2xl bg-cyan-600 dark:bg-cyan-500 px-5 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-cyan-700 dark:hover:bg-cyan-400 hover:shadow-md active:scale-[0.98]"
+            className="inline-flex items-center gap-2 rounded-2xl bg-cyan-600 dark:bg-cyan-500 px-5 py-3 text-sm font-bold text-white shadow-sm transition-smooth hover:bg-cyan-700 dark:hover:bg-cyan-400 hover:shadow-md active:scale-[0.98]"
           >
             <ShieldCheck size={16} />
             Run Health Check
@@ -105,8 +105,8 @@ export function WikiHealthCheckTab({
           <div className="space-y-3">
             {lintReport.issues.map((issue, i) => (
               <div
-                key={i}
-                className="group rounded-[20px] border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm transition-all hover:border-cyan-200 hover:shadow-md"
+                key={`${issue.ruleId}-${issue.pageId}`}
+                className="group rounded-[20px] border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm transition-smooth hover:border-cyan-200 hover:shadow-md"
               >
                 <div className="flex items-start gap-3">
                   <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-100">
@@ -132,7 +132,7 @@ export function WikiHealthCheckTab({
 
           <button
             onClick={onRunLint}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:shadow-md active:scale-[0.98]"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 shadow-sm transition-smooth hover:bg-slate-50 hover:shadow-md active:scale-[0.98]"
           >
             <RefreshCw size={14} />
             Re-run Health Check

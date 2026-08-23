@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { CheckSquare, Square, Sparkles, ArrowRight, RefreshCw, CheckCircle2 } from "lucide-react";
 import { AssessmentStage1Data, AssessmentStage2Data, AssessmentSelfReportStatus } from "../../services/llmService";
 import { McqVerificationWizard } from "./McqVerificationWizard";
@@ -26,8 +26,9 @@ export function ReassessmentWizard({
   );
 
   const [selectedIds, setSelectedIds] = useState<string[]>(
-    revisitableConcepts.map((c) => c.id)
+    () => revisitableConcepts.map((c) => c.id)
   );
+  const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) =>
@@ -89,14 +90,14 @@ export function ReassessmentWizard({
 
           <div className="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
             {revisitableConcepts.map((concept) => {
-              const isChecked = selectedIds.includes(concept.id);
+              const isChecked = selectedIdSet.has(concept.id);
               const prevStatus = selfReportAnswers[concept.id] || "gap";
 
               return (
                 <div
                   key={concept.id}
                   onClick={() => toggleSelect(concept.id)}
-                  className={`flex cursor-pointer items-start gap-4 rounded-2xl border p-4 transition-all ${
+                  className={`flex cursor-pointer items-start gap-4 rounded-2xl border p-4 transition-smooth ${
                     isChecked
                       ? "border-cyan-500 bg-cyan-50/60 dark:border-cyan-500/80 dark:bg-cyan-950/60 shadow-sm"
                       : "border-slate-200 bg-white dark:border-white/10 dark:bg-slate-900/80 hover:border-slate-300 dark:hover:bg-slate-800"
@@ -144,7 +145,7 @@ export function ReassessmentWizard({
           type="button"
           onClick={handleChecklistNext}
           disabled={isLoading || selectedIds.length === 0}
-          className="w-full flex items-center justify-center gap-2 rounded-2xl bg-cyan-600 px-6 py-4 text-sm font-bold text-white shadow-md transition-all hover:bg-cyan-700 disabled:opacity-40"
+          className="w-full flex items-center justify-center gap-2 rounded-2xl bg-cyan-600 px-6 py-4 text-sm font-bold text-white shadow-md transition-smooth hover:bg-cyan-700 disabled:opacity-40"
         >
           {isLoading ? (
             <>

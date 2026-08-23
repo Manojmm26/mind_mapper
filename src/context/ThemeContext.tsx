@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState, ReactNode } from "react";
 
 export type ThemeMode = "light" | "dark" | "system";
 
@@ -31,18 +31,18 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     theme === "system" ? getSystemTheme() : theme
   );
 
-  const setTheme = (mode: ThemeMode) => {
+  const setTheme = useCallback((mode: ThemeMode) => {
     setThemeState(mode);
     localStorage.setItem("theme", mode);
-  };
+  }, []);
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     if (effectiveTheme === "dark") {
       setTheme("light");
     } else {
       setTheme("dark");
     }
-  };
+  }, [effectiveTheme, setTheme]);
 
   useEffect(() => {
     const handleSystemChange = (e: MediaQueryListEvent) => {
@@ -69,8 +69,13 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     };
   }, [theme]);
 
+  const contextValue = useMemo(
+    () => ({ theme, effectiveTheme, setTheme, toggleTheme }),
+    [theme, effectiveTheme, setTheme, toggleTheme]
+  );
+
   return (
-    <ThemeContext.Provider value={{ theme, effectiveTheme, setTheme, toggleTheme }}>
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   );

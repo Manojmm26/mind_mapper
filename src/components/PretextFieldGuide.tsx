@@ -30,14 +30,19 @@ function MeasuredLineStack({
 }
 
 function getNodesFromIds(ids: string[], nodeMap: Map<string, PretextMapNode>) {
-  return ids.map((id) => nodeMap.get(id)).filter(Boolean) as PretextMapNode[];
+  return ids.flatMap((id) => {
+    const n = nodeMap.get(id);
+    return n ? [n] : [];
+  });
 }
+
+const EMPTY_NODE_IDS: string[] = [];
 
 export function PretextFieldGuide({
   layout,
   selectedNodeId,
-  visitedNodeIds = [],
-  collectedNodeIds = [],
+  visitedNodeIds = EMPTY_NODE_IDS,
+  collectedNodeIds = EMPTY_NODE_IDS,
   onSelectNode,
   onToggleCollected,
 }: PretextFieldGuideProps) {
@@ -57,7 +62,7 @@ export function PretextFieldGuide({
   const nearbyNodes = childNodes.length > 0 ? childNodes : siblingNodes;
   const nearbyLabel = childNodes.length > 0 ? 'Nearby sightings' : siblingNodes.length > 0 ? 'Other trail markers' : 'Trail complete';
   const collectedNodes = getNodesFromIds(collectedNodeIds, nodeMap);
-  const recentVisitedNodes = getNodesFromIds([...visitedNodeIds].reverse().slice(0, 6), nodeMap);
+  const recentVisitedNodes = getNodesFromIds([...new Set(visitedNodeIds)].reverse().slice(0, 6), nodeMap);
   const recommendedNode =
     childNodes.find((node) => !visitedSet.has(node.id)) ||
     childNodes[0] ||
@@ -338,7 +343,7 @@ export function PretextFieldGuide({
             <div className="mt-4 space-y-3">
               {recentVisitedNodes.map((node, index) => (
                 <button
-                  key={`${node.id}-${index}`}
+                  key={node.id}
                   type="button"
                   onClick={() => onSelectNode?.(node.id)}
                   className={`w-full rounded-[24px] border px-4 py-3 text-left transition-colors ${

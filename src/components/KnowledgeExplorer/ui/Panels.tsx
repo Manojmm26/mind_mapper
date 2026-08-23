@@ -257,7 +257,7 @@ export function CollectedPanel({
                       e.stopPropagation();
                       onToggleCollect(id);
                     }}
-                    className="shrink-0 rounded-md p-1 text-slate-500 opacity-0 transition-all group-hover:opacity-100 hover:bg-white/10 hover:text-red-400"
+                    className="shrink-0 rounded-md p-1 text-slate-500 opacity-0 transition-smooth group-hover:opacity-100 hover:bg-white/10 hover:text-red-400"
                   >
                     <X size={12} />
                   </button>
@@ -490,7 +490,7 @@ export function StatsPanel({
               const height = (count / maxCount) * 100;
               return (
                 <div
-                  key={i}
+                  key={`depth-level-${i}`}
                   className="flex-1 flex flex-col items-center gap-1"
                 >
                   <div

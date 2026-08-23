@@ -157,7 +157,7 @@ async function fetchRelevantPages(
   }
 
   const scoredEntries = index
-    .map((entry) => {
+    .reduce<Array<{ entry: (typeof index)[number]; score: number }>>((acc, entry) => {
       const titleScore = scoreText(entry.title, lowerQuery, terms) * 4;
       const summaryScore = scoreText(entry.summary, lowerQuery, terms) * 2;
       const tagScore = entry.tags.reduce(
@@ -172,9 +172,11 @@ async function fetchRelevantPages(
         sourceScore +
         (conceptBoosts.get(entry.id) || 0);
 
-      return { entry, score: totalScore };
-    })
-    .filter(({ score }) => score > 0)
+      if (totalScore > 0) {
+        acc.push({ entry, score: totalScore });
+      }
+      return acc;
+    }, [])
     .sort((a, b) => b.score - a.score)
     .slice(0, maxPages * 2);
 

@@ -29,7 +29,7 @@ export function GalleryPage({
           {/* Back Button */}
           <button
             onClick={onBack}
-            className="group flex items-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-white/10 dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition-all hover:border-slate-300 dark:hover:border-white/20 hover:shadow-md active:scale-95"
+            className="group flex items-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-white/10 dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition-smooth hover:border-slate-300 dark:hover:border-white/20 hover:shadow-md active:scale-95"
           >
             <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-0.5" />
             Back

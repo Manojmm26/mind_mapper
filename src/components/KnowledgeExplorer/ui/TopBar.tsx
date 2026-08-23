@@ -142,7 +142,7 @@ export function TopBar({
       <div className="flex items-center gap-1 rounded-xl bg-slate-800/60 p-1">
         <button
           onClick={() => setMode("atlas")}
-          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-smooth ${
             mode === "atlas"
               ? "bg-cyan-500/20 text-cyan-300"
               : "text-slate-400 hover:text-white"
@@ -153,7 +153,7 @@ export function TopBar({
         </button>
         <button
           onClick={() => setMode("tunnel")}
-          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-smooth ${
             mode === "tunnel"
               ? "bg-cyan-500/20 text-cyan-300"
               : "text-slate-400 hover:text-white"
@@ -164,7 +164,7 @@ export function TopBar({
         </button>
         <button
           onClick={() => setMode("overview")}
-          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-smooth ${
             mode === "overview"
               ? "bg-cyan-500/20 text-cyan-300"
               : "text-slate-400 hover:text-white"

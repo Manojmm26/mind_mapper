@@ -8,7 +8,7 @@ import {
 } from "../config/aiConfig";
 
 export function ModelSelector() {
-  const [selectedModelId, setSelectedModelId] = useState<string>(getActiveGeminiModel());
+  const [selectedModelId, setSelectedModelId] = useState<string>(() => getActiveGeminiModel());
   const [isOpen, setIsOpen] = useState(false);
 
   const currentModel =
@@ -26,7 +26,7 @@ export function ModelSelector() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="inline-flex items-center gap-2 rounded-2xl border border-white/80 dark:border-white/10 bg-white/90 dark:bg-slate-800/90 px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-slate-100 shadow-sm backdrop-blur-xl transition-all hover:bg-white dark:hover:bg-slate-800 hover:shadow-md active:scale-95"
+        className="inline-flex items-center gap-2 rounded-2xl border border-white/80 dark:border-white/10 bg-white/90 dark:bg-slate-800/90 px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-slate-100 shadow-sm backdrop-blur-xl transition-smooth hover:bg-white dark:hover:bg-slate-800 hover:shadow-md active:scale-95"
       >
         <Cpu size={14} className="text-cyan-600 dark:text-cyan-400" />
         <span>{currentModel.name}</span>
@@ -62,7 +62,7 @@ export function ModelSelector() {
                     key={model.id}
                     type="button"
                     onClick={() => handleSelect(model)}
-                    className={`w-full text-left rounded-2xl p-3 transition-all ${
+                    className={`w-full text-left rounded-2xl p-3 transition-smooth ${
                       isSelected
                         ? "bg-gradient-to-r from-cyan-50/90 to-indigo-50/90 dark:from-cyan-950/60 dark:to-indigo-950/60 ring-1 ring-cyan-200/80 dark:ring-cyan-800/40"
                         : "hover:bg-slate-50 dark:hover:bg-slate-800/80"

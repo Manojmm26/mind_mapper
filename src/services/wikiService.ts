@@ -386,9 +386,11 @@ export async function getWikiStats(): Promise<{
 }
 
 export async function exportWikiToJSON(): Promise<string> {
-  const pages = await getAllWikiPages();
-  const index = await getWikiIndex();
-  const logs = await getLogs();
+  const [pages, index, logs] = await Promise.all([
+    getAllWikiPages(),
+    getWikiIndex(),
+    getLogs(),
+  ]);
 
   const exportData = {
     exportedAt: new Date().toISOString(),

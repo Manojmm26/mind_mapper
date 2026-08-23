@@ -37,7 +37,7 @@ export function TechStackSwitcher({
       <button
         id="tech-stack-switcher-btn"
         onClick={() => setIsOpen(!isOpen)}
-        className="relative z-50 flex items-center gap-2 rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 px-3.5 py-2 min-h-[40px] text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm hover:border-purple-300 dark:hover:border-purple-800 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+        className="relative z-50 flex items-center gap-2 rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 px-3.5 py-2 min-h-[40px] text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm hover:border-purple-300 dark:hover:border-purple-800 transition-smooth focus:outline-none focus:ring-2 focus:ring-purple-500/50"
       >
         <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 text-white text-[10px] font-black shadow-sm">
           <Layers size={13} />
@@ -95,7 +95,7 @@ export function TechStackSwitcher({
                       onSelectStack(stack);
                       setIsOpen(false);
                     }}
-                    className={`w-full text-left rounded-2xl p-3 min-h-[52px] transition-all flex items-start justify-between gap-2 border ${
+                    className={`w-full text-left rounded-2xl p-3 min-h-[52px] transition-smooth flex items-start justify-between gap-2 border ${
                       isSelected
                         ? "bg-purple-50 dark:bg-purple-950/40 border-purple-300 dark:border-purple-800 text-slate-900 dark:text-white font-bold shadow-sm"
                         : "bg-white dark:bg-slate-950 border-slate-100 dark:border-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-700 dark:text-slate-300"

@@ -160,7 +160,7 @@ export function HomePage({
               type="button"
               onClick={() => onWorkflowModeChange("learn")}
               disabled={isLoading}
-              className={`flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-bold transition-all ${
+              className={`flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-bold transition-smooth ${
                 workflowMode === "learn"
                   ? "bg-white text-slate-900 dark:bg-slate-900 dark:text-white shadow-sm"
                   : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
@@ -173,7 +173,7 @@ export function HomePage({
               type="button"
               onClick={() => onWorkflowModeChange("compare")}
               disabled={isLoading}
-              className={`flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-bold transition-all ${
+              className={`flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-bold transition-smooth ${
                 workflowMode === "compare"
                   ? "bg-white text-slate-900 dark:bg-slate-900 dark:text-white shadow-sm"
                   : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
@@ -186,7 +186,7 @@ export function HomePage({
               type="button"
               onClick={() => onWorkflowModeChange("assess")}
               disabled={isLoading}
-              className={`flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-bold transition-all ${
+              className={`flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-bold transition-smooth ${
                 workflowMode === "assess"
                   ? "bg-white text-slate-900 dark:bg-slate-900 dark:text-white shadow-sm"
                   : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
@@ -200,9 +200,9 @@ export function HomePage({
           {/* Topic Input Form */}
           <form onSubmit={onTopicSubmit} className="space-y-4">
             <div className="group relative">
-              <div className="theme-accent-bg absolute -inset-0.5 rounded-2xl blur opacity-10 transition-all duration-1000 group-hover:opacity-20" />
+              <div className="theme-accent-bg absolute -inset-0.5 rounded-2xl blur opacity-10 transition-smooth duration-1000 group-hover:opacity-20" />
               <div
-                className={`relative flex items-center overflow-hidden rounded-2xl border border-slate-200/90 bg-white dark:border-white/15 dark:bg-slate-800/90 shadow-sm transition-all duration-300 focus-within:ring-4 focus-within:shadow-md ${
+                className={`relative flex items-center overflow-hidden rounded-2xl border border-slate-200/90 bg-white dark:border-white/15 dark:bg-slate-800/90 shadow-sm transition-smooth duration-300 focus-within:ring-4 focus-within:shadow-md ${
                   workflowMode === "assess"
                     ? "focus-within:border-amber-500 focus-within:ring-amber-500/15"
                     : workflowMode === "compare"
@@ -241,7 +241,7 @@ export function HomePage({
                 <button
                   type="submit"
                   disabled={isLoading || !topicInput.trim()}
-                  className="theme-accent-bg mr-3 rounded-xl p-3 text-white shadow-md transition-all hover:opacity-90 disabled:opacity-30 active:scale-95"
+                  className="theme-accent-bg mr-3 rounded-xl p-3 text-white shadow-md transition-smooth hover:opacity-90 disabled:opacity-30 active:scale-95"
                 >
                   {isLoading ? (
                     <Loader2 size={18} className="animate-spin" />
@@ -282,7 +282,7 @@ export function HomePage({
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isLoading}
-                className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-slate-800/60 px-4 py-6 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition-all hover:border-cyan-500/30 hover:bg-white dark:hover:bg-slate-800 hover:text-cyan-600 dark:hover:text-cyan-400 hover:shadow-md disabled:opacity-50"
+                className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-slate-800/60 px-4 py-6 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition-smooth hover:border-cyan-500/30 hover:bg-white dark:hover:bg-slate-800 hover:text-cyan-600 dark:hover:text-cyan-400 hover:shadow-md disabled:opacity-50"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 bg-white dark:border-white/10 dark:bg-slate-900 shadow-sm transition-colors group-hover:bg-cyan-50 dark:group-hover:bg-cyan-950/40">
                   <Upload
@@ -301,7 +301,7 @@ export function HomePage({
               <button
                 onClick={() => jsonInputRef.current?.click()}
                 disabled={isLoading}
-                className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-slate-800/60 px-4 py-6 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition-all hover:border-orange-500/30 hover:bg-white dark:hover:bg-slate-800 hover:text-orange-600 dark:hover:text-orange-400 hover:shadow-md disabled:opacity-50"
+                className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-slate-800/60 px-4 py-6 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition-smooth hover:border-orange-500/30 hover:bg-white dark:hover:bg-slate-800 hover:text-orange-600 dark:hover:text-orange-400 hover:shadow-md disabled:opacity-50"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 bg-white dark:border-white/10 dark:bg-slate-900 shadow-sm transition-colors group-hover:bg-orange-50 dark:group-hover:bg-orange-950/40">
                   <FileJson
@@ -320,7 +320,7 @@ export function HomePage({
               <button
                 onClick={onOpenWikiExplorer}
                 disabled={isLoading}
-                className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-slate-800/60 px-4 py-6 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition-all hover:border-indigo-500/30 hover:bg-white dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 hover:shadow-md disabled:opacity-50"
+                className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-slate-800/60 px-4 py-6 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition-smooth hover:border-indigo-500/30 hover:bg-white dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 hover:shadow-md disabled:opacity-50"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 bg-white dark:border-white/10 dark:bg-slate-900 shadow-sm transition-colors group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/40">
                   <BookOpen
@@ -398,7 +398,7 @@ export function HomePage({
               <button
                 type="button"
                 onClick={onOpenInterviewStudio}
-                className="group flex shrink-0 items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-red-600 via-purple-600 to-blue-600 px-6 py-4 text-sm font-black text-white shadow-xl shadow-purple-500/20 transition-all hover:shadow-2xl hover:shadow-purple-500/30 hover:scale-[1.03] active:scale-[0.98]"
+                className="group flex shrink-0 items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-red-600 via-purple-600 to-blue-600 px-6 py-4 text-sm font-black text-white shadow-xl shadow-purple-500/20 transition-smooth hover:shadow-2xl hover:shadow-purple-500/30 hover:scale-[1.03] active:scale-[0.98]"
               >
                 <GraduationCap size={18} />
                 Launch Interview Studio
@@ -447,7 +447,7 @@ export function HomePage({
             <button
               type="button"
               onClick={onOpenGallery}
-              className="group flex shrink-0 items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-4 text-sm font-bold text-white shadow-lg shadow-cyan-500/25 transition-all hover:shadow-xl hover:shadow-cyan-500/30 hover:scale-[1.02] active:scale-[0.98]"
+              className="group flex shrink-0 items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-4 text-sm font-bold text-white shadow-lg shadow-cyan-500/25 transition-smooth hover:shadow-xl hover:shadow-cyan-500/30 hover:scale-[1.02] active:scale-[0.98]"
             >
               <Library size={18} />
               Browse Showcase
@@ -464,7 +464,7 @@ export function HomePage({
           <div className="relative w-full max-w-4xl max-h-[90vh]">
             <button
               onClick={onCloseWikiExplorer}
-              className="absolute top-2 right-2 sm:-top-3 sm:-right-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-700 dark:bg-slate-800 dark:text-slate-200 shadow-lg ring-1 ring-slate-200 dark:ring-white/10 transition-all hover:bg-slate-50 dark:hover:bg-slate-700 hover:scale-105"
+              className="absolute top-2 right-2 sm:-top-3 sm:-right-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-700 dark:bg-slate-800 dark:text-slate-200 shadow-lg ring-1 ring-slate-200 dark:ring-white/10 transition-smooth hover:bg-slate-50 dark:hover:bg-slate-700 hover:scale-105"
               aria-label="Close Knowledge Base"
             >
               <X size={20} />

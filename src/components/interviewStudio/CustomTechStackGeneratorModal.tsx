@@ -206,7 +206,7 @@ export function CustomTechStackGeneratorModal({
                   key={f}
                   type="button"
                   onClick={() => setFrontendName(f)}
-                  className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all ${
+                  className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition-smooth ${
                     frontendName === f
                       ? "bg-purple-600 text-white shadow-sm"
                       : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
@@ -236,7 +236,7 @@ export function CustomTechStackGeneratorModal({
                   key={b}
                   type="button"
                   onClick={() => setBackendName(b)}
-                  className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all ${
+                  className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition-smooth ${
                     backendName === b
                       ? "bg-indigo-600 text-white shadow-sm"
                       : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
@@ -266,7 +266,7 @@ export function CustomTechStackGeneratorModal({
                   key={d}
                   type="button"
                   onClick={() => setDatabaseName(d)}
-                  className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all ${
+                  className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition-smooth ${
                     databaseName === d
                       ? "bg-emerald-600 text-white shadow-sm"
                       : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
@@ -296,7 +296,7 @@ export function CustomTechStackGeneratorModal({
           <button
             onClick={handleGenerate}
             disabled={isGenerating}
-            className="rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-5 py-2.5 text-xs font-bold shadow-md transition-all flex items-center gap-2 disabled:opacity-50"
+            className="rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-5 py-2.5 text-xs font-bold shadow-md transition-smooth flex items-center gap-2 disabled:opacity-50"
           >
             {isGenerating ? (
               <>

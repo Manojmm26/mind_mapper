@@ -238,8 +238,9 @@ export function useAssessmentHandlers({
       setLoadingMessage("Generating targeted verification questions...");
 
       try {
+        const selectedIdSet = new Set(selectedConceptIds);
         const selectedConcepts = assessmentStage1Data.concepts.filter((c) =>
-          selectedConceptIds.includes(c.id),
+          selectedIdSet.has(c.id),
         );
         const wikiCtx = buildWikiContext(assessmentStage1Data.topic, wiki);
         const stage2 = await generateAssessmentStage2(

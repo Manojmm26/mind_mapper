@@ -122,7 +122,7 @@ export function ParadigmDetailModal({
             <button
               onClick={() => onSelectParadigm(prevParadigm)}
               title="Previous Paradigm (Left Arrow)"
-              className="inline-flex items-center gap-1 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 min-h-[36px] text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
+              className="inline-flex items-center gap-1 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 min-h-[36px] text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-smooth"
             >
               <ChevronLeft size={16} />
               <span className="hidden sm:inline">Prev</span>
@@ -130,7 +130,7 @@ export function ParadigmDetailModal({
             <button
               onClick={() => onSelectParadigm(nextParadigm)}
               title="Next Paradigm (Right Arrow)"
-              className="inline-flex items-center gap-1 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 min-h-[36px] text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
+              className="inline-flex items-center gap-1 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 min-h-[36px] text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-smooth"
             >
               <span className="hidden sm:inline">Next</span>
               <ChevronRight size={16} />
@@ -149,7 +149,7 @@ export function ParadigmDetailModal({
         <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-2.5 bg-white dark:bg-slate-900 overflow-x-auto scrollbar-thin">
           <button
             onClick={() => setActiveTab("bridge")}
-            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 min-h-[36px] text-xs font-black transition-all shrink-0 ${
+            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 min-h-[36px] text-xs font-black transition-smooth shrink-0 ${
               activeTab === "bridge"
                 ? "bg-slate-900 text-white dark:bg-purple-600 shadow-sm"
                 : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -161,7 +161,7 @@ export function ParadigmDetailModal({
 
           <button
             onClick={() => setActiveTab("angular")}
-            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 min-h-[36px] text-xs font-black transition-all shrink-0 ${
+            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 min-h-[36px] text-xs font-black transition-smooth shrink-0 ${
               activeTab === "angular"
                 ? "bg-red-600 text-white shadow-sm"
                 : "text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40"
@@ -173,7 +173,7 @@ export function ParadigmDetailModal({
 
           <button
             onClick={() => setActiveTab("dotnet")}
-            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 min-h-[36px] text-xs font-black transition-all shrink-0 ${
+            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 min-h-[36px] text-xs font-black transition-smooth shrink-0 ${
               activeTab === "dotnet"
                 ? "bg-blue-600 text-white shadow-sm"
                 : "text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40"
@@ -202,7 +202,7 @@ export function ParadigmDetailModal({
                 </div>
                 <button
                   onClick={() => handleCopy(paradigm.interviewPunchline, "modal-punchline")}
-                  className="shrink-0 p-2 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/40 rounded-lg transition-all"
+                  className="shrink-0 p-2 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/40 rounded-lg transition-smooth"
                   title="Copy Punchline"
                 >
                   {copiedKey === "modal-punchline" ? (
@@ -340,7 +340,7 @@ export function ParadigmDetailModal({
                   </h5>
                   <ul className="space-y-2 text-xs text-slate-700 dark:text-slate-300">
                     {angDossier.productionBestPractices.map((bp, i) => (
-                      <li key={i} className="flex items-start gap-2">
+                      <li key={bp} className="flex items-start gap-2">
                         <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-[10px] font-black mt-0.5">
                           {i + 1}
                         </span>
@@ -361,7 +361,7 @@ export function ParadigmDetailModal({
                   <div className="space-y-3">
                     {angDossier.seniorInterviewProbes.map((probe, i) => (
                       <div
-                        key={i}
+                        key={probe.interviewerQuestion}
                         className="rounded-2xl bg-purple-50/50 dark:bg-purple-950/20 p-4 border border-purple-200/60 dark:border-purple-900/40 space-y-2 text-xs"
                       >
                         <div className="font-bold text-slate-900 dark:text-white flex items-start gap-1.5">
@@ -394,7 +394,7 @@ export function ParadigmDetailModal({
                   </h5>
                   <div className="space-y-3">
                     {angDossier.criticalPitfallsAndAntiPatterns.map((pitfall, i) => (
-                      <div key={i} className="rounded-xl bg-white/70 dark:bg-slate-900/70 p-3.5 space-y-1.5 border border-red-100 dark:border-red-900/30">
+                      <div key={pitfall.antiPattern} className="rounded-xl bg-white/70 dark:bg-slate-900/70 p-3.5 space-y-1.5 border border-red-100 dark:border-red-900/30">
                         <strong className="text-red-700 dark:text-red-400 block font-bold">
                           ⚠️ Anti-Pattern: {pitfall.antiPattern}
                         </strong>
@@ -465,7 +465,7 @@ export function ParadigmDetailModal({
                   </h5>
                   <ul className="space-y-2 text-xs text-slate-700 dark:text-slate-300">
                     {netDossier.productionBestPractices.map((bp, i) => (
-                      <li key={i} className="flex items-start gap-2">
+                      <li key={bp} className="flex items-start gap-2">
                         <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-[10px] font-black mt-0.5">
                           {i + 1}
                         </span>
@@ -486,7 +486,7 @@ export function ParadigmDetailModal({
                   <div className="space-y-3">
                     {netDossier.seniorInterviewProbes.map((probe, i) => (
                       <div
-                        key={i}
+                        key={probe.interviewerQuestion}
                         className="rounded-2xl bg-purple-50/50 dark:bg-purple-950/20 p-4 border border-purple-200/60 dark:border-purple-900/40 space-y-2 text-xs"
                       >
                         <div className="font-bold text-slate-900 dark:text-white flex items-start gap-1.5">
@@ -519,7 +519,7 @@ export function ParadigmDetailModal({
                   </h5>
                   <div className="space-y-3">
                     {netDossier.criticalPitfallsAndAntiPatterns.map((pitfall, i) => (
-                      <div key={i} className="rounded-xl bg-white/70 dark:bg-slate-900/70 p-3.5 space-y-1.5 border border-red-100 dark:border-red-900/30">
+                      <div key={pitfall.antiPattern} className="rounded-xl bg-white/70 dark:bg-slate-900/70 p-3.5 space-y-1.5 border border-red-100 dark:border-red-900/30">
                         <strong className="text-red-700 dark:text-red-400 block font-bold">
                           ⚠️ Anti-Pattern: {pitfall.antiPattern}
                         </strong>

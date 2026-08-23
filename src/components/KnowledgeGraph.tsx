@@ -26,7 +26,7 @@ import { ConceptIndex } from "../services/wikiIndex";
 
 function WikiPageNode({ data }: NodeProps) {
   return (
-    <div className="group relative rounded-2xl border border-indigo-200/80 bg-white/95 p-4 shadow-[0_8px_30px_rgb(15,23,42,0.08)] backdrop-blur-md min-w-[240px] max-w-[270px] transition-all hover:scale-[1.02] hover:shadow-[0_12px_40px_rgb(99,102,241,0.2)] hover:border-indigo-400 ring-1 ring-slate-100">
+    <div className="group relative rounded-2xl border border-indigo-200/80 bg-white/95 p-4 shadow-[0_8px_30px_rgb(15,23,42,0.08)] backdrop-blur-md min-w-[240px] max-w-[270px] transition-smooth hover:scale-[1.02] hover:shadow-[0_12px_40px_rgb(99,102,241,0.2)] hover:border-indigo-400 ring-1 ring-slate-100">
       <Handle
         type="target"
         position={Position.Top}
@@ -72,7 +72,7 @@ function ConceptNode({ data }: NodeProps) {
   const isMulti = Number(data.occurrences) > 1;
 
   return (
-    <div className={`group relative rounded-full border px-4 py-2 shadow-sm min-w-[130px] max-w-[210px] flex items-center justify-between gap-2 transition-all hover:scale-105 ${
+    <div className={`group relative rounded-full border px-4 py-2 shadow-sm min-w-[130px] max-w-[210px] flex items-center justify-between gap-2 transition-smooth hover:scale-105 ${
       isMulti
         ? "border-emerald-300 bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-emerald-500/20"
         : "border-cyan-200 bg-white text-slate-800 ring-1 ring-slate-100 hover:border-cyan-400"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   GrillSessionRecord,
   getGrillSessions,
@@ -28,13 +28,9 @@ interface GrillHistoryViewProps {
 }
 
 export function GrillHistoryView({ onStartNewDrill }: GrillHistoryViewProps) {
-  const [sessions, setSessions] = useState<GrillSessionRecord[]>([]);
+  const [sessions, setSessions] = useState<GrillSessionRecord[]>(() => getGrillSessions());
   const [expandedSessionId, setExpandedSessionId] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
-
-  useEffect(() => {
-    setSessions(getGrillSessions());
-  }, []);
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this drill session log?")) {
@@ -97,7 +93,7 @@ export function GrillHistoryView({ onStartNewDrill }: GrillHistoryViewProps) {
             {onStartNewDrill && (
               <button
                 onClick={() => onStartNewDrill()}
-                className="rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2.5 min-h-[44px] text-xs font-black text-white shadow-md hover:from-purple-700 hover:to-indigo-700 transition-all"
+                className="rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2.5 min-h-[44px] text-xs font-black text-white shadow-md hover:from-purple-700 hover:to-indigo-700 transition-smooth"
               >
                 + Start New AI Grill
               </button>
@@ -105,7 +101,7 @@ export function GrillHistoryView({ onStartNewDrill }: GrillHistoryViewProps) {
             {sessions.length > 0 && (
               <button
                 onClick={handleClearAll}
-                className="rounded-2xl bg-red-500/20 hover:bg-red-500/30 text-red-300 px-3.5 py-2.5 min-h-[44px] text-xs font-bold border border-red-500/30 transition-all"
+                className="rounded-2xl bg-red-500/20 hover:bg-red-500/30 text-red-300 px-3.5 py-2.5 min-h-[44px] text-xs font-bold border border-red-500/30 transition-smooth"
                 title="Clear all logs"
               >
                 <Trash2 size={16} />
@@ -157,7 +153,7 @@ export function GrillHistoryView({ onStartNewDrill }: GrillHistoryViewProps) {
             return (
               <div
                 key={session.id}
-                className="rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 shadow-sm overflow-hidden transition-all hover:shadow-md"
+                className="rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 shadow-sm overflow-hidden transition-smooth hover:shadow-md"
               >
                 {/* Session Summary Header */}
                 <div
@@ -227,7 +223,7 @@ export function GrillHistoryView({ onStartNewDrill }: GrillHistoryViewProps) {
                   <div className="p-6 pt-2 space-y-6 border-t border-slate-100 dark:border-slate-800">
                     {session.answers.map((ans, idx) => (
                       <div
-                        key={idx}
+                        key={ans.questionId}
                         className="rounded-2xl bg-slate-50/80 dark:bg-slate-950/70 p-5 border border-slate-200/60 dark:border-slate-800/80 space-y-3"
                       >
                         {/* Question Title & Score */}

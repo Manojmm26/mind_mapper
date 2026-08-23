@@ -31,19 +31,22 @@ export function buildTunnelScene(
 
   const parentId = parentMap[focusId];
   const parentNode = parentId ? nodes.find((n) => n.id === parentId) : null;
-  const childNodes = (childrenMap[focusId] || [])
-    .map((id) => nodes.find((n) => n.id === id))
-    .filter(Boolean) as ExplorerNode[];
+  const childNodes = (childrenMap[focusId] || []).flatMap((id) => {
+    const node = nodes.find((n) => n.id === id);
+    return node ? [node] : [];
+  });
   const siblingNodes = parentId
-    ? ((childrenMap[parentId] || [])
-        .filter((id) => id !== focusId)
-        .map((id) => nodes.find((n) => n.id === id))
-        .filter(Boolean) as ExplorerNode[])
+    ? (childrenMap[parentId] || []).flatMap((id) => {
+        if (id === focusId) return [];
+        const node = nodes.find((n) => n.id === id);
+        return node ? [node] : [];
+      })
     : [];
   const ancestorIds = getAncestorChain(focusId, parentMap);
-  const ancestorNodes = ancestorIds
-    .map((id) => nodes.find((n) => n.id === id))
-    .filter(Boolean) as ExplorerNode[];
+  const ancestorNodes = ancestorIds.flatMap((id) => {
+    const node = nodes.find((n) => n.id === id);
+    return node ? [node] : [];
+  });
 
   const sceneNodes: SceneNode[] = [];
   const centerX = containerWidth / 2;
@@ -155,13 +158,15 @@ export function buildAtlasScene(
 
   const parentId = parentMap[focusId];
   const parentNode = parentId ? nodes.find((n) => n.id === parentId) : null;
-  const childNodes = (childrenMap[focusId] || [])
-    .map((id) => nodes.find((n) => n.id === id))
-    .filter(Boolean) as ExplorerNode[];
+  const childNodes = (childrenMap[focusId] || []).flatMap((id) => {
+    const node = nodes.find((n) => n.id === id);
+    return node ? [node] : [];
+  });
   const ancestorIds = getAncestorChain(focusId, parentMap);
-  const ancestorNodes = ancestorIds
-    .map((id) => nodes.find((n) => n.id === id))
-    .filter(Boolean) as ExplorerNode[];
+  const ancestorNodes = ancestorIds.flatMap((id) => {
+    const node = nodes.find((n) => n.id === id);
+    return node ? [node] : [];
+  });
 
   const sceneNodes: SceneNode[] = [];
   const centerX = containerWidth / 2;

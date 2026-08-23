@@ -115,7 +115,7 @@ function OutlineNodeItem({
           type="button"
           onClick={() => onSelectNode?.(item.id)}
           className={cn(
-            'w-full rounded-2xl p-3 text-left transition-all',
+            'w-full rounded-2xl p-3 text-left transition-smooth',
             isSelected
               ? 'border border-cyan-200 bg-cyan-50/80 dark:border-cyan-800/60 dark:bg-cyan-950/60 shadow-sm'
               : 'border border-transparent hover:border-slate-200 dark:hover:border-white/10 hover:bg-slate-50/80 dark:hover:bg-slate-800/50'

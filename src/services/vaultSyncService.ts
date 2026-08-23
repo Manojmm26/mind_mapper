@@ -96,10 +96,6 @@ export async function syncAllPagesToVault(pages: WikiPage[]): Promise<number> {
     return 0;
   }
 
-  let count = 0;
-  for (const page of pages) {
-    const success = await syncPageToVault(page);
-    if (success) count++;
-  }
-  return count;
+  const results = await Promise.all(pages.map((page) => syncPageToVault(page)));
+  return results.filter(Boolean).length;
 }

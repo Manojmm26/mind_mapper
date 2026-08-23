@@ -131,9 +131,12 @@ export function runLintChecks(pages: WikiPage[], index: ConceptIndex): LintRepor
       tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
     }
   }
-  const rareTags = Array.from(tagCounts.entries())
-    .filter(([, count]) => count === 1)
-    .map(([tag]) => tag);
+  const rareTags = Array.from(tagCounts.entries()).reduce<string[]>((acc, [tag, count]) => {
+    if (count === 1) {
+      acc.push(tag);
+    }
+    return acc;
+  }, []);
 
   if (rareTags.length > 0 && pages.length > 5) {
     issues.push({

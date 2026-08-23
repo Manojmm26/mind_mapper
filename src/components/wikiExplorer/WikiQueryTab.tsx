@@ -98,12 +98,12 @@ export function WikiQueryTab({
           onKeyDown={handleKeyDown}
           placeholder="Ask a question about your knowledge base..."
           rows={3}
-          className="w-full rounded-2xl border border-slate-200/80 bg-white/80 dark:border-white/10 dark:bg-slate-800/80 py-3 pl-12 pr-14 text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 shadow-sm ring-1 ring-slate-100 dark:ring-white/10 transition-all focus:border-cyan-200 dark:focus:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-100 resize-none"
+          className="w-full rounded-2xl border border-slate-200/80 bg-white/80 dark:border-white/10 dark:bg-slate-800/80 py-3 pl-12 pr-14 text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 shadow-sm ring-1 ring-slate-100 dark:ring-white/10 transition-smooth focus:border-cyan-200 dark:focus:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-100 resize-none"
         />
         <button
           onClick={handleAsk}
           disabled={isQuerying || !query.trim() || wikiIndex.length === 0}
-          className="absolute right-3 bottom-3 flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-600 dark:bg-cyan-500 text-white shadow-sm transition-all hover:bg-cyan-700 dark:hover:bg-cyan-400 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
+          className="absolute right-3 bottom-3 flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-600 dark:bg-cyan-500 text-white shadow-sm transition-smooth hover:bg-cyan-700 dark:hover:bg-cyan-400 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isQuerying ? (
             <Loader2 size={16} className="animate-spin" />
@@ -184,7 +184,7 @@ export function WikiQueryTab({
                   <button
                     key={cite.pageId}
                     onClick={() => onLoadPage(cite.pageId)}
-                    className="group w-full rounded-xl border border-slate-200 bg-white dark:border-white/10 dark:bg-slate-800 p-3 text-left shadow-sm transition-all hover:border-cyan-200 dark:hover:border-cyan-500/50 hover:shadow-md"
+                    className="group w-full rounded-xl border border-slate-200 bg-white dark:border-white/10 dark:bg-slate-800 p-3 text-left shadow-sm transition-smooth hover:border-cyan-200 dark:hover:border-cyan-500/50 hover:shadow-md"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <h4 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors">

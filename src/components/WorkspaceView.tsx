@@ -305,7 +305,7 @@ export function WorkspaceViewComponent({
                 <button
                   type="button"
                   onClick={onStartAssessmentFromMap}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-amber-500 px-3.5 py-2 text-xs sm:text-sm font-bold text-white shadow-sm transition-all hover:bg-amber-600 hover:scale-105 shrink-0"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-amber-500 px-3.5 py-2 text-xs sm:text-sm font-bold text-white shadow-sm transition-smooth hover:bg-amber-600 hover:scale-105 shrink-0"
                 >
                   <Target size={16} />
                   <span>Test My Knowledge</span>

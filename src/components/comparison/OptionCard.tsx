@@ -49,8 +49,13 @@ function getTopScores(
   limit = 3,
 ) {
   const scored = criteria
-    .map((c) => ({ criterion: c, score: scores[c.id] }))
-    .filter((x) => parseRating(x.score?.rating) > 0)
+    .reduce<Array<{ criterion: ComparisonCriterion; score: CriterionScore | undefined }>>((acc, c) => {
+      const score = scores[c.id];
+      if (parseRating(score?.rating) > 0) {
+        acc.push({ criterion: c, score });
+      }
+      return acc;
+    }, [])
     .sort(
       (a, b) => parseRating(b.score!.rating) - parseRating(a.score!.rating),
     );
@@ -151,7 +156,7 @@ export function OptionCard({
 
   return (
     <article
-      className={`group relative flex w-full min-w-[300px] max-w-[380px] shrink-0 snap-center flex-col justify-between rounded-[28px] border p-6 transition-all duration-300 ${
+      className={`group relative flex w-full min-w-[300px] max-w-[380px] shrink-0 snap-center flex-col justify-between rounded-[28px] border p-6 transition-smooth duration-300 ${
         isRecommended
           ? "border-amber-200 dark:border-amber-500/40 bg-gradient-to-b from-amber-50/50 via-white to-white dark:from-amber-950/30 dark:via-slate-900 dark:to-slate-900 shadow-[0_16px_50px_rgba(245,158,11,0.12)] ring-1 ring-amber-200/60 dark:ring-amber-500/30"
           : "border-slate-200/80 dark:border-white/10 bg-white dark:bg-slate-900 shadow-[0_14px_40px_rgba(15,23,42,0.04)] hover:border-slate-300 dark:hover:border-white/20 hover:shadow-lg"
@@ -305,7 +310,7 @@ export function OptionCard({
               href={action.href}
               target="_blank"
               rel="noreferrer"
-              className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-[11px] font-bold tracking-wide transition-all active:scale-95 ${getActionClasses(action.variant)}`}
+              className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-[11px] font-bold tracking-wide transition-smooth active:scale-95 ${getActionClasses(action.variant)}`}
             >
               {action.label}
               <ExternalLink size={12} className="opacity-40" />

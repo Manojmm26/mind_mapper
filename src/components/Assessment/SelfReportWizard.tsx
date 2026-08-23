@@ -45,11 +45,11 @@ export function SelfReportWizard({ data, onSubmit }: SelfReportWizardProps) {
 
     // Adaptive pruning: if a level 1 concept is marked gap, auto-set child concepts to gap
     if (status === "gap" && currentConcept.level === 1) {
-      data.concepts
-        .filter((c) => c.parentId === currentConcept.id)
-        .forEach((child) => {
+      for (const child of data.concepts) {
+        if (child.parentId === currentConcept.id) {
           newAnswers[child.id] = "gap";
-        });
+        }
+      }
     }
 
     setAnswers(newAnswers);
@@ -107,14 +107,14 @@ export function SelfReportWizard({ data, onSubmit }: SelfReportWizardProps) {
         {/* Progress Bar */}
         <div className="mt-5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
           <div
-            className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 transition-all duration-300"
+            className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 transition-[width] duration-300"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
       </div>
 
       {/* Active Concept Card */}
-      <div className="rounded-[32px] border border-white/80 bg-white/90 dark:border-white/10 dark:bg-slate-900/90 p-5 sm:p-8 shadow-xl backdrop-blur-xl transition-all">
+      <div className="rounded-[32px] border border-white/80 bg-white/90 dark:border-white/10 dark:bg-slate-900/90 p-5 sm:p-8 shadow-xl backdrop-blur-xl transition-smooth">
         <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-cyan-50 dark:bg-cyan-950/60 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-cyan-700 dark:text-cyan-300 border border-cyan-200/60 dark:border-cyan-800/40">
@@ -156,7 +156,7 @@ export function SelfReportWizard({ data, onSubmit }: SelfReportWizardProps) {
             type="button"
             onClick={() => handleSelectAnswer("mastered")}
             className={cn(
-              "group flex items-center justify-center gap-2 rounded-2xl border p-4 text-sm font-bold transition-all",
+              "group flex items-center justify-center gap-2 rounded-2xl border p-4 text-sm font-bold transition-smooth",
               currentStatus === "mastered"
                 ? "border-emerald-500 bg-emerald-50 text-emerald-900 dark:border-emerald-500/80 dark:bg-emerald-950/60 dark:text-emerald-200 ring-2 ring-emerald-500/20"
                 : "border-slate-200 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-800 dark:text-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/40"
@@ -170,7 +170,7 @@ export function SelfReportWizard({ data, onSubmit }: SelfReportWizardProps) {
             type="button"
             onClick={() => handleSelectAnswer("review")}
             className={cn(
-              "group flex items-center justify-center gap-2 rounded-2xl border p-4 text-sm font-bold transition-all",
+              "group flex items-center justify-center gap-2 rounded-2xl border p-4 text-sm font-bold transition-smooth",
               currentStatus === "review"
                 ? "border-amber-500 bg-amber-50 text-amber-900 dark:border-amber-500/80 dark:bg-amber-950/60 dark:text-amber-200 ring-2 ring-amber-500/20"
                 : "border-slate-200 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-800 dark:text-slate-200 hover:border-amber-300 hover:bg-amber-50/50 dark:hover:bg-amber-950/40"
@@ -184,7 +184,7 @@ export function SelfReportWizard({ data, onSubmit }: SelfReportWizardProps) {
             type="button"
             onClick={() => handleSelectAnswer("gap")}
             className={cn(
-              "group flex items-center justify-center gap-2 rounded-2xl border p-4 text-sm font-bold transition-all",
+              "group flex items-center justify-center gap-2 rounded-2xl border p-4 text-sm font-bold transition-smooth",
               currentStatus === "gap"
                 ? "border-rose-500 bg-rose-50 text-rose-900 dark:border-rose-500/80 dark:bg-rose-950/60 dark:text-rose-200 ring-2 ring-rose-500/20"
                 : "border-slate-200 bg-white text-slate-700 dark:border-white/10 dark:bg-slate-800 dark:text-slate-200 hover:border-rose-300 hover:bg-rose-50/50 dark:hover:bg-rose-950/40"
@@ -211,7 +211,7 @@ export function SelfReportWizard({ data, onSubmit }: SelfReportWizardProps) {
             <button
               type="button"
               onClick={handleFinish}
-              className="inline-flex items-center gap-2 rounded-2xl bg-cyan-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-cyan-500/20 transition-all hover:bg-cyan-700 hover:scale-105 active:scale-95"
+              className="inline-flex items-center gap-2 rounded-2xl bg-cyan-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-cyan-500/20 transition-smooth hover:bg-cyan-700 hover:scale-105 active:scale-95"
             >
               Proceed to Phase 2
               <ArrowRight size={16} />

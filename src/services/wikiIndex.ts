@@ -269,6 +269,17 @@ export function updateConceptIndex(
   }
 
   // Rebuild cross-references for the updated page
+  const updatedPageRefs = new Set(crossReferences[updatedPage.id]);
+  const backRefSets = new Map<string, Set<string>>();
+  const ensureBackRefs = (pageId: string) => {
+    let set = backRefSets.get(pageId);
+    if (!set) {
+      set = new Set(crossReferences[pageId] || []);
+      backRefSets.set(pageId, set);
+    }
+    return set;
+  };
+
   for (const concept of Object.values(conceptIndex)) {
     if (
       concept.pageIds.includes(updatedPage.id) &&
@@ -276,13 +287,16 @@ export function updateConceptIndex(
     ) {
       for (const relatedPageId of concept.pageIds) {
         if (relatedPageId !== updatedPage.id) {
-          if (!crossReferences[updatedPage.id].includes(relatedPageId)) {
+          if (!updatedPageRefs.has(relatedPageId)) {
+            updatedPageRefs.add(relatedPageId);
             crossReferences[updatedPage.id].push(relatedPageId);
           }
-          if (!crossReferences[relatedPageId]) {
-            crossReferences[relatedPageId] = [];
-          }
-          if (!crossReferences[relatedPageId].includes(updatedPage.id)) {
+          const backRefs = ensureBackRefs(relatedPageId);
+          if (!backRefs.has(updatedPage.id)) {
+            backRefs.add(updatedPage.id);
+            if (!crossReferences[relatedPageId]) {
+              crossReferences[relatedPageId] = [];
+            }
             crossReferences[relatedPageId].push(updatedPage.id);
           }
         }
@@ -320,18 +334,26 @@ export function findRelatedPages(
   const related = index.crossReferences[pageId] || [];
 
   // Count shared concepts for better ranking
-  const pageConcepts = Object.values(index.concepts)
-    .filter((c) => c.pageIds.includes(pageId))
-    .map((c) => c.id);
+  const pageConceptIds = new Set<string>();
+  for (const c of Object.values(index.concepts)) {
+    if (c.pageIds.includes(pageId)) {
+      pageConceptIds.add(c.id);
+    }
+  }
+
+  const sharedCounts = new Map<string, number>();
+  for (const c of Object.values(index.concepts)) {
+    if (!pageConceptIds.has(c.id)) continue;
+    for (const pid of c.pageIds) {
+      sharedCounts.set(pid, (sharedCounts.get(pid) || 0) + 1);
+    }
+  }
 
   return related
-    .map((relatedId) => {
-      const sharedConcepts = Object.values(index.concepts).filter(
-        (c) => c.pageIds.includes(relatedId) && pageConcepts.includes(c.id),
-      ).length;
-
-      return { pageId: relatedId, sharedConcepts };
-    })
+    .map((relatedId) => ({
+      pageId: relatedId,
+      sharedConcepts: (sharedCounts.get(relatedId) || 0),
+    }))
     .sort((a, b) => b.sharedConcepts - a.sharedConcepts);
 }
 

@@ -205,6 +205,7 @@ Evaluate strictly and return JSON matching the schema.`;
   });
 
   const hasTrap = lowerAnswer.includes("task.run") || lowerAnswer.includes("gc.collect") || lowerAnswer.includes("infinite");
+  const matchedKeyPointSet = new Set(matchedKeyPoints);
   const baseScore = Math.min(5, Math.max(2, 2.5 + matchedKeyPoints.length * 0.9 - (hasTrap ? 1.2 : 0)));
   const scoreRounded = Math.round(baseScore * 10) / 10;
 
@@ -227,9 +228,9 @@ Evaluate strictly and return JSON matching the schema.`;
       matchedKeyPoints.length > 0
         ? matchedKeyPoints.map((k) => `Articulated core concept related to ${k.slice(0, 40)}...`)
         : ["Clear articulation of high-level problem resolution."],
-    gaps: question.modelAnswerKeyPoints
-      .filter((kp) => !matchedKeyPoints.includes(kp))
-      .map((k) => `Could emphasize: ${k}`),
+    gaps: question.modelAnswerKeyPoints.flatMap((kp) =>
+      matchedKeyPointSet.has(kp) ? [] : [`Could emphasize: ${kp}`]
+    ),
     redFlagTriggered: hasTrap,
     redFlagDetails: hasTrap ? `Be careful to avoid: ${question.trapToAvoid}` : undefined,
     staffSoundbite: question.modelAnswerKeyPoints[0] || "Deliver crisp, mechanism-driven answers with verified telemetry.",

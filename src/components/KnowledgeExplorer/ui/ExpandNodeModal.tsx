@@ -74,7 +74,7 @@ export function ExpandNodeModal({
                   onExpand(expandPrompt.nodeId, expandPrompt.input)
                 }
                 disabled={!expandPrompt.input.trim()}
-                className="inline-flex items-center gap-2 rounded-2xl bg-cyan-600 px-5 py-2.5 text-xs font-bold text-white transition-all hover:bg-cyan-500 disabled:opacity-40 shadow-sm"
+                className="inline-flex items-center gap-2 rounded-2xl bg-cyan-600 px-5 py-2.5 text-xs font-bold text-white transition-smooth hover:bg-cyan-500 disabled:opacity-40 shadow-sm"
               >
                 <Sparkles size={14} />
                 <span>Expand Branch</span>

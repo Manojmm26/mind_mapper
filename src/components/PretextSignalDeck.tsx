@@ -48,14 +48,19 @@ function MeasuredLineStack({
 }
 
 function getNodesFromIds(ids: string[], nodeMap: Map<string, PretextMapNode>) {
-  return ids.map((id) => nodeMap.get(id)).filter(Boolean) as PretextMapNode[];
+  return ids.flatMap((id) => {
+    const n = nodeMap.get(id);
+    return n ? [n] : [];
+  });
 }
+
+const EMPTY_NODE_IDS: string[] = [];
 
 export function PretextSignalDeck({
   layout,
   selectedNodeId,
-  visitedNodeIds = [],
-  collectedNodeIds = [],
+  visitedNodeIds = EMPTY_NODE_IDS,
+  collectedNodeIds = EMPTY_NODE_IDS,
   onSelectNode,
   onToggleCollected,
 }: PretextSignalDeckProps) {

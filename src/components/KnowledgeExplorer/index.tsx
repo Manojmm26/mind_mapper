@@ -473,7 +473,7 @@ export function KnowledgeExplorer({
         <div className="flex items-center gap-1 rounded-xl bg-slate-800/60 p-1">
           <button
             onClick={() => setMode("atlas")}
-            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-smooth ${
               mode === "atlas"
                 ? "bg-cyan-500/20 text-cyan-300"
                 : "text-slate-400 hover:text-white"
@@ -484,7 +484,7 @@ export function KnowledgeExplorer({
           </button>
           <button
             onClick={() => setMode("tunnel")}
-            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-smooth ${
               mode === "tunnel"
                 ? "bg-cyan-500/20 text-cyan-300"
                 : "text-slate-400 hover:text-white"
@@ -495,7 +495,7 @@ export function KnowledgeExplorer({
           </button>
           <button
             onClick={() => setMode("overview")}
-            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-smooth ${
               mode === "overview"
                 ? "bg-cyan-500/20 text-cyan-300"
                 : "text-slate-400 hover:text-white"
@@ -641,12 +641,13 @@ export function KnowledgeExplorer({
                   },
                 ].map((item, i) => {
                   if (!item.show) return null;
-                  if (item.divider) return <div key={i} className="my-1 border-t border-slate-700/50" />;
+                  const stableKey = item.key ? `tool-${item.key}` : `tools-divider-${i}`;
+                  if (item.divider) return <div key={stableKey} className="my-1 border-t border-slate-700/50" />;
                   
                   const Icon = item.icon!;
                   return (
                     <button
-                      key={i}
+                      key={stableKey}
                       onClick={item.onClick}
                       className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-xs text-slate-300 hover:bg-cyan-500/20 hover:text-cyan-100"
                     >
@@ -1000,7 +1001,7 @@ export function KnowledgeExplorer({
                               e.stopPropagation();
                               handleToggleCollect(id);
                             }}
-                            className="shrink-0 rounded-md p-1 text-slate-500 opacity-0 transition-all group-hover:opacity-100 hover:bg-white/10 hover:text-red-400"
+                            className="shrink-0 rounded-md p-1 text-slate-500 opacity-0 transition-smooth group-hover:opacity-100 hover:bg-white/10 hover:text-red-400"
                           >
                             <X size={12} />
                           </button>
@@ -1306,14 +1307,14 @@ export function KnowledgeExplorer({
                         const height = (count / maxCount) * 100;
                         return (
                           <div
-                            key={i}
+                            key={`depth-level-${i}`}
                             className="flex-1 flex flex-col items-center justify-end"
                           >
                             <span className="text-[9px] text-slate-500 mb-1">
                               {count}
                             </span>
                             <div
-                              className="w-full rounded-t bg-cyan-500/30 transition-all"
+                              className="w-full rounded-t bg-cyan-500/30 transition-[height]"
                               style={{ height: `${Math.max(4, height)}%` }}
                             />
                             <span className="text-[9px] text-slate-600 mt-1">
@@ -1378,7 +1379,7 @@ export function KnowledgeExplorer({
                     </div>
                     <div className="h-2 rounded-full bg-white/5 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-cyan-500/40 transition-all"
+                        className="h-full rounded-full bg-cyan-500/40 transition-[width]"
                         style={{
                           width: `${nodes.length > 0 ? (visitedIds.size / nodes.length) * 100 : 0}%`,
                         }}
@@ -1396,7 +1397,7 @@ export function KnowledgeExplorer({
                     </div>
                     <div className="h-2 rounded-full bg-white/5 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-amber-500/40 transition-all"
+                        className="h-full rounded-full bg-amber-500/40 transition-[width]"
                         style={{
                           width: `${nodes.length > 0 ? (collectedIds.size / nodes.length) * 100 : 0}%`,
                         }}
@@ -2051,7 +2052,7 @@ export function KnowledgeExplorer({
                         setTopicInput(suggestion);
                         setTimeout(() => handleGenerateMap(), 100);
                       }}
-                      className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300 transition-all hover:bg-cyan-500/20 hover:border-cyan-500/30 hover:text-cyan-300"
+                      className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300 transition-smooth hover:bg-cyan-500/20 hover:border-cyan-500/30 hover:text-cyan-300"
                     >
                       {suggestion}
                     </button>

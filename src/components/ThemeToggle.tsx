@@ -55,7 +55,7 @@ export function ThemeToggle() {
     <div ref={containerRef} className="fixed bottom-6 right-6 z-50 flex flex-col items-center">
       {/* Expanded Speed-Dial Options Container */}
       <div
-        className={`mb-3 flex flex-col items-center gap-2.5 transition-all duration-300 ease-out ${
+        className={`mb-3 flex flex-col items-center gap-2.5 transition-smooth duration-300 ease-out ${
           isOpen
             ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
             : "opacity-0 translate-y-4 scale-90 pointer-events-none"
@@ -77,7 +77,7 @@ export function ThemeToggle() {
                   setTheme(opt.id);
                   setIsOpen(false);
                 }}
-                className={`flex h-11 w-11 items-center justify-center rounded-full border border-white/80 dark:border-white/10 bg-white/90 dark:bg-slate-900/90 shadow-lg backdrop-blur-xl transition-all duration-200 hover:scale-110 active:scale-95 ${
+                className={`flex h-11 w-11 items-center justify-center rounded-full border border-white/80 dark:border-white/10 bg-white/90 dark:bg-slate-900/90 shadow-lg backdrop-blur-xl transition-smooth duration-200 hover:scale-110 active:scale-95 ${
                   isSelected ? opt.activeClass : "hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400"
                 }`}
                 aria-label={opt.label}
@@ -93,7 +93,7 @@ export function ThemeToggle() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex h-14 w-14 items-center justify-center rounded-full border border-white/90 dark:border-white/20 bg-white/95 dark:bg-slate-900/95 shadow-[0_12px_40px_rgba(15,23,42,0.22)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.6)] backdrop-blur-2xl transition-all duration-300 hover:scale-105 active:scale-95 ${
+        className={`flex h-14 w-14 items-center justify-center rounded-full border border-white/90 dark:border-white/20 bg-white/95 dark:bg-slate-900/95 shadow-[0_12px_40px_rgba(15,23,42,0.22)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.6)] backdrop-blur-2xl transition-smooth duration-300 hover:scale-105 active:scale-95 ${
           isOpen ? "ring-4 ring-cyan-500/30 rotate-90" : "hover:ring-2 hover:ring-cyan-500/20"
         }`}
         title="Toggle Theme"

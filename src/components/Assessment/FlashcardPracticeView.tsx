@@ -101,7 +101,7 @@ export function FlashcardPracticeView({
           <button
             type="button"
             onClick={onFinish}
-            className="w-full flex items-center justify-center gap-2 rounded-2xl bg-slate-950 dark:bg-white px-6 py-4 text-sm font-bold text-white dark:text-slate-950 shadow-md transition-all hover:bg-slate-800 dark:hover:bg-slate-100 hover:scale-[1.02]"
+            className="w-full flex items-center justify-center gap-2 rounded-2xl bg-slate-950 dark:bg-white px-6 py-4 text-sm font-bold text-white dark:text-slate-950 shadow-md transition-smooth hover:bg-slate-800 dark:hover:bg-slate-100 hover:scale-[1.02]"
           >
             <span>Return to Workspace Report & Map</span>
             <ArrowRight size={18} />
@@ -133,7 +133,7 @@ export function FlashcardPracticeView({
           </div>
           <div className="h-2 w-28 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
             <div
-              className="h-full bg-cyan-600 dark:bg-cyan-500 transition-all duration-300"
+              className="h-full bg-cyan-600 dark:bg-cyan-500 transition-[width] duration-300"
               style={{ width: `${Math.min(100, Math.max(5, progressPercent))}%` }}
             />
           </div>
@@ -144,7 +144,7 @@ export function FlashcardPracticeView({
       <div className="mx-auto w-full max-w-2xl flex-1 flex flex-col justify-center min-h-[380px]">
         <div
           onClick={handleFlip}
-          className="group relative cursor-pointer min-h-[360px] w-full rounded-[32px] border border-white/90 dark:border-white/10 bg-white dark:bg-slate-900 shadow-[0_20px_60px_rgba(15,23,42,0.08)] transition-all duration-500 hover:shadow-2xl"
+          className="group relative cursor-pointer min-h-[360px] w-full rounded-[32px] border border-white/90 dark:border-white/10 bg-white dark:bg-slate-900 shadow-[0_20px_60px_rgba(15,23,42,0.08)] transition-smooth duration-500 hover:shadow-2xl"
           style={{ perspective: "1000px" }}
         >
           {!isFlipped ? (
@@ -201,7 +201,7 @@ export function FlashcardPracticeView({
                     <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">Key Skills</span>
                     <ul className="space-y-1">
                       {currentCard.keyTakeaways.map((point, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-xs text-slate-300">
+                        <li key={point} className="flex items-start gap-2 text-xs text-slate-300">
                           <CheckCircle2 size={14} className="mt-0.5 shrink-0 text-emerald-400" />
                           <span>{point}</span>
                         </li>
@@ -228,7 +228,7 @@ export function FlashcardPracticeView({
                   <button
                     type="button"
                     onClick={() => handleRating("hard")}
-                    className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-rose-500/20 border border-rose-500/40 p-3 text-xs font-bold text-rose-300 hover:bg-rose-500/30 transition-all active:scale-95"
+                    className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-rose-500/20 border border-rose-500/40 p-3 text-xs font-bold text-rose-300 hover:bg-rose-500/30 transition-smooth active:scale-95"
                   >
                     <XCircle size={18} />
                     <span>Hard 🔴</span>
@@ -237,7 +237,7 @@ export function FlashcardPracticeView({
                   <button
                     type="button"
                     onClick={() => handleRating("good")}
-                    className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-amber-500/20 border border-amber-500/40 p-3 text-xs font-bold text-amber-300 hover:bg-amber-500/30 transition-all active:scale-95"
+                    className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-amber-500/20 border border-amber-500/40 p-3 text-xs font-bold text-amber-300 hover:bg-amber-500/30 transition-smooth active:scale-95"
                   >
                     <AlertCircle size={18} />
                     <span>Good 🟡</span>
@@ -246,7 +246,7 @@ export function FlashcardPracticeView({
                   <button
                     type="button"
                     onClick={() => handleRating("easy")}
-                    className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 p-3 text-xs font-bold text-emerald-300 hover:bg-emerald-500/30 transition-all active:scale-95"
+                    className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 p-3 text-xs font-bold text-emerald-300 hover:bg-emerald-500/30 transition-smooth active:scale-95"
                   >
                     <CheckCircle2 size={18} />
                     <span>Easy 🟢</span>

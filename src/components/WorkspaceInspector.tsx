@@ -37,7 +37,10 @@ export function WorkspaceInspector({
   const { nodeMap, parentMap, childrenMap, depthMap, root } = buildGraphMaps(nodes, edges);
   const selectedNode = selectedNodeId ? nodeMap.get(selectedNodeId) : root || null;
   const parentNode = selectedNode ? nodeMap.get(parentMap[selectedNode.id] || '') : null;
-  const childNodes = selectedNode ? (childrenMap[selectedNode.id] || []).map((childId) => nodeMap.get(childId)).filter(Boolean) as Node[] : [];
+  const childNodes = selectedNode ? (childrenMap[selectedNode.id] || []).flatMap((childId) => {
+    const node = nodeMap.get(childId);
+    return node ? [node] : [];
+  }) : [];
   const tags = Array.isArray(selectedNode?.data?.tags) ? (selectedNode?.data?.tags as string[]) : [];
 
   const handleSaveBranchToWiki = async () => {
@@ -56,9 +59,10 @@ export function WorkspaceInspector({
     };
     collectDescendants(selectedNode.id);
 
-    const subNodes = nodes
-      .filter((n) => descendantIds.has(n.id))
-      .map((n) => ({
+    const subNodes: MindMapData['nodes'] = [];
+    for (const n of nodes) {
+      if (!descendantIds.has(n.id)) continue;
+      subNodes.push({
         id: n.id,
         label: String(n.data?.label || ''),
         description: String(n.data?.description || ''),
@@ -66,15 +70,18 @@ export function WorkspaceInspector({
         importance: (n.data?.importance as "high" | "medium" | "low") || 'medium',
         tags: Array.isArray(n.data?.tags) ? (n.data?.tags as string[]) : [],
         nextStep: n.data?.nextStep as string | undefined,
-      }));
+      });
+    }
 
-    const subEdges = edges
-      .filter((e) => descendantIds.has(e.source) && descendantIds.has(e.target))
-      .map((e) => ({
+    const subEdges: MindMapData['edges'] = [];
+    for (const e of edges) {
+      if (!descendantIds.has(e.source) || !descendantIds.has(e.target)) continue;
+      subEdges.push({
         source: e.source,
         target: e.target,
         label: e.label as string | undefined,
-      }));
+      });
+    }
 
     const title = String(selectedNode.data?.label || 'Untitled Concept');
 
@@ -102,7 +109,7 @@ export function WorkspaceInspector({
               onClick={handleSaveBranchToWiki}
               disabled={savedToWiki}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] transition-all",
+                "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] transition-smooth",
                 savedToWiki
                   ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 ring-1 ring-emerald-200 dark:ring-emerald-800/40"
                   : "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 ring-1 ring-indigo-100 dark:ring-indigo-800/40"
@@ -159,7 +166,7 @@ export function WorkspaceInspector({
       {selectedNode?.data?.assessmentStatus && (
         <section
           className={cn(
-            "rounded-[28px] border p-5 transition-all shadow-sm",
+            "rounded-[28px] border p-5 transition-smooth shadow-sm",
             selectedNode.data.assessmentStatus === "mastered"
               ? "border-emerald-200 bg-emerald-50/70"
               : selectedNode.data.assessmentStatus === "review"
@@ -213,7 +220,7 @@ export function WorkspaceInspector({
             <button
               type="button"
               onClick={() => onStartFlashcards([selectedNode.id])}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-purple-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-purple-700 active:scale-95"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-purple-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition-smooth hover:bg-purple-700 active:scale-95"
             >
               <span>🃏 Study Flashcards for this Node</span>
             </button>
@@ -260,7 +267,7 @@ export function WorkspaceInspector({
               <button
                 type="button"
                 onClick={() => onSelectNode(parentNode.id)}
-                className="flex w-full items-center justify-between rounded-2xl bg-slate-50 dark:bg-slate-800 p-4 text-left transition-all hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-[0.98]"
+                className="flex w-full items-center justify-between rounded-2xl bg-slate-50 dark:bg-slate-800 p-4 text-left transition-smooth hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-[0.98]"
               >
                 <div className="min-w-0">
                   <p className="truncate text-[13px] font-black text-slate-900 dark:text-white leading-none">{String(parentNode.data?.label || 'Untitled')}</p>
@@ -285,7 +292,7 @@ export function WorkspaceInspector({
                     type="button"
                     onClick={() => onSelectNode(childNode.id)}
                     className={cn(
-                      'flex w-full items-center justify-between rounded-2xl p-4 text-left transition-all active:scale-[0.98]',
+                      'flex w-full items-center justify-between rounded-2xl p-4 text-left transition-smooth active:scale-[0.98]',
                       childNode.id === selectedNodeId 
                         ? 'bg-cyan-50 dark:bg-cyan-950/60 shadow-[inset_0_0_0_2px_rgba(6,182,212,0.1)]' 
                         : 'bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700'
@@ -322,7 +329,7 @@ export function WorkspaceInspector({
       </section>
 
       {comparisonData && (
-        <section className="group rounded-[32px] bg-[linear-gradient(135deg,rgba(255,251,235,0.7),rgba(255,255,255,0.8))] p-6 ring-1 ring-amber-100 shadow-sm transition-all hover:ring-amber-200">
+        <section className="group rounded-[32px] bg-[linear-gradient(135deg,rgba(255,251,235,0.7),rgba(255,255,255,0.8))] p-6 ring-1 ring-amber-100 shadow-sm transition-smooth hover:ring-amber-200">
           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-amber-700">
             <Compass size={14} className="animate-spin-slow" />
             Decision Intelligence

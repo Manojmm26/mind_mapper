@@ -63,7 +63,7 @@ export function WikiActivityLogTab({
         logs.map((log) => (
           <div
             key={log.id}
-            className="group flex items-start gap-3 rounded-[20px] border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white dark:border-white/10 dark:from-slate-800/80 dark:to-slate-900/90 p-4 shadow-sm transition-all hover:border-cyan-200 dark:hover:border-cyan-500/50 hover:shadow-md"
+            className="group flex items-start gap-3 rounded-[20px] border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white dark:border-white/10 dark:from-slate-800/80 dark:to-slate-900/90 p-4 shadow-sm transition-smooth hover:border-cyan-200 dark:hover:border-cyan-500/50 hover:shadow-md"
           >
             <div
               className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${getLogColor(log.type)}`}

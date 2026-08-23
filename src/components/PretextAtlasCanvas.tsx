@@ -197,16 +197,19 @@ function buildAtlasScene(
   const parentNode = layout.parentMap[focusId]
     ? nodeMap.get(layout.parentMap[focusId] as string) || null
     : null;
-  const childNodes = (layout.childrenMap[focusId] || [])
-    .map((childId) => nodeMap.get(childId))
-    .filter(Boolean) as PretextMapNode[];
-  const siblingNodes = parentNode
-    ? ((layout.childrenMap[parentNode.id] || [])
-        .filter((nodeId) => nodeId !== focusId)
-        .map((nodeId) => nodeMap.get(nodeId))
-        .filter(Boolean)
-        .slice(0, 4) as PretextMapNode[])
-    : [];
+  const childNodes = (layout.childrenMap[focusId] || []).flatMap((childId) => {
+    const node = nodeMap.get(childId);
+    return node ? [node] : [];
+  });
+  const siblingNodes: PretextMapNode[] = [];
+  if (parentNode) {
+    for (const nodeId of layout.childrenMap[parentNode.id] || []) {
+      if (siblingNodes.length >= 4) break;
+      if (nodeId === focusId) continue;
+      const node = nodeMap.get(nodeId);
+      if (node) siblingNodes.push(node);
+    }
+  }
   const ancestorNodes = getAncestorChain(layout, focusId, nodeMap)
     .slice(0, -1)
     .slice(-3);
@@ -591,10 +594,12 @@ function drawNodeCard(
   context.restore();
 }
 
+const EMPTY_NODE_IDS: string[] = [];
+
 export function PretextAtlasCanvas({
   layout,
   selectedNodeId,
-  visitedNodeIds = [],
+  visitedNodeIds = EMPTY_NODE_IDS,
   onSelectNode,
 }: PretextAtlasCanvasProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -610,7 +615,6 @@ export function PretextAtlasCanvas({
   const [showInstructions, setShowInstructions] = useState(true);
   const [showAtlasInfo, setShowAtlasInfo] = useState(true);
   const [isFocused, setIsFocused] = useState(false);
-  const [pressedNodeId, setPressedNodeId] = useState<string | null>(null);
 
   const nodeMap = useMemo(
     () => new Map(layout.nodes.map((node) => [node.id, node])),
@@ -1140,8 +1144,8 @@ export function PretextAtlasCanvas({
       setHighlightedChildId(hit.id);
     }
 
-    if (pressedNodeId && pressedNodeId !== hit?.id) {
-      setPressedNodeId(null);
+    if (pressedNodeIdRef.current && pressedNodeIdRef.current !== hit?.id) {
+      pressedNodeIdRef.current = null;
     }
   };
 
@@ -1149,7 +1153,6 @@ export function PretextAtlasCanvas({
     event.currentTarget.focus();
     const hit = getPointerHit(event.clientX, event.clientY);
     pressedNodeIdRef.current = hit?.id || null;
-    setPressedNodeId(hit?.id || null);
   };
 
   const handlePointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -1159,7 +1162,6 @@ export function PretextAtlasCanvas({
     }
 
     pressedNodeIdRef.current = null;
-    setPressedNodeId(null);
   };
 
   const handleKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {

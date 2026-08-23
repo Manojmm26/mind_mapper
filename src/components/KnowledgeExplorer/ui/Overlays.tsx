@@ -60,7 +60,7 @@ export function OnboardingOverlay({ onDismiss }: OnboardingOverlayProps) {
           </div>
           <button
             onClick={onDismiss}
-            className="mt-6 w-full rounded-2xl bg-cyan-500 px-4 py-3 text-sm font-bold text-white shadow-lg transition-all hover:bg-cyan-400 active:scale-[0.98]"
+            className="mt-6 w-full rounded-2xl bg-cyan-500 px-4 py-3 text-sm font-bold text-white shadow-lg transition-smooth hover:bg-cyan-400 active:scale-[0.98]"
           >
             Get Started
           </button>
@@ -352,7 +352,7 @@ export function DeleteConfirmation({
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 rounded-2xl bg-red-500 px-4 py-3 text-sm font-bold text-white shadow-lg transition-all hover:bg-red-400 active:scale-[0.98]"
+            className="flex-1 rounded-2xl bg-red-500 px-4 py-3 text-sm font-bold text-white shadow-lg transition-smooth hover:bg-red-400 active:scale-[0.98]"
           >
             Delete
           </button>

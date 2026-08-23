@@ -182,7 +182,10 @@ function buildTunnelScene(
 
   const parentId = layout.parentMap[focusId];
   const parentNode = parentId ? nodeMap.get(parentId) || null : null;
-  const childNodes = (layout.childrenMap[focusId] || []).map((childId) => nodeMap.get(childId)).filter(Boolean) as PretextMapNode[];
+  const childNodes = (layout.childrenMap[focusId] || []).flatMap((childId) => {
+    const node = nodeMap.get(childId);
+    return node ? [node] : [];
+  });
   const sceneNodes: TunnelNode[] = [];
 
   if (parentNode) {
@@ -410,10 +413,12 @@ function drawTunnelCard(
   context.restore();
 }
 
+const EMPTY_NODE_IDS: string[] = [];
+
 export function PretextTunnelCanvas({
   layout,
   selectedNodeId,
-  visitedNodeIds = [],
+  visitedNodeIds = EMPTY_NODE_IDS,
   onSelectNode,
 }: PretextTunnelCanvasProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);

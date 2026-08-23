@@ -344,9 +344,10 @@ export function useKnowledgeExplorer({
 
   const focusNode = focusId ? nodeMap.get(focusId) || null : null;
   const childNodes = focusId
-    ? ((childrenMap[focusId] || [])
-        .map((id) => nodeMap.get(id))
-        .filter(Boolean) as ExplorerNode[])
+    ? (childrenMap[focusId] || []).flatMap((id) => {
+        const node = nodeMap.get(id);
+        return node ? [node] : [];
+      })
     : [];
   const parentNode =
     focusId && parentMap[focusId]
@@ -906,9 +907,10 @@ export function useKnowledgeExplorer({
   const handleExportCollectedSummary = useCallback(() => {
     if (collectedIds.size === 0) return;
 
-    const collectedNodes = Array.from(collectedIds)
-      .map((id) => nodeMap.get(id))
-      .filter(Boolean) as ExplorerNode[];
+    const collectedNodes = Array.from(collectedIds).flatMap((id) => {
+      const node = nodeMap.get(id);
+      return node ? [node] : [];
+    });
 
     let summary = `# Collected Nodes — Knowledge Explorer\n\n`;
     summary += `Generated: ${new Date().toISOString().split("T")[0]}\n`;

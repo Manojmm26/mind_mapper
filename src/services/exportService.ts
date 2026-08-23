@@ -277,10 +277,11 @@ export function exportLayoutToSvg(
 
     svg += `  <g transform="translate(${offsetX}, ${offsetY})">\n`;
 
-    svg += `    <g id="edges">\n`;
+    svg += `  <g id="edges">\n`;
+    const nodesById = new Map(layout.nodes.map((n) => [n.id, n]));
     for (const edge of layout.edges) {
-      const source = layout.nodes.find((n) => n.id === edge.source);
-      const target = layout.nodes.find((n) => n.id === edge.target);
+      const source = nodesById.get(edge.source);
+      const target = nodesById.get(edge.target);
 
       if (!source || !target) continue;
 
